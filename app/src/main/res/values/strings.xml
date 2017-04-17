@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Bnade</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="wow_tokens">时光徽章</string>
+    <string name="item_search">物价查询</string>
+    <string name="realm_rank">服务器排行</string>
+    <string name="search_rank">搜索排行</string>
+    <string name="wow_token_current_price">当前价格</string>
+    <string name="wow_token_modified_time">更新时间</string>
+    <string name="wow_token_min_price">24小时最低价</string>
+    <string name="wow_token_max_price">24小时最高价</string>
+    <string name="gold">%1$d金</string>
+    <string name="full_gold">%1$d金%2$d银%3$d铜</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search_hot_label">热门搜索</string>
+    <string name="search_hot_month">每月</string>
+    <string name="search_hot_week">每周</string>
+    <string name="search_hot_day">每日</string>
+    <string name="search_history_label">搜索历史</string>
+    <string name="result_avg_buyout">全服均价：%1$s</string>
+    <string name="realm_rank_total_count">拍卖总数</string>
+    <string name="realm_rank_user_count">拍卖玩家数</string>
+    <string name="realm_rank_item_kind">物品种类</string>
+    <string name="realm_rank_update_time">更新时间</string>
+    <string name="search_result_filter_hint">过滤服务器</string>
+</resources>
