@@ -5,6 +5,13 @@ package com.summer.lib.model.entity;
  */
 
 public class AuctionRealm {
+    public enum SortType {
+        TotalUp, TotalDown, PlayerUp, PlayerDown, ItemUp, ItemDown, TimeUp, TimeDown
+    }
+
+    public static final String PVP = "pvp";
+    public static final String PVE = "pve";
+
     private long id;
     private String type;
     private Realm realm;

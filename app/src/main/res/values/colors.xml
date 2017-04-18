@@ -4,4 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="black">#000000</color>
+    <color name="pvp_label">#a94442</color>
+    <color name="pve_label">#337ab7</color>
 </resources>

@@ -1,5 +1,6 @@
 package com.summer.bnade.realmrank;
 
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.TextView;
 
@@ -8,6 +9,8 @@ import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.lib.model.entity.AuctionRealm;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +50,9 @@ class RealmRankAdapter extends BaseAdapter<AuctionRealm, RealmRankAdapter.ViewHo
         public void onBind(AuctionRealm auctionRealm) {
             mTvRealmName.setText(auctionRealm.getRealm().getConnected());
             mTvRealmType.setText(auctionRealm.getType());
+            mTvRealmType.setTextColor(Objects.equals(auctionRealm.getType(), AuctionRealm.PVP)
+                    ? ContextCompat.getColor(itemView.getContext(), R.color.pvp_label)
+                    : ContextCompat.getColor(itemView.getContext(), R.color.pve_label));
             mTvTotalCount.setText(String.valueOf(auctionRealm.getAuctionQuantity()));
             mTvUserCount.setText(String.valueOf(auctionRealm.getPlayerQuantity()));
             mTvItemKind.setText(String.valueOf(auctionRealm.getItemQuantity()));

@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface RealmRankContract {
     interface View extends BaseView<Presenter> {
-        void show(List<AuctionRealm> list);
+        void show(List<AuctionRealm> list, AuctionRealm.SortType sortType);
 
         void setDependency(RealmRankAdapter adapter);
 
@@ -20,5 +20,7 @@ public interface RealmRankContract {
 
     interface Presenter {
         void load();
+
+        void sort(AuctionRealm.SortType sortType);
     }
 }

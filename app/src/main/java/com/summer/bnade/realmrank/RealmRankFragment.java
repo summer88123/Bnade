@@ -18,6 +18,7 @@ import com.summer.lib.model.entity.AuctionRealm;
 import java.util.List;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
@@ -41,8 +42,13 @@ public class RealmRankFragment extends BaseFragment implements RealmRankContract
     TextView mTvUpdateTime;
     @BindView(R.id.refresh_layout)
     SwipeRefreshLayout mRefreshLayout;
+    @BindViews({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})
+    List<TextView> labels;
+
+
     private RealmRankContract.Presenter mPresenter;
     private RealmRankAdapter mAdapter;
+    private AuctionRealm.SortType lastType;
 
     @SuppressWarnings("unused")
     public static RealmRankFragment newInstance() {
@@ -74,9 +80,14 @@ public class RealmRankFragment extends BaseFragment implements RealmRankContract
     }
 
     @Override
-    public void show(List<AuctionRealm> list) {
-        setRefreshing(false);
+    public void show(List<AuctionRealm> list, AuctionRealm.SortType sortType) {
+        updateSortType(sortType);
         this.mAdapter.update(list);
+    }
+
+    private void updateSortType(AuctionRealm.SortType sortType) {
+        this.lastType = sortType;
+        // TODO: 2017/4/19 切换动画
     }
 
     @Override
@@ -102,15 +113,31 @@ public class RealmRankFragment extends BaseFragment implements RealmRankContract
 
     @OnClick({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})
     public void onViewClicked(View view) {
+        AuctionRealm.SortType last = lastType;
+        AuctionRealm.SortType current;
         switch (view.getId()) {
-            case R.id.tv_total_count:
-                break;
             case R.id.tv_user_count:
+                current = last == AuctionRealm.SortType.PlayerDown
+                        ? AuctionRealm.SortType.PlayerUp
+                        : AuctionRealm.SortType.PlayerDown;
                 break;
             case R.id.tv_item_kind:
+                current = last == AuctionRealm.SortType.ItemDown
+                        ? AuctionRealm.SortType.ItemUp
+                        : AuctionRealm.SortType.ItemDown;
                 break;
             case R.id.tv_update_time:
+                current = last == AuctionRealm.SortType.TimeDown
+                        ? AuctionRealm.SortType.TimeUp
+                        : AuctionRealm.SortType.TimeDown;
+                break;
+            case R.id.tv_total_count:
+            default:
+                current = last == AuctionRealm.SortType.TotalDown
+                        ? AuctionRealm.SortType.TotalUp
+                        : AuctionRealm.SortType.TotalDown;
                 break;
         }
+        mPresenter.sort(current);
     }
 }
