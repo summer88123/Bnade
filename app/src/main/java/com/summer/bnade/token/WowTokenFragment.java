@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
-import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -45,8 +44,11 @@ public class WowTokenFragment extends BaseFragment implements WowTokenContract.V
     TextView mTvMaxPrice;
     @BindView(R.id.refresh_layout)
     SwipeRefreshLayout mRefreshLayout;
-    @BindView(R.id.chart1)
+    @BindView(R.id.chart_one_day)
     LineChart mChart;
+    @BindView(R.id.chart_history)
+    LineChart mChartHistory;
+
     Unbinder unbinder;
     private WowTokenContract.Presenter mPresenter;
 
@@ -74,33 +76,18 @@ public class WowTokenFragment extends BaseFragment implements WowTokenContract.V
         mRefreshLayout.setOnRefreshListener(this);
 
         initChart();
+        initHistoryChart();
         return view;
     }
 
-    private void initChart() {
-        mChart.setViewPortOffsets(0, 0, 0, 0);
+    private void initHistoryChart() {
+        mChartHistory.setViewPortOffsets(0, 0, 0, 0);
+        mChartHistory.getDescription().setEnabled(false);
+        mChartHistory.setDrawGridBackground(false);
+        mChartHistory.setMaxHighlightDistance(300);
 
-        // no description text
-        mChart.getDescription().setEnabled(false);
-
-        // enable touch gestures
-        mChart.setTouchEnabled(true);
-
-        // enable scaling and dragging
-        mChart.setDragEnabled(true);
-        mChart.setScaleEnabled(true);
-
-        // if disabled, scaling can be done on x- and y-axis separately
-        mChart.setPinchZoom(false);
-
-        mChart.setDrawGridBackground(false);
-        mChart.setMaxHighlightDistance(300);
-
-        XAxis x = mChart.getXAxis();
-        x.setEnabled(false);
-
-        YAxis y = mChart.getAxisLeft();
-        y.setLabelCount(6, false);
+        YAxis y = mChartHistory.getAxisRight();
+        y.setLabelCount(4, false);
         y.setTextColor(Color.BLACK);
         y.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         y.setGridColor(Color.BLACK);
@@ -117,14 +104,37 @@ public class WowTokenFragment extends BaseFragment implements WowTokenContract.V
             }
         });
 
-        mChart.getAxisRight().setEnabled(false);
+        mChartHistory.getAxisLeft().setEnabled(false);
+        mChartHistory.getLegend().setEnabled(false);
+        mChartHistory.animateXY(2000, 2000);
+    }
 
+    private void initChart() {
+        mChart.setViewPortOffsets(0, 0, 0, 0);
+        mChart.getDescription().setEnabled(false);
+        mChart.setDrawGridBackground(false);
+        mChart.setMaxHighlightDistance(300);
+
+        YAxis y = mChart.getAxisRight();
+        y.setLabelCount(4, false);
+        y.setTextColor(Color.BLACK);
+        y.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
+        y.setGridColor(Color.BLACK);
+        y.setAxisLineColor(Color.BLACK);
+        y.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return (int) (value / 10000) + "wG";
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return -1;
+            }
+        });
+
+        mChart.getAxisLeft().setEnabled(false);
         mChart.getLegend().setEnabled(false);
-
-        mChart.animateXY(2000, 2000);
-
-        // dont forget to refresh the drawing
-        mChart.invalidate();
     }
 
     @Override
@@ -144,6 +154,47 @@ public class WowTokenFragment extends BaseFragment implements WowTokenContract.V
         mTvModifiedTime.setText(DateUtil.format(current.getLastModified(), "M月d日 H:m:s"));
         mTvMinPrice.setText(getString(R.string.gold, current.getMinGold()));
         mTvMaxPrice.setText(getString(R.string.gold, current.getMaxGold()));
+    }
+
+    @Override
+    public void showHistoryChart(List<Entry> allTokens) {
+        LineDataSet set1;
+
+        if (mChartHistory.getData() != null &&
+                mChartHistory.getData().getDataSetCount() > 0) {
+            set1 = (LineDataSet) mChartHistory.getData().getDataSetByIndex(0);
+            set1.setValues(allTokens);
+            mChartHistory.getData().notifyDataChanged();
+            mChartHistory.notifyDataSetChanged();
+        } else {
+            // create a dataset and give it a type
+            set1 = new LineDataSet(allTokens, "DataSet 1");
+
+            set1.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+            set1.setCubicIntensity(0.2f);
+            set1.setDrawFilled(true);
+            set1.setDrawCircles(false);
+            set1.setLineWidth(2.4f);
+            set1.setHighlightEnabled(false);
+            set1.setColor(Color.BLUE);
+            set1.setFillColor(Color.BLUE);
+            set1.setFillAlpha(50);
+            set1.setFillFormatter(new IFillFormatter() {
+                @Override
+                public float getFillLinePosition(ILineDataSet dataSet, LineDataProvider dataProvider) {
+                    return -10;
+                }
+            });
+
+            // create a data object with the datasets
+            LineData data1 = new LineData(set1);
+            data1.setValueTextSize(9f);
+            data1.setDrawValues(false);
+
+            // set data
+            mChartHistory.setData(data1);
+        }
+        mChartHistory.animateXY(2000, 2000);
     }
 
     @Override

@@ -14,6 +14,8 @@ public interface WowTokenContract {
     interface View extends BaseView<Presenter> {
         void showCurrentToken(WowTokenVO current);
 
+        void showHistoryChart(List<Entry> allTokens);
+
         void showOneDayChart(List<Entry> data);
 
         void refreshOver();

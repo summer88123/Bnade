@@ -60,7 +60,7 @@
                     />
 
                 <com.github.mikephil.charting.charts.CombinedChart
-                    android:id="@+id/chart1"
+                    android:id="@+id/chart"
                     android:layout_width="0dp"
                     android:layout_height="200dp"
                     app:layout_constraintBottom_toBottomOf="parent"

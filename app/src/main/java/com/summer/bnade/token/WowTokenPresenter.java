@@ -14,10 +14,12 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
@@ -29,6 +31,19 @@ import io.reactivex.schedulers.Schedulers;
 
 public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> implements WowTokenContract.Presenter {
 
+    private Comparator<? super WowTokens> timeComparator = new Comparator<WowTokens>() {
+        @Override
+        public int compare(WowTokens wowTokens, WowTokens t1) {
+            return (int) (wowTokens.getLastModified() - t1.getLastModified());
+        }
+    };
+    private Comparator<? super WowTokens> goldComparator = new Comparator<WowTokens>() {
+        @Override
+        public int compare(WowTokens wowTokens, WowTokens t1) {
+            return wowTokens.getGold() - t1.getGold();
+        }
+    };
+
     @Inject
     WowTokenPresenter(WowTokenContract.View view, BnadeRepo repo) {
         super(view, repo);
@@ -36,49 +51,31 @@ public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> impl
 
     @Override
     public void load() {
-        final long oneDay = 24 * 3600 * 1000L;
         mRepo.getWowTokens()
-                .flatMapObservable(new Function<List<WowTokens>, ObservableSource<WowTokens>>() {
+                .flatMap(new Function<List<WowTokens>, SingleSource<WowTokenVO>>() {
                     @Override
-                    public ObservableSource<WowTokens> apply(@NonNull List<WowTokens> wowTokenses) throws Exception {
-                        return Observable.fromIterable(wowTokenses);
-                    }
-                })
-                .filter(new Predicate<WowTokens>() {
-                    @Override
-                    public boolean test(@NonNull WowTokens wowTokens) throws Exception {
-                        long current = System.currentTimeMillis();
-                        return (current - wowTokens.getLastModified()) < oneDay;
-                    }
-                })
-                .toSortedList(new Comparator<WowTokens>() {
-                    @Override
-                    public int compare(WowTokens wowTokens, WowTokens t1) {
-                        return wowTokens.getGold() - t1.getGold();
-                    }
-                })
-                .map(new Function<List<WowTokens>, WowTokenVO>() {
-                    @Override
-                    public WowTokenVO apply(@NonNull List<WowTokens> wowTokenses) throws Exception {
-                        final WowTokenVO token = new WowTokenVO();
-                        int last = wowTokenses.size() - 1;
-                        token.setMinGold(wowTokenses.get(0).getGold());
-                        token.setMaxGold(wowTokenses.get(last).getGold());
+                    public SingleSource<WowTokenVO> apply(@NonNull List<WowTokens> wowTokenses) throws Exception {
+                        return Single.zip(getOnedayData(wowTokenses), getSortedAllData(wowTokenses),
+                                new BiFunction<List<WowTokens>, List<WowTokens>, WowTokenVO>() {
+                                    @Override
+                                    public WowTokenVO apply(@NonNull List<WowTokens> oneDay, @NonNull
+                                            List<WowTokens> all) throws Exception {
+                                        final WowTokenVO token = new WowTokenVO();
+                                        int last = oneDay.size() - 1;
+                                        token.setMinGold(oneDay.get(0).getGold());
+                                        token.setMaxGold(oneDay.get(last).getGold());
 
-                        Collections.sort(wowTokenses, new Comparator<WowTokens>() {
-                            @Override
-                            public int compare(WowTokens wowTokens, WowTokens t1) {
-                                return (int) (wowTokens.getLastModified() - t1.getLastModified());
-                            }
-                        });
-                        token.setCurrentGold(wowTokenses.get(last).getGold());
-                        token.setLastModified(wowTokenses.get(last).getLastModified());
+                                        Collections.sort(oneDay, timeComparator);
+                                        token.setCurrentGold(oneDay.get(last).getGold());
+                                        token.setLastModified(oneDay.get(last).getLastModified());
 
-                        token.setTokens(convert(wowTokenses));
-                        return token;
+                                        token.setOneDayTokens(convert(oneDay));
+                                        token.setAllTokens(convert(all));
+                                        return token;
+                                    }
+                                });
                     }
                 })
-                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnSubscribe(new Consumer<Disposable>() {
                     @Override
@@ -91,9 +88,30 @@ public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> impl
                     public void accept(@NonNull WowTokenVO wowTokenVO) throws Exception {
                         mView.refreshOver();
                         mView.showCurrentToken(wowTokenVO);
-                        mView.showOneDayChart(wowTokenVO.getTokens());
+                        mView.showOneDayChart(wowTokenVO.getOneDayTokens());
+                        mView.showHistoryChart(wowTokenVO.getAllTokens());
                     }
                 });
+    }
+
+    private SingleSource<? extends List<WowTokens>> getSortedAllData(List<WowTokens> all) {
+        return Observable.fromIterable(all)
+                .toSortedList(timeComparator)
+                .subscribeOn(Schedulers.computation());
+    }
+
+    private Single<List<WowTokens>> getOnedayData(List<WowTokens> all) {
+        final long oneDay = 24 * 3600 * 1000L;
+        return Observable.fromIterable(all)
+                .filter(new Predicate<WowTokens>() {
+                    @Override
+                    public boolean test(@NonNull WowTokens wowTokens) throws Exception {
+                        long current = System.currentTimeMillis();
+                        return (current - wowTokens.getLastModified()) < oneDay;
+                    }
+                })
+                .toSortedList(goldComparator)
+                .subscribeOn(Schedulers.computation());
     }
 
     private List<Entry> convert(List<WowTokens> list) {

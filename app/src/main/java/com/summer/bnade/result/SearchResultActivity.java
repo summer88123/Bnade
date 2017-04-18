@@ -47,7 +47,7 @@ public class SearchResultActivity extends BaseActivity implements SearchResultCo
     TextView mTvAvgBuyout;
     @BindView(R.id.iv_item_icon)
     ImageView mIvItemIcon;
-    @BindView(R.id.chart1)
+    @BindView(R.id.chart)
     CombinedChart mChart;
 
     @Override

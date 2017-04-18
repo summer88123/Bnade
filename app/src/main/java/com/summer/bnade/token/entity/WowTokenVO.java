@@ -13,14 +13,23 @@ public class WowTokenVO {
     private long lastModified;
     private int minGold;
     private int maxGold;
-    private List<Entry> tokens;
+    private List<Entry> oneDayTokens;
+    private List<Entry> allTokens;
 
-    public List<Entry> getTokens() {
-        return tokens;
+    public List<Entry> getAllTokens() {
+        return allTokens;
     }
 
-    public void setTokens(List<Entry> tokens) {
-        this.tokens = tokens;
+    public void setAllTokens(List<Entry> allTokens) {
+        this.allTokens = allTokens;
+    }
+
+    public List<Entry> getOneDayTokens() {
+        return oneDayTokens;
+    }
+
+    public void setOneDayTokens(List<Entry> oneDayTokens) {
+        this.oneDayTokens = oneDayTokens;
     }
 
     public int getCurrentGold() {

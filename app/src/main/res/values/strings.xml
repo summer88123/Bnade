@@ -29,4 +29,7 @@
     <string name="realm_rank_item_kind">物品种类</string>
     <string name="realm_rank_update_time">更新时间</string>
     <string name="search_result_filter_hint">过滤服务器</string>
+    <string name="wow_token_one_day">24小时内</string>
+    <string name="scope">~</string>
+    <string name="wow_token_history">历史数据</string>
 </resources>
