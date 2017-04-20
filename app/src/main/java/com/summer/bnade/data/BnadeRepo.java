@@ -78,6 +78,10 @@ public class BnadeRepo {
                 .toList();
     }
 
+    public Single<List<Realm>> getRealmsByName(CharSequence s) {
+        return mRealmHelper.getRealmsByName(s.toString()).toList();
+    }
+
     public Single<List<WowTokens>> getWowTokens() {
         return api.getAhWowtokens();
     }
@@ -111,5 +115,9 @@ public class BnadeRepo {
                     }
                 })
                 .toList();
+    }
+
+    public Single<List<Realm>> getAllRealm(boolean hasAllItem) {
+        return mRealmHelper.getAllRealm(hasAllItem).toList();
     }
 }

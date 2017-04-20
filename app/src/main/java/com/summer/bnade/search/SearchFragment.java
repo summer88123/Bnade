@@ -3,6 +3,7 @@ package com.summer.bnade.search;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -13,6 +14,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
@@ -21,7 +23,10 @@ import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.result.SearchResultActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
+import com.summer.bnade.select.RealmSelectActivity;
+import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Hot;
+import com.summer.lib.model.entity.Realm;
 
 import java.util.List;
 
@@ -34,7 +39,7 @@ import butterknife.Unbinder;
 
 import static com.summer.bnade.R.id.searchView;
 
-public class SearchFragment extends BaseFragment implements SearchContract.View {
+public class SearchFragment extends BaseFragment<SearchContract.Presenter> implements SearchContract.View {
     public static final String TAG = SearchFragment.class.getSimpleName();
     @BindView(searchView)
     SearchView mSearchView;
@@ -50,18 +55,19 @@ public class SearchFragment extends BaseFragment implements SearchContract.View 
     @BindView(R.id.fuzzy_list)
     RecyclerView mFuzzyList;
     @Inject
-    SearchContract.Presenter mPresenter;
-    @Inject
     HotSearchAdapter mHotAdapter;
     @Inject
     HistoryAdapter mHistoriesAdapter;
     @Inject
     FuzzyItemAdapter mFuzzyAdapter;
+    @BindView(R.id.btn_realm_select)
+    Button mBtnRealmSelect;
 
     @OnClick(R.id.ib_clear_histories)
     public void onClick() {
         mPresenter.clearHistories();
     }
+
 
     public static SearchFragment newInstance() {
         return new SearchFragment();
@@ -109,7 +115,6 @@ public class SearchFragment extends BaseFragment implements SearchContract.View 
             @Override
             public boolean onQueryTextSubmit(String s) {
                 mPresenter.search(s, true);
-
                 return false;
             }
 
@@ -121,6 +126,11 @@ public class SearchFragment extends BaseFragment implements SearchContract.View 
         });
 
         return view;
+    }
+
+    @OnClick(R.id.btn_realm_select)
+    public void onViewClicked() {
+        startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
     }
 
     private boolean isFuzzyListVisible() {
@@ -135,13 +145,18 @@ public class SearchFragment extends BaseFragment implements SearchContract.View 
     }
 
     @Override
-    public void setPresenter(SearchContract.Presenter presenter) {
-        this.mPresenter = presenter;
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
+            Realm realm = data.getParcelableExtra(Content.EXTRA_DATA);
+            mBtnRealmSelect.setText(realm.getConnected());
+            mPresenter.selectRealm(realm);
+        }
     }
 
     @Override
     public void hideFuzzyList(String text) {
-        if (isFuzzyListVisible()){
+        if (isFuzzyListVisible()) {
             mFuzzyList.setVisibility(View.GONE);
         }
         if (!TextUtils.isEmpty(text)) {

@@ -25,11 +25,14 @@
     <string name="search_history_label">搜索历史</string>
     <string name="result_avg_buyout">全服均价：%1$s</string>
     <string name="realm_rank_total_count">拍卖总数</string>
-    <string name="realm_rank_user_count">拍卖玩家数</string>
+    <string name="realm_rank_user_count">玩家数</string>
     <string name="realm_rank_item_kind">物品种类</string>
     <string name="realm_rank_update_time">更新时间</string>
     <string name="search_result_filter_hint">过滤服务器</string>
     <string name="wow_token_one_day">24小时内</string>
     <string name="scope">~</string>
     <string name="wow_token_history">历史数据</string>
+    <string name="realm_select_search_hint">过滤服务器</string>
+    <string name="realm_select_no_match">没有找到服务器</string>
+    <string name="btn_realm_select">选择服务器</string>
 </resources>

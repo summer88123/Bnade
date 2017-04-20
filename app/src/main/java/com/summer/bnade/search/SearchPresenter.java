@@ -9,6 +9,7 @@ import com.summer.bnade.search.entity.SearchVO;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
     private final HistorySearchRepo mHistorySearchRepo;
 
     private SearchVO mSearchVO;
+    private Realm currentRealm;
 
     @Inject
     SearchPresenter(SearchContract.View view, BnadeRepo repo, HistorySearchRepo historySearchRepo) {
@@ -152,6 +154,11 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                         mView.showToast("异常");
                     }
                 });
+    }
+
+    @Override
+    public void selectRealm(Realm realm) {
+        this.currentRealm = realm;
     }
 
     @Override

@@ -1,7 +1,11 @@
 package com.summer.bnade.realmrank;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +21,7 @@ import com.summer.lib.model.entity.AuctionRealm;
 
 import java.util.List;
 
+import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
@@ -26,7 +31,8 @@ import butterknife.Unbinder;
 /**
  * interface.
  */
-public class RealmRankFragment extends BaseFragment implements RealmRankContract.View, SwipeRefreshLayout
+public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter> implements RealmRankContract.View,
+        SwipeRefreshLayout
         .OnRefreshListener {
     public static final String TAG = RealmRankFragment.class.getSimpleName();
     @BindView(R.id.list)
@@ -44,11 +50,24 @@ public class RealmRankFragment extends BaseFragment implements RealmRankContract
     SwipeRefreshLayout mRefreshLayout;
     @BindViews({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})
     List<TextView> labels;
+    @BindDrawable(R.drawable.ic_arrow_drop_up_black_24dp)
+    Drawable up;
+    @BindDrawable(R.drawable.ic_arrow_drop_down_black_24dp)
+    Drawable down;
+
+    Drawable tintUp;
+    Drawable tintDown;
 
 
-    private RealmRankContract.Presenter mPresenter;
     private RealmRankAdapter mAdapter;
     private AuctionRealm.SortType lastType;
+
+    private ButterKnife.Action<TextView> DisableRightDrawable = new ButterKnife.Action<TextView>() {
+        @Override
+        public void apply(@NonNull TextView view, int index) {
+            view.setCompoundDrawables(null, null, null, null);
+        }
+    };
 
     @SuppressWarnings("unused")
     public static RealmRankFragment newInstance() {
@@ -65,6 +84,10 @@ public class RealmRankFragment extends BaseFragment implements RealmRankContract
         mList.setAdapter(mAdapter);
         DefaultViewUtil.defaultRefresh(mRefreshLayout);
         mRefreshLayout.setOnRefreshListener(this);
+        tintUp = DrawableCompat.wrap(up);
+        DrawableCompat.setTint(tintUp, ContextCompat.getColor(getContext(), R.color.colorAccent));
+        tintDown = DrawableCompat.wrap(down);
+        DrawableCompat.setTint(tintDown, ContextCompat.getColor(getContext(), R.color.colorAccent));
         return view;
     }
 
@@ -75,11 +98,6 @@ public class RealmRankFragment extends BaseFragment implements RealmRankContract
     }
 
     @Override
-    public void setPresenter(RealmRankContract.Presenter presenter) {
-        this.mPresenter = presenter;
-    }
-
-    @Override
     public void show(List<AuctionRealm> list, AuctionRealm.SortType sortType) {
         updateSortType(sortType);
         this.mAdapter.update(list);
@@ -87,7 +105,33 @@ public class RealmRankFragment extends BaseFragment implements RealmRankContract
 
     private void updateSortType(AuctionRealm.SortType sortType) {
         this.lastType = sortType;
-        // TODO: 2017/4/19 切换动画
+        ButterKnife.apply(labels, DisableRightDrawable);
+        switch (sortType) {
+            case TotalUp:
+                mTvTotalCount.setCompoundDrawablesWithIntrinsicBounds(null, null, tintUp, null);
+                break;
+            case TotalDown:
+                mTvTotalCount.setCompoundDrawablesWithIntrinsicBounds(null, null, tintDown, null);
+                break;
+            case PlayerUp:
+                mTvUserCount.setCompoundDrawablesWithIntrinsicBounds(null, null, tintUp, null);
+                break;
+            case PlayerDown:
+                mTvUserCount.setCompoundDrawablesWithIntrinsicBounds(null, null, tintDown, null);
+                break;
+            case ItemUp:
+                mTvItemKind.setCompoundDrawablesWithIntrinsicBounds(null, null, tintUp, null);
+                break;
+            case ItemDown:
+                mTvItemKind.setCompoundDrawablesWithIntrinsicBounds(null, null, tintDown, null);
+                break;
+            case TimeUp:
+                mTvUpdateTime.setCompoundDrawablesWithIntrinsicBounds(null, null, tintUp, null);
+                break;
+            case TimeDown:
+                mTvUpdateTime.setCompoundDrawablesWithIntrinsicBounds(null, null, tintDown, null);
+                break;
+        }
     }
 
     @Override

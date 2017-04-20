@@ -31,7 +31,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-public class WowTokenFragment extends BaseFragment implements WowTokenContract.View, SwipeRefreshLayout
+public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> implements WowTokenContract.View,
+        SwipeRefreshLayout
         .OnRefreshListener {
     public static final String TAG = WowTokenFragment.class.getSimpleName();
     @BindView(R.id.tv_cur_price)
@@ -50,7 +51,6 @@ public class WowTokenFragment extends BaseFragment implements WowTokenContract.V
     LineChart mChartHistory;
 
     Unbinder unbinder;
-    private WowTokenContract.Presenter mPresenter;
 
     /**
      * Use this factory method to create a new instance of
@@ -141,11 +141,6 @@ public class WowTokenFragment extends BaseFragment implements WowTokenContract.V
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mPresenter.load();
-    }
-
-    @Override
-    public void setPresenter(WowTokenContract.Presenter presenter) {
-        this.mPresenter = presenter;
     }
 
     @Override

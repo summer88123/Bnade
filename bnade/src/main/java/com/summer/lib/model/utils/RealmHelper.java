@@ -15,8 +15,13 @@ import java.util.concurrent.Callable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -125,45 +130,43 @@ public class RealmHelper {
         return mRealms;
     }
 
-    public Single<List<Realm>> getAll() {
-        return Single.defer(new Callable<SingleSource<? extends List<Realm>>>() {
-            @Override
-            public SingleSource<? extends List<Realm>> call() throws Exception {
-                getRealms();
-                return Single.just(Collections.unmodifiableList(mRealms));
-            }
-        }).subscribeOn(Schedulers.io());
+    public Observable<Realm> getAllRealm(final boolean hasAllItem) {
+        return Observable
+                .defer(new Callable<ObservableSource<Realm>>() {
+                    @Override
+                    public ObservableSource<Realm> call() throws Exception {
+                        return Observable.fromIterable(Collections.unmodifiableList(getRealms()));
+                    }
+                })
+                .compose(new ObservableTransformer<Realm, Realm>() {
+                    @Override
+                    public ObservableSource<Realm> apply(@NonNull Observable<Realm> upstream) {
+                        if (hasAllItem) {
+                            return upstream.skip(1);
+                        }
+                        return upstream;
+                    }
+                }).subscribeOn(Schedulers.computation());
     }
 
-    public Single<List<Realm>> getRealmsByName(final String name) {
-        return Single.defer(new Callable<SingleSource<List<Realm>>>() {
-            @Override
-            public SingleSource<List<Realm>> call() throws Exception {
-                List<Realm> realms = getRealms();
-                List<Realm> result = new ArrayList<>();
-                for (Realm realm : realms) {
-                    if (realm.getConnected().contains(name)) {
-                        result.add(realm);
+    public Observable<Realm> getRealmsByName(final String name) {
+        return getAllRealm(false)
+                .filter(new Predicate<Realm>() {
+                    @Override
+                    public boolean test(@NonNull Realm realm) throws Exception {
+                        return realm.getConnected().contains(name);
                     }
-                }
-                return Single.just(result);
-            }
-        }).subscribeOn(Schedulers.io());
-
+                });
     }
 
     public Single<Realm> getRealmById(final long id) {
-        return Single.defer(new Callable<SingleSource<? extends Realm>>() {
-            @Override
-            public SingleSource<? extends Realm> call() throws Exception {
-                List<Realm> realms = getRealms();
-                for (Realm realm : realms) {
-                    if (realm.getId() == id) {
-                        return Single.just(realm);
+        return getAllRealm(false)
+                .filter(new Predicate<Realm>() {
+                    @Override
+                    public boolean test(@NonNull Realm realm) throws Exception {
+                        return realm.getId() == id;
                     }
-                }
-                return Single.just(Realm.unKnowInstance(id));
-            }
-        }).subscribeOn(Schedulers.io());
+                })
+                .single(Realm.unKnowInstance(id));
     }
 }

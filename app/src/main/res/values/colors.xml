@@ -6,4 +6,5 @@
     <color name="black">#000000</color>
     <color name="pvp_label">#a94442</color>
     <color name="pve_label">#337ab7</color>
+    <color name="white">#ffffff</color>
 </resources>

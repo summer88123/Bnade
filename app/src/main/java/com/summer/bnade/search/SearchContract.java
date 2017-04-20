@@ -4,6 +4,7 @@ import com.summer.bnade.base.BaseView;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
 import com.summer.lib.model.entity.Hot;
+import com.summer.lib.model.entity.Realm;
 
 import java.util.List;
 
@@ -32,6 +33,8 @@ public interface SearchContract {
         void load();
 
         void search(String name, boolean saveHistory);
+
+        void selectRealm(Realm realm);
 
         void updateHotSearchType(int type);
 
