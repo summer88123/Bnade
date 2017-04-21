@@ -9,7 +9,7 @@ import java.util.List;
  * Created by kevin.bai on 2017/4/20.
  */
 
-public interface RealmSelectContract {
+interface RealmSelectContract {
     interface View extends BaseView<Presenter> {
         void show(List<Realm> list);
     }

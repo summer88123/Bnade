@@ -10,7 +10,7 @@ import dagger.Component;
  */
 @PreActivity
 @Component(dependencies = {ApplicationComponent.class}, modules = {RealmSelectModule.class})
-public interface RealmSelectComponent {
+interface RealmSelectComponent {
     void inject(RealmSelectActivity activity);
 
     void inject(RealmSelectFragment fragment);

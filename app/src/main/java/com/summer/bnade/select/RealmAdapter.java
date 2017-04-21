@@ -16,10 +16,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class RealmAdapter extends BaseAdapter<Realm, RealmAdapter.ViewHolder> {
+class RealmAdapter extends BaseAdapter<Realm, RealmAdapter.ViewHolder> {
     private FragmentActivity mActivity;
 
-    public RealmAdapter(FragmentActivity activity) {
+    RealmAdapter(FragmentActivity activity) {
         this.mActivity = activity;
     }
 

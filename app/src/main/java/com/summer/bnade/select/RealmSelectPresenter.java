@@ -16,11 +16,11 @@ import io.reactivex.functions.Consumer;
  * Created by kevin.bai on 2017/4/20.
  */
 
-public class RealmSelectPresenter extends BasePresenter<RealmSelectContract.View> implements RealmSelectContract
+class RealmSelectPresenter extends BasePresenter<RealmSelectContract.View> implements RealmSelectContract
         .Presenter {
 
     @Inject
-    public RealmSelectPresenter(RealmSelectContract.View view, BnadeRepo repo) {
+    RealmSelectPresenter(RealmSelectContract.View view, BnadeRepo repo) {
         super(view, repo);
     }
 
