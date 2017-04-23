@@ -2,12 +2,13 @@ package com.summer.lib.model.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 /**
  * Created by kevin.bai on 2017/4/4.
  */
 
-public class AuctionItem implements Parcelable {
+public class AuctionItem implements Parcelable , Comparable<AuctionItem>{
     private long realmId;
     private Realm realm;
     private long minBuyOut;
@@ -15,6 +16,11 @@ public class AuctionItem implements Parcelable {
     private int total;
     private long lastUpdateTime;
     private String lastTime;
+
+    @Override
+    public int compareTo(@NonNull AuctionItem o) {
+        return (int) (this.minBuyOut - o.getMinBuyOut());
+    }
 
     public Realm getRealm() {
         return realm;

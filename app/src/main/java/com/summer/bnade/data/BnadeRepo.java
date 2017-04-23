@@ -75,7 +75,7 @@ public class BnadeRepo {
                                         });
                     }
                 })
-                .toList();
+                .toSortedList();
     }
 
     public Single<List<Realm>> getRealmsByName(CharSequence s) {

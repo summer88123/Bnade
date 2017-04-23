@@ -26,8 +26,8 @@ public class SearchModule {
     }
 
     @Provides
-    FuzzyItemAdapter provideFuzzyItemAdapter(SearchPresenter presenter) {
-        return new FuzzyItemAdapter(presenter);
+    FuzzyItemAdapter provideFuzzyItemAdapter() {
+        return new FuzzyItemAdapter();
     }
 
     @Provides

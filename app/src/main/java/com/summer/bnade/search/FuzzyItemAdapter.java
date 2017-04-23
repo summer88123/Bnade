@@ -3,19 +3,14 @@ package com.summer.bnade.search;
 import android.view.View;
 import android.widget.TextView;
 
-import com.summer.bnade.base.BaseAdapter;
-import com.summer.bnade.base.BaseViewHolder;
+import com.summer.bnade.base.Adapter;
+
 
 /**
  * Created by kevin.bai on 2017/4/17.
  */
 
-class FuzzyItemAdapter extends BaseAdapter<String, FuzzyItemAdapter.ViewHolder> {
-    private SearchContract.Presenter mPresenter;
-
-    public FuzzyItemAdapter(SearchContract.Presenter presenter) {
-        this.mPresenter = presenter;
-    }
+class FuzzyItemAdapter extends Adapter<String, FuzzyItemAdapter.ViewHolder> {
 
     @Override
     protected int layoutId() {
@@ -27,23 +22,17 @@ class FuzzyItemAdapter extends BaseAdapter<String, FuzzyItemAdapter.ViewHolder> 
         return new ViewHolder(v);
     }
 
-    class ViewHolder extends BaseViewHolder<String> {
+    class ViewHolder extends com.summer.bnade.base.ViewHolder<String> {
         TextView mTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);
             mTextView = (TextView) itemView;
-            mTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mPresenter.fuzzySearch(mTextView.getText().toString());
-                }
-            });
         }
 
         @Override
-        public void onBind(String s) {
-            mTextView.setText(s);
+        protected void onBind(String item) {
+            mTextView.setText(item);
         }
     }
 }

@@ -5,18 +5,22 @@ import com.google.android.flexbox.JustifyContent;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
@@ -52,8 +56,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     ImageButton mIbClearHistories;
     @BindView(R.id.list_histories)
     RecyclerView mListHistories;
-    @BindView(R.id.fuzzy_list)
-    RecyclerView mFuzzyList;
     @Inject
     HotSearchAdapter mHotAdapter;
     @Inject
@@ -62,6 +64,8 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     FuzzyItemAdapter mFuzzyAdapter;
     @BindView(R.id.btn_realm_select)
     Button mBtnRealmSelect;
+
+    ListPopupWindow mFuzzyList;
 
     @OnClick(R.id.ib_clear_histories)
     public void onClick() {
@@ -91,7 +95,19 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         mListHistories.setLayoutManager(layoutManager);
         mListHistories.setAdapter(mHistoriesAdapter);
 
+        mFuzzyList = new ListPopupWindow(getContext());
+        mFuzzyList.setWidth(ListPopupWindow.WRAP_CONTENT);//设置宽度
+        mFuzzyList.setHeight(ListPopupWindow.WRAP_CONTENT);//设置高度
         mFuzzyList.setAdapter(mFuzzyAdapter);
+        mFuzzyList.setAnchorView(mSearchView);
+        mFuzzyList.setModal(true);
+        mFuzzyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                mFuzzyList.dismiss();
+                mPresenter.fuzzySearch(((TextView) view).getText().toString());
+            }
+        });
 
         mRgHotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -133,10 +149,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
     }
 
-    private boolean isFuzzyListVisible() {
-        return mFuzzyList.getVisibility() == View.VISIBLE;
-    }
-
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -156,9 +168,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
 
     @Override
     public void hideFuzzyList(String text) {
-        if (isFuzzyListVisible()) {
-            mFuzzyList.setVisibility(View.GONE);
-        }
         if (!TextUtils.isEmpty(text)) {
             mSearchView.setQuery(text, false);
         }
@@ -173,7 +182,12 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     @Override
     public void showFuzzySearch(SearchResultVO searchResultVO) {
         mFuzzyAdapter.update(searchResultVO.getNames());
-        mFuzzyList.setVisibility(View.VISIBLE);
+        if (Build.VERSION.SDK_INT == 24) {
+            int[] a = new int[2];
+            mSearchView.getLocationInWindow(a);
+            mFuzzyList.setHeight(getResources().getDisplayMetrics().heightPixels - a[1] - mSearchView.getHeight());
+        }
+        mFuzzyList.show();
     }
 
     @Override
