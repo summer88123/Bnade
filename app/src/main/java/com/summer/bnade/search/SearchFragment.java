@@ -213,4 +213,15 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         super.onDestroyView();
         unbinder.unbind();
     }
+
+    public void search() {
+        if (mSearchView.isIconified()) {
+            mSearchView.setIconified(false);
+        } else {
+            String query = mSearchView.getQuery().toString();
+            if (!TextUtils.isEmpty(query)) {
+                mPresenter.search(query, true);
+            }
+        }
+    }
 }

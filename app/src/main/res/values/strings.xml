@@ -35,4 +35,5 @@
     <string name="realm_select_search_hint">过滤服务器</string>
     <string name="realm_select_no_match">没有找到服务器</string>
     <string name="btn_realm_select">选择服务器</string>
+    <string name="search_query_hint">物品名称，支持模糊</string>
 </resources>

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -72,8 +71,12 @@ public class MainActivity extends BaseActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                SearchFragment searchFragment = (SearchFragment) fm.findFragmentByTag(SearchFragment.TAG);
+                if (searchFragment != null) {
+                    searchFragment.search();
+                } else {
+                    showSearch();
+                }
             }
         });
 
@@ -176,6 +179,5 @@ public class MainActivity extends BaseActivity
         }
         mMainComponent.inject(search);
         fm.beginTransaction().replace(R.id.content_main, search, SearchFragment.TAG).commit();
-
     }
 }
