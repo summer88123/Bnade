@@ -15,9 +15,9 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/realm_rank" />
         <item
-            android:id="@+id/btn_search_rank"
+            android:id="@+id/btn_player_item"
             android:icon="@drawable/ic_menu_manage"
-            android:title="@string/search_rank" />
+            android:title="@string/player_item" />
     </group>
 
     <item android:title="Communicate">

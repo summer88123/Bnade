@@ -19,6 +19,9 @@ import com.summer.bnade.R;
 import com.summer.bnade.home.di.DaggerMainComponent;
 import com.summer.bnade.home.di.MainComponent;
 import com.summer.bnade.home.di.MainModule;
+import com.summer.bnade.player.PlayerItemFragment;
+import com.summer.bnade.player.PlayerItemModule;
+import com.summer.bnade.player.PlayerItemPresenter;
 import com.summer.bnade.realmrank.RealmRankFragment;
 import com.summer.bnade.realmrank.RealmRankModule;
 import com.summer.bnade.realmrank.RealmRankPresenter;
@@ -59,6 +62,8 @@ public class MainActivity extends BaseActivity
     SearchPresenter mSearchPresenter;
     @Inject
     RealmRankPresenter mRealmRankPresenter;
+    @Inject
+    PlayerItemPresenter mPlayerItemPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +81,7 @@ public class MainActivity extends BaseActivity
                     searchFragment.search();
                 } else {
                     showSearch();
+                    navigationView.setCheckedItem(R.id.btn_item_search);
                 }
             }
         });
@@ -88,6 +94,7 @@ public class MainActivity extends BaseActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         showSearch();
+        navigationView.setCheckedItem(R.id.btn_item_search);
         setTitle(R.string.item_search);
     }
 
@@ -99,6 +106,7 @@ public class MainActivity extends BaseActivity
                 .wowTokenModule(new WowTokenModule(WowTokenFragment.newInstance()))
                 .searchModule(new SearchModule(SearchFragment.newInstance()))
                 .realmRankModule(new RealmRankModule(RealmRankFragment.newInstance()))
+                .playerItemModule(new PlayerItemModule(PlayerItemFragment.newInstance()))
                 .build();
         mMainComponent.inject(this);
     }
@@ -154,8 +162,12 @@ public class MainActivity extends BaseActivity
                 token = (RealmRankFragment) mMainComponent.realmRankView();
             }
             fm.beginTransaction().replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
-        } else if (id == R.id.btn_search_rank) {
-
+        } else if (id == R.id.btn_player_item) {
+            PlayerItemFragment player = (PlayerItemFragment) fm.findFragmentByTag(PlayerItemFragment.TAG);
+            if (player == null) {
+                player = (PlayerItemFragment) mMainComponent.playerItemView();
+            }
+            fm.beginTransaction().replace(R.id.content_main, player, PlayerItemFragment.TAG).commit();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

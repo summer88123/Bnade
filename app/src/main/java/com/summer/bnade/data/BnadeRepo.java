@@ -119,7 +119,27 @@ public class BnadeRepo {
     }
 
     public Single<List<Auction>> getAuctionRealmOwner(long realmId, String name) {
-        return api.getAuctionRealmOwner(realmId, name);
+        return api.getAuctionRealmOwner(realmId, name)
+                .flatMapObservable(new Function<List<Auction>, ObservableSource<Auction>>() {
+                    @Override
+                    public ObservableSource<Auction> apply(@NonNull List<Auction> auctions) throws Exception {
+                        return Observable.fromIterable(auctions);
+                    }
+                })
+                .flatMapSingle(new Function<Auction, SingleSource<Auction>>() {
+                    @Override
+                    public SingleSource<Auction> apply(@NonNull Auction auction) throws Exception {
+                        return Single.just(auction).zipWith(getItem(auction.getName()),
+                                new BiFunction<Auction, Item, Auction>() {
+                                    @Override
+                                    public Auction apply(@NonNull Auction auction, @NonNull Item item) throws Exception {
+                                        auction.setItem(item);
+                                        return auction;
+                                    }
+                                });
+                    }
+                })
+                .toList();
     }
 
     public Single<List<Realm>> getAllRealm(boolean hasAllItem) {

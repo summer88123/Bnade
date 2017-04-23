@@ -2,6 +2,7 @@ package com.summer.bnade.search.entity;
 
 import com.summer.lib.model.entity.Hot;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ public class SearchVO {
 
     public List<Hot> getHotList() {
         if (map == null) {
-            return null;
+            return Collections.emptyList();
         }
         return map.get(currentType);
     }

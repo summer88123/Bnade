@@ -3,6 +3,8 @@ package com.summer.bnade.home.di;
 import android.support.v4.app.FragmentManager;
 
 import com.summer.bnade.home.MainActivity;
+import com.summer.bnade.player.PlayerItemContract;
+import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.realmrank.RealmRankContract;
 import com.summer.bnade.realmrank.RealmRankModule;
 import com.summer.bnade.search.SearchContract;
@@ -26,6 +28,7 @@ import dagger.Component;
                 WowTokenModule.class,
                 SearchModule.class,
                 RealmRankModule.class,
+                PlayerItemModule.class,
         })
 public interface MainComponent {
     void inject(MainActivity activity);
@@ -37,6 +40,8 @@ public interface MainComponent {
     SearchContract.View searchView();
 
     RealmRankContract.View realmRankView();
+
+    PlayerItemContract.View playerItemView();
 
     FragmentManager fragmentManager();
 }

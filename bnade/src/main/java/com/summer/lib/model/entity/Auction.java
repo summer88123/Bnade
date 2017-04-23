@@ -10,12 +10,21 @@ import android.os.Parcelable;
 public class Auction implements Parcelable {
     private long itemId;
     private String name;
+    private Item item;
     private String realmName;
-    private long bidPrece;
-    private long buyOut;
+    private Gold bidPrece;
+    private Gold buyOut;
     private int count;
     private String lastTime;
     private long lastModified;
+
+    public Item getItem() {
+        return item;
+    }
+
+    public void setItem(Item item) {
+        this.item = item;
+    }
 
     public long getItemId() {
         return itemId;
@@ -41,19 +50,19 @@ public class Auction implements Parcelable {
         this.realmName = realmName;
     }
 
-    public long getBidPrece() {
+    public Gold getBidPrece() {
         return bidPrece;
     }
 
-    public void setBidPrece(long bidPrece) {
+    public void setBidPrece(Gold bidPrece) {
         this.bidPrece = bidPrece;
     }
 
-    public long getBuyOut() {
+    public Gold getBuyOut() {
         return buyOut;
     }
 
-    public void setBuyOut(long buyOut) {
+    public void setBuyOut(Gold buyOut) {
         this.buyOut = buyOut;
     }
 
@@ -81,6 +90,9 @@ public class Auction implements Parcelable {
         this.lastModified = lastModified;
     }
 
+    public Auction() {
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -90,29 +102,28 @@ public class Auction implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.itemId);
         dest.writeString(this.name);
+        dest.writeParcelable(this.item, flags);
         dest.writeString(this.realmName);
-        dest.writeLong(this.bidPrece);
-        dest.writeLong(this.buyOut);
+        dest.writeParcelable(this.bidPrece, flags);
+        dest.writeParcelable(this.buyOut, flags);
         dest.writeInt(this.count);
         dest.writeString(this.lastTime);
         dest.writeLong(this.lastModified);
     }
 
-    public Auction() {
-    }
-
     protected Auction(Parcel in) {
         this.itemId = in.readLong();
         this.name = in.readString();
+        this.item = in.readParcelable(Item.class.getClassLoader());
         this.realmName = in.readString();
-        this.bidPrece = in.readLong();
-        this.buyOut = in.readLong();
+        this.bidPrece = in.readParcelable(Gold.class.getClassLoader());
+        this.buyOut = in.readParcelable(Gold.class.getClassLoader());
         this.count = in.readInt();
         this.lastTime = in.readString();
         this.lastModified = in.readLong();
     }
 
-    public static final Parcelable.Creator<Auction> CREATOR = new Parcelable.Creator<Auction>() {
+    public static final Creator<Auction> CREATOR = new Creator<Auction>() {
         @Override
         public Auction createFromParcel(Parcel source) {
             return new Auction(source);

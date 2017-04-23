@@ -14,8 +14,6 @@ import java.util.List;
 
 public interface SearchContract {
     interface View extends BaseView<Presenter> {
-        void hideFuzzyList(String text);
-
         void show(SearchVO searchVO);
 
         void showFuzzySearch(SearchResultVO searchResultVO);
@@ -35,6 +33,8 @@ public interface SearchContract {
         void search(String name, boolean saveHistory);
 
         void selectRealm(Realm realm);
+
+        void updateHistory();
 
         void updateHotSearchType(int type);
 

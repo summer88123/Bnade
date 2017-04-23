@@ -23,10 +23,10 @@ import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by kevin.bai on 2017/4/13.
@@ -48,7 +48,6 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
     @Override
     public void fuzzySearch(String text) {
-        mView.hideFuzzyList(text);
         search(text, true);
     }
 
@@ -162,6 +161,18 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
     }
 
     @Override
+    public void updateHistory() {
+        getHistories()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<String>>() {
+                    @Override
+                    public void accept(@NonNull List<String> strings) throws Exception {
+                        mView.updateHistories(strings);
+                    }
+                });
+    }
+
+    @Override
     public void updateHotSearchType(int type) {
         mSearchVO.setCurrentType(type);
         mView.updateHotSearch(mSearchVO.getHotList());
@@ -169,9 +180,13 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
     @Override
     public void clearHistories() {
-        mHistorySearchRepo.clear();
         getHistories()
-                .subscribeOn(Schedulers.io())
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(@NonNull Disposable disposable) throws Exception {
+                        mHistorySearchRepo.clear();
+                    }
+                })
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<String>>() {
                     @Override

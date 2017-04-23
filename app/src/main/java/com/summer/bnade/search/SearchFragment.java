@@ -136,12 +136,17 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
 
             @Override
             public boolean onQueryTextChange(String s) {
-                hideFuzzyList(null);
                 return false;
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.updateHistory();
     }
 
     @OnClick(R.id.btn_realm_select)
@@ -163,13 +168,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
             Realm realm = data.getParcelableExtra(Content.EXTRA_DATA);
             mBtnRealmSelect.setText(realm.getConnected());
             mPresenter.selectRealm(realm);
-        }
-    }
-
-    @Override
-    public void hideFuzzyList(String text) {
-        if (!TextUtils.isEmpty(text)) {
-            mSearchView.setQuery(text, false);
         }
     }
 

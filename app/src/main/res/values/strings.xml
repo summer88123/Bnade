@@ -36,4 +36,9 @@
     <string name="realm_select_no_match">没有找到服务器</string>
     <string name="btn_realm_select">选择服务器</string>
     <string name="search_query_hint">物品名称，支持模糊</string>
+    <string name="player_item">玩家物品</string>
+    <string name="toast_player_item_no_select_realm">请选择服务器</string>
+    <string name="bid_price">当前竞价</string>
+    <string name="buyout">一口价</string>
+    <string name="search_query_hint_player">请输入玩家名</string>
 </resources>
