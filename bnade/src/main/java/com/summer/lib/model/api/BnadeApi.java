@@ -2,6 +2,7 @@ package com.summer.lib.model.api;
 
 import com.google.gson.JsonElement;
 
+import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealm;
 import com.summer.lib.model.entity.Hot;
@@ -91,7 +92,7 @@ public interface BnadeApi {
     Single<List<AuctionRealm>> getAuctionRealmsSummary();
 
     @GET("auction/realm/{realmId}/owner/{name}")
-    Single<List<String>> getAuctionRealmOwner(@Path("realmId") long realmId, @Path("name") String name);
+    Single<List<Auction>> getAuctionRealmOwner(@Path("realmId") long realmId, @Path("name") String name);
 
     /**
      * 查询某个服务器某个物品的拍卖行的所有数据

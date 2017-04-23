@@ -2,6 +2,7 @@ package com.summer.bnade.data;
 
 import com.summer.bnade.data.error.EmptyDataException;
 import com.summer.lib.model.api.BnadeApi;
+import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealm;
 import com.summer.lib.model.entity.Hot;
@@ -115,6 +116,10 @@ public class BnadeRepo {
                     }
                 })
                 .toList();
+    }
+
+    public Single<List<Auction>> getAuctionRealmOwner(long realmId, String name) {
+        return api.getAuctionRealmOwner(realmId, name);
     }
 
     public Single<List<Realm>> getAllRealm(boolean hasAllItem) {
