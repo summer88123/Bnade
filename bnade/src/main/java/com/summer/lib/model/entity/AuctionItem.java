@@ -15,7 +15,7 @@ public class AuctionItem implements Parcelable , Comparable<AuctionItem>{
     private String name;
     private int total;
     private long lastUpdateTime;
-    private String lastTime;
+    private LastTime lastTime;
 
     @Override
     public int compareTo(@NonNull AuctionItem o) {
@@ -70,11 +70,11 @@ public class AuctionItem implements Parcelable , Comparable<AuctionItem>{
         this.lastUpdateTime = lastUpdateTime;
     }
 
-    public String getLastTime() {
+    public LastTime getLastTime() {
         return lastTime;
     }
 
-    public void setLastTime(String lastTime) {
+    public void setLastTime(LastTime lastTime) {
         this.lastTime = lastTime;
     }
 
@@ -94,7 +94,7 @@ public class AuctionItem implements Parcelable , Comparable<AuctionItem>{
         dest.writeString(this.name);
         dest.writeInt(this.total);
         dest.writeLong(this.lastUpdateTime);
-        dest.writeString(this.lastTime);
+        dest.writeInt(this.lastTime == null ? -1 : this.lastTime.ordinal());
     }
 
     protected AuctionItem(Parcel in) {
@@ -104,7 +104,8 @@ public class AuctionItem implements Parcelable , Comparable<AuctionItem>{
         this.name = in.readString();
         this.total = in.readInt();
         this.lastUpdateTime = in.readLong();
-        this.lastTime = in.readString();
+        int tmpLastTime = in.readInt();
+        this.lastTime = tmpLastTime == -1 ? null : LastTime.values()[tmpLastTime];
     }
 
     public static final Creator<AuctionItem> CREATOR = new Creator<AuctionItem>() {

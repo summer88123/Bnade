@@ -8,6 +8,7 @@ import com.google.gson.JsonParseException;
 
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.Gold;
+import com.summer.lib.model.entity.LastTime;
 
 import java.lang.reflect.Type;
 
@@ -28,7 +29,7 @@ public class AuctionParser implements JsonDeserializer<Auction> {
         item.setBidPrece(new Gold(array.get(3).getAsLong()));
         item.setBuyOut(new Gold(array.get(4).getAsLong()));
         item.setCount(array.get(5).getAsInt());
-        item.setLastTime(array.get(6).getAsString());
+        item.setLastTime(LastTime.valueOf(array.get(6).getAsString()));
         item.setLastModified(array.get(7).getAsLong());
         return item;
     }

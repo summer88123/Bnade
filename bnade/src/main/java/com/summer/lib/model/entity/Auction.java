@@ -15,7 +15,7 @@ public class Auction implements Parcelable {
     private Gold bidPrece;
     private Gold buyOut;
     private int count;
-    private String lastTime;
+    private LastTime lastTime;
     private long lastModified;
 
     public Item getItem() {
@@ -74,11 +74,11 @@ public class Auction implements Parcelable {
         this.count = count;
     }
 
-    public String getLastTime() {
+    public LastTime getLastTime() {
         return lastTime;
     }
 
-    public void setLastTime(String lastTime) {
+    public void setLastTime(LastTime lastTime) {
         this.lastTime = lastTime;
     }
 
@@ -107,7 +107,7 @@ public class Auction implements Parcelable {
         dest.writeParcelable(this.bidPrece, flags);
         dest.writeParcelable(this.buyOut, flags);
         dest.writeInt(this.count);
-        dest.writeString(this.lastTime);
+        dest.writeInt(this.lastTime == null ? -1 : this.lastTime.ordinal());
         dest.writeLong(this.lastModified);
     }
 
@@ -119,7 +119,8 @@ public class Auction implements Parcelable {
         this.bidPrece = in.readParcelable(Gold.class.getClassLoader());
         this.buyOut = in.readParcelable(Gold.class.getClassLoader());
         this.count = in.readInt();
-        this.lastTime = in.readString();
+        int tmpLastTime = in.readInt();
+        this.lastTime = tmpLastTime == -1 ? null : LastTime.values()[tmpLastTime];
         this.lastModified = in.readLong();
     }
 

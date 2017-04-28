@@ -62,7 +62,7 @@ public class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.Vi
             Glide.with(mFragment).load(auction.getItem().getUrl()).into(mIvIcon);
             mTvCount.setText(String.valueOf(auction.getCount()));
             mTvName.setText(auction.getName());
-            mTvLastTime.setText(auction.getLastTime());
+            mTvLastTime.setText(auction.getLastTime().getResult());
             mTvLabelBidPrice.setText(R.string.bid_price);
             Gold bidPrice = auction.getBidPrece();
             mTvBidPrice.setText(mResources

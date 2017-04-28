@@ -49,7 +49,7 @@ class SearchResultAdapter extends BaseAdapter<AuctionItem, SearchResultAdapter.V
         public void onBind(AuctionItem auctionItem) {
             mTvRealm.setText(auctionItem.getRealm().getConnected());
             mTvSeller.setText(auctionItem.getName());
-            mTvLastTime.setText(auctionItem.getLastTime());
+            mTvLastTime.setText(auctionItem.getLastTime().getResult());
             mTvUpdateTime.setText(DateUtil.format(auctionItem.getLastUpdateTime(), "H:mm"));
             mTvTotal.setText(auctionItem.getTotal() + "");
             mTvMinBuyout.setText(mTvMinBuyout.getContext()

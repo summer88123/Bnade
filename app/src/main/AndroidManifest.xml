@@ -24,9 +24,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".result.SearchResultActivity" />
-        <activity android:name=".select.RealmSelectActivity"
+        <activity
+            android:name=".select.RealmSelectActivity"
             android:label="@string/btn_realm_select"
-            />
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
     </application>
 
 </manifest>
