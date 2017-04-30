@@ -5,9 +5,9 @@ import android.os.Parcelable;
 
 import com.github.mikephil.charting.data.CombinedData;
 import com.summer.lib.model.entity.AuctionItem;
+import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Item;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,18 +16,14 @@ import java.util.List;
 
 public class SearchResultVO implements Parcelable {
     private Item item;
+    private List<AuctionRealmItem> auctionRealmItems;
     private long avgBuyout;
     private List<AuctionItem> auctionItems;
     private CombinedData combinedData;
-
     private List<String> names;
 
-    public CombinedData getCombinedData() {
-        return combinedData;
-    }
-
-    public void setCombinedData(CombinedData combinedData) {
-        this.combinedData = combinedData;
+    public SearchResultVO(Item item) {
+        this.item = item;
     }
 
     public SearchResultVO(Item item, List<AuctionItem> auctionItems) {
@@ -39,8 +35,20 @@ public class SearchResultVO implements Parcelable {
         this.names = names;
     }
 
-    public List<String> getNames() {
-        return names;
+    public List<AuctionItem> getAuctionItems() {
+        return auctionItems;
+    }
+
+    public void setAuctionItems(List<AuctionItem> auctionItems) {
+        this.auctionItems = auctionItems;
+    }
+
+    public List<AuctionRealmItem> getAuctionRealmItems() {
+        return auctionRealmItems;
+    }
+
+    public void setAuctionRealmItems(List<AuctionRealmItem> auctionRealmItems) {
+        this.auctionRealmItems = auctionRealmItems;
     }
 
     public long getAvgBuyout() {
@@ -51,6 +59,14 @@ public class SearchResultVO implements Parcelable {
         this.avgBuyout = avgBuyout;
     }
 
+    public CombinedData getCombinedData() {
+        return combinedData;
+    }
+
+    public void setCombinedData(CombinedData combinedData) {
+        this.combinedData = combinedData;
+    }
+
     public Item getItem() {
         return item;
     }
@@ -59,12 +75,8 @@ public class SearchResultVO implements Parcelable {
         this.item = item;
     }
 
-    public List<AuctionItem> getAuctionItems() {
-        return auctionItems;
-    }
-
-    public void setAuctionItems(List<AuctionItem> auctionItems) {
-        this.auctionItems = auctionItems;
+    public List<String> getNames() {
+        return names;
     }
 
     @Override
@@ -75,16 +87,17 @@ public class SearchResultVO implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(this.item, flags);
-        dest.writeList(this.auctionItems);
+        dest.writeTypedList(this.auctionRealmItems);
+        dest.writeTypedList(this.auctionItems);
     }
 
     protected SearchResultVO(Parcel in) {
         this.item = in.readParcelable(Item.class.getClassLoader());
-        this.auctionItems = new ArrayList<AuctionItem>();
-        in.readList(this.auctionItems, AuctionItem.class.getClassLoader());
+        this.auctionRealmItems = in.createTypedArrayList(AuctionRealmItem.CREATOR);
+        this.auctionItems = in.createTypedArrayList(AuctionItem.CREATOR);
     }
 
-    public static final Parcelable.Creator<SearchResultVO> CREATOR = new Parcelable.Creator<SearchResultVO>() {
+    public static final Creator<SearchResultVO> CREATOR = new Creator<SearchResultVO>() {
         @Override
         public SearchResultVO createFromParcel(Parcel source) {
             return new SearchResultVO(source);

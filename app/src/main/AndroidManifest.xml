@@ -28,6 +28,7 @@
             android:name=".select.RealmSelectActivity"
             android:label="@string/btn_realm_select"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" />
+        <activity android:name=".result.SearchRealmItemResultActivity"></activity>
     </application>
 
 </manifest>

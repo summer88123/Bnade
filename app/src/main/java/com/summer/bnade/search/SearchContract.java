@@ -18,6 +18,8 @@ public interface SearchContract {
 
         void showFuzzySearch(SearchResultVO searchResultVO);
 
+        void showRealmItemResult(SearchResultVO searchResultVO);
+
         void showResult(SearchResultVO searchResultVO);
 
         void updateHistories(List<String> histories);

@@ -10,9 +10,11 @@ import android.content.SharedPreferences;
 
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.AuctionItem;
+import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.WowTokens;
 import com.summer.lib.model.gson.AuctionItemParser;
 import com.summer.lib.model.gson.AuctionParser;
+import com.summer.lib.model.gson.AuctionRealmItemParser;
 import com.summer.lib.model.gson.WowTokensParser;
 
 import javax.inject.Singleton;
@@ -44,6 +46,7 @@ public class ApplicationModule {
                 .registerTypeAdapter(AuctionItem.class, AuctionItemParser.create())
                 .registerTypeAdapter(WowTokens.class, WowTokensParser.create())
                 .registerTypeAdapter(Auction.class, AuctionParser.create())
+                .registerTypeAdapter(AuctionRealmItem.class, AuctionRealmItemParser.create())
                 .create();
     }
 

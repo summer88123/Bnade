@@ -23,6 +23,7 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
 import com.summer.bnade.search.entity.SearchResultVO;
+import com.summer.bnade.utils.Content;
 import com.summer.lib.base.BaseActivity;
 import com.summer.lib.model.di.ComponentHolder;
 
@@ -59,7 +60,7 @@ public class SearchResultActivity extends BaseActivity implements SearchResultCo
         mList.setAdapter(mResultAdapter);
         initChart();
 
-        mPresenter.setData((SearchResultVO) getIntent().getParcelableExtra("data"));
+        mPresenter.setData((SearchResultVO) getIntent().getParcelableExtra(Content.EXTRA_DATA));
         mPresenter.load();
     }
 

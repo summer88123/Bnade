@@ -12,4 +12,6 @@ import dagger.Component;
 @Component(dependencies = {ApplicationComponent.class}, modules = SearchResultModule.class)
 interface SearchResultComponent {
     void inject(SearchResultActivity activity);
+
+    void inject(SearchRealmItemResultActivity activity);
 }

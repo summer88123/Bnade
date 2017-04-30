@@ -1,5 +1,6 @@
 package com.summer.bnade.base;
 
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
@@ -9,9 +10,11 @@ import android.view.View;
 
 public abstract class BaseViewHolder<Item> extends RecyclerView.ViewHolder {
     protected Item item;
+    protected Resources mResources;
 
     public BaseViewHolder(View itemView) {
         super(itemView);
+        this.mResources = itemView.getResources();
     }
 
     void bind(Item item) {

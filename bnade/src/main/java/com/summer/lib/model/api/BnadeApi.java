@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealm;
+import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.WowTokens;
@@ -101,7 +102,7 @@ public interface BnadeApi {
      * @return
      */
     @GET("auction/realm/{realmId}/item/{itemId}")
-    Observable<List<String>> getAuctionRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
+    Single<List<AuctionRealmItem>> getAuctionRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
 
     @GET("ah/wowtokens")
     Single<List<WowTokens>> getAhWowtokens();

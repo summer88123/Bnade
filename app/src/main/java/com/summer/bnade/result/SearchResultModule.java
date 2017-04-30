@@ -8,9 +8,9 @@ import dagger.Provides;
  */
 @Module
 class SearchResultModule {
-    final SearchResultActivity mView;
+    final SearchResultContract.View mView;
 
-    public SearchResultModule(SearchResultActivity view) {
+    public SearchResultModule(SearchResultContract.View view) {
         this.mView = view;
     }
 
@@ -22,6 +22,11 @@ class SearchResultModule {
     @Provides
     SearchResultAdapter provideAdapter() {
         return new SearchResultAdapter();
+    }
+
+    @Provides
+    SearchRealmItemResultAdapter provideRealmItemAdapter(){
+        return new SearchRealmItemResultAdapter();
     }
 
 }

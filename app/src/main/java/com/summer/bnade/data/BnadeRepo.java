@@ -5,6 +5,7 @@ import com.summer.lib.model.api.BnadeApi;
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealm;
+import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
@@ -140,6 +141,10 @@ public class BnadeRepo {
                     }
                 })
                 .toList();
+    }
+
+    public Single<List<AuctionRealmItem>> getAuctionRealmItem(long realmId, long itemId) {
+        return api.getAuctionRealmItem(realmId, itemId);
     }
 
     public Single<List<Realm>> getAllRealm(boolean hasAllItem) {
