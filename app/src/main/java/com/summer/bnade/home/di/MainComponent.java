@@ -2,6 +2,9 @@ package com.summer.bnade.home.di;
 
 import android.support.v4.app.FragmentManager;
 
+import com.summer.bnade.data.HistoryRealmRepo;
+import com.summer.bnade.data.HistorySearchRepo;
+import com.summer.bnade.data.RepoModule;
 import com.summer.bnade.home.MainActivity;
 import com.summer.bnade.player.PlayerItemContract;
 import com.summer.bnade.player.PlayerItemModule;
@@ -29,6 +32,7 @@ import dagger.Component;
                 SearchModule.class,
                 RealmRankModule.class,
                 PlayerItemModule.class,
+                RepoModule.class,
         })
 public interface MainComponent {
     void inject(MainActivity activity);
@@ -44,4 +48,8 @@ public interface MainComponent {
     PlayerItemContract.View playerItemView();
 
     FragmentManager fragmentManager();
+
+    HistoryRealmRepo historyRealmRepo();
+
+    HistorySearchRepo historySearchRepo();
 }

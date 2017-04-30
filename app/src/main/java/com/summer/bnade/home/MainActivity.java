@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.summer.bnade.R;
+import com.summer.bnade.data.RepoModule;
 import com.summer.bnade.home.di.DaggerMainComponent;
 import com.summer.bnade.home.di.MainComponent;
 import com.summer.bnade.home.di.MainModule;
@@ -107,6 +108,7 @@ public class MainActivity extends BaseActivity
                 .searchModule(new SearchModule(SearchFragment.newInstance()))
                 .realmRankModule(new RealmRankModule(RealmRankFragment.newInstance()))
                 .playerItemModule(new PlayerItemModule(PlayerItemFragment.newInstance()))
+                .repoModule(new RepoModule())
                 .build();
         mMainComponent.inject(this);
     }

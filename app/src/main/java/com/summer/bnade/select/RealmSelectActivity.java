@@ -1,9 +1,11 @@
 package com.summer.bnade.select;
 
 import android.os.Bundle;
+import android.view.Window;
 import android.widget.FrameLayout;
 
 import com.summer.bnade.R;
+import com.summer.bnade.data.RepoModule;
 import com.summer.lib.base.BaseActivity;
 import com.summer.lib.model.di.ComponentHolder;
 
@@ -21,6 +23,8 @@ public class RealmSelectActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.setFinishOnTouchOutside(true);
         setContentView(R.layout.activity_realm_select);
         ButterKnife.bind(this);
         RealmSelectFragment fragment = (RealmSelectFragment) getSupportFragmentManager()
@@ -32,6 +36,7 @@ public class RealmSelectActivity extends BaseActivity {
         }
         DaggerRealmSelectComponent.builder().applicationComponent(ComponentHolder.getComponent())
                 .realmSelectModule(new RealmSelectModule(fragment))
+                .repoModule(new RepoModule())
                 .build().inject(this);
     }
 

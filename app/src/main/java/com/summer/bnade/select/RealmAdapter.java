@@ -1,15 +1,11 @@
 package com.summer.bnade.select;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.widget.TextView;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
-import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Realm;
 
 import butterknife.BindView;
@@ -17,10 +13,10 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 class RealmAdapter extends BaseAdapter<Realm, RealmAdapter.ViewHolder> {
-    private FragmentActivity mActivity;
+    private RealmSelectContract.View view;
 
-    RealmAdapter(FragmentActivity activity) {
-        this.mActivity = activity;
+    RealmAdapter(RealmSelectContract.View view) {
+        this.view = view;
     }
 
     @Override
@@ -49,10 +45,7 @@ class RealmAdapter extends BaseAdapter<Realm, RealmAdapter.ViewHolder> {
 
         @OnClick(R.id.layout)
         public void onClick() {
-            Intent intent = new Intent();
-            intent.putExtra(Content.EXTRA_DATA, item);
-            mActivity.setResult(Activity.RESULT_OK, intent);
-            mActivity.finish();
+            view.selected(item);
         }
     }
 }

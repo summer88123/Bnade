@@ -150,4 +150,8 @@ public class BnadeRepo {
     public Single<List<Realm>> getAllRealm(boolean hasAllItem) {
         return mRealmHelper.getAllRealm(hasAllItem).toList();
     }
+
+    public Single<Realm> getRealm(String name) {
+        return mRealmHelper.getRealmsByName(name).firstOrError();
+    }
 }

@@ -2,6 +2,7 @@ package com.summer.bnade.search;
 
 import com.summer.bnade.base.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
+import com.summer.bnade.data.HistoryRealmRepo;
 import com.summer.bnade.data.HistorySearchRepo;
 import com.summer.bnade.data.error.EmptyDataException;
 import com.summer.bnade.search.entity.SearchResultVO;
@@ -22,6 +23,7 @@ import javax.inject.Inject;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -35,15 +37,17 @@ import io.reactivex.functions.Function;
 
 public class SearchPresenter extends BasePresenter<SearchContract.View> implements SearchContract.Presenter {
     private final HistorySearchRepo mHistorySearchRepo;
-
+    private final HistoryRealmRepo mRealmRepo;
     private SearchVO mSearchVO;
     private Realm currentRealm;
 
     @Inject
-    SearchPresenter(SearchContract.View view, BnadeRepo repo, HistorySearchRepo historySearchRepo) {
+    SearchPresenter(SearchContract.View view, BnadeRepo repo, HistorySearchRepo historySearchRepo,
+                    HistoryRealmRepo realmRepo) {
         super(view, repo);
 
         this.mHistorySearchRepo = historySearchRepo;
+        this.mRealmRepo = realmRepo;
         mSearchVO = new SearchVO();
     }
 
@@ -107,6 +111,17 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                         if (saveHistory) {
                             mHistorySearchRepo.add(item.getName());
                         }
+                    }
+                })
+                .compose(new SingleTransformer<Item, Item>() {
+                    @Override
+                    public SingleSource<Item> apply(@NonNull Single<Item> upstream) {
+                        if (saveHistory) {
+                            if (currentRealm != null) {
+                                return mRealmRepo.add(currentRealm).andThen(upstream);
+                            }
+                        }
+                        return upstream;
                     }
                 })
                 .flatMap(new Function<Item, SingleSource<SearchResultVO>>() {

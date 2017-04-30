@@ -1,5 +1,9 @@
 package com.summer.bnade.select;
 
+import com.google.android.flexbox.FlexboxLayoutManager;
+
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
@@ -11,6 +15,8 @@ import android.view.ViewGroup;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
+import com.summer.bnade.select.entity.RealmSelectVO;
+import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Realm;
 
 import java.util.List;
@@ -32,6 +38,9 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
     Unbinder unbinder;
 
     RealmAdapter mAdapter;
+    @BindView(R.id.list_used)
+    RecyclerView mListUsed;
+    private HistoryAdapter mHistoriesAdapter;
 
     @SuppressWarnings("unused")
     public static RealmSelectFragment newInstance() {
@@ -48,8 +57,13 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_realm_select, container, false);
         unbinder = ButterKnife.bind(this, view);
-        mAdapter = new RealmAdapter(getActivity());
+        mAdapter = new RealmAdapter(this);
         mList.setAdapter(mAdapter);
+
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager();
+        mListUsed.setLayoutManager(layoutManager);
+        mHistoriesAdapter = new HistoryAdapter(mPresenter);
+        mListUsed.setAdapter(mHistoriesAdapter);
         return view;
     }
 
@@ -66,12 +80,28 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
     }
 
     @Override
-    public void show(List<Realm> list) {
-        if (list.isEmpty()) {
+    public void show(RealmSelectVO vo) {
+        show(vo.getRealms());
+        mHistoriesAdapter.update(vo.getHistories());
+    }
+
+    @Override
+    public void selected(Realm realm) {
+        Intent intent = new Intent();
+        intent.putExtra(Content.EXTRA_DATA, realm);
+        getActivity().setResult(Activity.RESULT_OK, intent);
+        getActivity().finish();
+    }
+
+    @Override
+    public void show(List<Realm> realms) {
+        if (realms.isEmpty()) {
+            mTextInputLayout.setErrorEnabled(true);
             mTextInputLayout.setError(getString(R.string.realm_select_no_match));
         } else {
+            mTextInputLayout.setErrorEnabled(false);
             mTextInputLayout.setError(null);
         }
-        mAdapter.update(list);
+        mAdapter.update(realms);
     }
 }

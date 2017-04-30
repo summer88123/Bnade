@@ -7,8 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.inject.Inject;
-
 /**
  * Created by kevin.bai on 2017/4/16.
  */
@@ -18,7 +16,6 @@ public class HistorySearchRepo {
     private Set<String> cache;
     private SharedPreferences mSp;
     private SharedPreferences.Editor mEditor;
-    @Inject
     HistorySearchRepo(SharedPreferences sp) {
         this.mSp = sp;
         this.mEditor = mSp.edit();

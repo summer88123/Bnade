@@ -142,9 +142,9 @@ public class RealmHelper {
                     @Override
                     public ObservableSource<Realm> apply(@NonNull Observable<Realm> upstream) {
                         if (hasAllItem) {
-                            return upstream.skip(1);
+                            return upstream;
                         }
-                        return upstream;
+                        return upstream.skip(1);
                     }
                 }).subscribeOn(Schedulers.computation());
     }
