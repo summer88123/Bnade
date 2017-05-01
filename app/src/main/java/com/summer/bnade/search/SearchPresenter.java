@@ -173,7 +173,11 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                         if (searchResultVO.getItem() == null) {
                             mView.showFuzzySearch(searchResultVO);
                         } else if (searchResultVO.getAuctionRealmItems() != null) {
-                            mView.showRealmItemResult(searchResultVO);
+                            if (searchResultVO.getAuctionRealmItems().isEmpty()) {
+                                mView.showToast("无拍卖数据");
+                            } else {
+                                mView.showRealmItemResult(searchResultVO);
+                            }
                         } else {
                             mView.showResult(searchResultVO);
                         }

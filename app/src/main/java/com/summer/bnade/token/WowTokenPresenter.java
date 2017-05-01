@@ -31,6 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> implements WowTokenContract.Presenter {
 
+    private static final long ONE_DAY = 24 * 3600 * 1000L;
     private Comparator<? super WowTokens> timeComparator = new Comparator<WowTokens>() {
         @Override
         public int compare(WowTokens wowTokens, WowTokens t1) {
@@ -43,6 +44,7 @@ public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> impl
             return wowTokens.getGold() - t1.getGold();
         }
     };
+    private long temp = 0;
 
     @Inject
     WowTokenPresenter(WowTokenContract.View view, BnadeRepo repo) {
@@ -94,26 +96,6 @@ public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> impl
                 });
     }
 
-    private SingleSource<? extends List<WowTokens>> getSortedAllData(List<WowTokens> all) {
-        return Observable.fromIterable(all)
-                .toSortedList(timeComparator)
-                .subscribeOn(Schedulers.computation());
-    }
-
-    private Single<List<WowTokens>> getOnedayData(List<WowTokens> all) {
-        final long oneDay = 24 * 3600 * 1000L;
-        return Observable.fromIterable(all)
-                .filter(new Predicate<WowTokens>() {
-                    @Override
-                    public boolean test(@NonNull WowTokens wowTokens) throws Exception {
-                        long current = System.currentTimeMillis();
-                        return (current - wowTokens.getLastModified()) < oneDay;
-                    }
-                })
-                .toSortedList(goldComparator)
-                .subscribeOn(Schedulers.computation());
-    }
-
     private List<Entry> convert(List<WowTokens> list) {
 
         ArrayList<Entry> yVals = new ArrayList<>();
@@ -121,5 +103,42 @@ public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> impl
             yVals.add(new Entry(tokens.getLastModified(), tokens.getGold()));
         }
         return yVals;
+    }
+
+    private Single<List<WowTokens>> getOnedayData(List<WowTokens> all) {
+        return Observable.fromIterable(all)
+                .filter(new Predicate<WowTokens>() {
+                    @Override
+                    public boolean test(@NonNull WowTokens wowTokens) throws Exception {
+                        long current = System.currentTimeMillis();
+                        return (current - wowTokens.getLastModified()) < ONE_DAY;
+                    }
+                })
+                .toSortedList(goldComparator)
+                .subscribeOn(Schedulers.computation());
+    }
+
+    private SingleSource<? extends List<WowTokens>> getSortedAllData(List<WowTokens> all) {
+        return Observable.fromIterable(all)
+                .sorted(timeComparator)
+                .filter(new Predicate<WowTokens>() {
+                    @Override
+                    public boolean test(@NonNull WowTokens wowTokens) throws Exception {
+                        if (temp == 0 || wowTokens.getLastModified() > temp + ONE_DAY) {
+                            temp = wowTokens.getLastModified();
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                })
+                .toList()
+                .doOnSubscribe(new Consumer<Disposable>() {
+                    @Override
+                    public void accept(@NonNull Disposable disposable) throws Exception {
+                        temp = 0;
+                    }
+                })
+                .subscribeOn(Schedulers.computation());
     }
 }

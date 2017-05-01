@@ -52,7 +52,7 @@ public class ApplicationModule {
 
     @Provides
     public SharedPreferences provideSharedPreferences() {
-        return mApp.getSharedPreferences("app", Activity.MODE_PRIVATE);
+        return mApp.getSharedPreferences("app", Activity.MODE_APPEND);
     }
 
 }
