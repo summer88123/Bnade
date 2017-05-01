@@ -80,8 +80,8 @@ public class BnadeRepo {
                 .toSortedList();
     }
 
-    public Single<List<Realm>> getRealmsByName(CharSequence s) {
-        return mRealmHelper.getRealmsByName(s.toString()).toList();
+    public Observable<Realm> getRealmsByName(CharSequence s) {
+        return mRealmHelper.getRealmsByName(s.toString());
     }
 
     public Single<List<WowTokens>> getWowTokens() {
@@ -147,8 +147,8 @@ public class BnadeRepo {
         return api.getAuctionRealmItem(realmId, itemId);
     }
 
-    public Single<List<Realm>> getAllRealm(boolean hasAllItem) {
-        return mRealmHelper.getAllRealm(hasAllItem).toList();
+    public Observable<Realm> getAllRealm(boolean hasAllItem) {
+        return mRealmHelper.getAllRealm(hasAllItem);
     }
 
     public Single<Realm> getRealm(String name) {

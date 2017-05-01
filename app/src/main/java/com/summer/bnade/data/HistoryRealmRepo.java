@@ -3,17 +3,19 @@ package com.summer.bnade.data;
 import android.content.SharedPreferences;
 
 import com.summer.lib.model.entity.Realm;
+import com.summer.lib.model.utils.RealmHelper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
-import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Function;
 
 /**
  * Created by kevin.bai on 2017/4/30.
@@ -24,8 +26,10 @@ public class HistoryRealmRepo {
     private final SharedPreferences sp;
     private final SharedPreferences.Editor mEditor;
     private final Set<String> cache;
+    private final RealmHelper mRealmHelper;
 
-    public HistoryRealmRepo(SharedPreferences sp){
+    public HistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
+        this.mRealmHelper = realmHelper;
         this.sp = sp;
         this.mEditor = sp.edit();
         cache = sp.getStringSet(HISTORY_REALM_KEY, new LinkedHashSet<String>());
@@ -47,7 +51,7 @@ public class HistoryRealmRepo {
         mEditor.putStringSet(HISTORY_REALM_KEY, cache).commit();
     }
 
-    public Completable clear(){
+    public Completable clear() {
         return Completable.defer(new Callable<CompletableSource>() {
             @Override
             public CompletableSource call() throws Exception {
@@ -58,12 +62,13 @@ public class HistoryRealmRepo {
         });
     }
 
-    public Single<List<String>> getAll(){
-        return Single.fromCallable(new Callable<List<String>>() {
-            @Override
-            public List<String> call() throws Exception {
-                return new ArrayList<>(cache);
-            }
-        }).subscribeOn(Schedulers.io());
+    public Observable<Realm> getAll() {
+        return Observable.fromIterable(new ArrayList<>(cache))
+                .flatMap(new Function<String, ObservableSource<Realm>>() {
+                    @Override
+                    public ObservableSource<Realm> apply(@NonNull String s) throws Exception {
+                        return mRealmHelper.getRealmsByName(s);
+                    }
+                });
     }
 }

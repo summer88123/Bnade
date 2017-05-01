@@ -1,7 +1,7 @@
 package com.summer.bnade.select;
 
 import com.summer.bnade.base.BaseView;
-import com.summer.bnade.select.entity.RealmSelectVO;
+import com.summer.bnade.select.entity.TypedRealm;
 import com.summer.lib.model.entity.Realm;
 
 import java.util.List;
@@ -12,17 +12,13 @@ import java.util.List;
 
 interface RealmSelectContract {
     interface View extends BaseView<Presenter> {
-        void show(RealmSelectVO vo);
-
         void selected(Realm realm);
 
-        void show(List<Realm> realms);
+        void show(List<TypedRealm> realms);
     }
     interface Presenter {
         void filter(CharSequence s);
 
         void load();
-
-        void selectHistory(String realm);
     }
 }

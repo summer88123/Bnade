@@ -3,6 +3,7 @@ package com.summer.bnade.data;
 import android.content.SharedPreferences;
 
 import com.summer.lib.model.di.PreActivity;
+import com.summer.lib.model.utils.RealmHelper;
 
 import dagger.Module;
 import dagger.Provides;
@@ -14,8 +15,8 @@ import dagger.Provides;
 public class RepoModule {
     @PreActivity
     @Provides
-    public HistoryRealmRepo provideHistoryRealmRepo(SharedPreferences sp) {
-        return new HistoryRealmRepo(sp);
+    public HistoryRealmRepo provideHistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
+        return new HistoryRealmRepo(sp, realmHelper);
     }
 
     @PreActivity

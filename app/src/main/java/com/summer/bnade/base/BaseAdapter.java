@@ -13,9 +13,9 @@ import java.util.List;
  * Created by kevin.bai on 2017/4/14.
  */
 
-public abstract class BaseAdapter<Item, VH extends BaseViewHolder<Item>> extends RecyclerView.Adapter<VH> {
-    private List<Item> data;
-    private LayoutInflater mInflater;
+public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends RecyclerView.Adapter<VH> {
+    private List<ITEM> data;
+    protected LayoutInflater mInflater;
     private BaseDiffCallback mCallback;
 
     public BaseAdapter() {
@@ -41,22 +41,26 @@ public abstract class BaseAdapter<Item, VH extends BaseViewHolder<Item>> extends
         return data.size();
     }
 
+    public ITEM getItem(int position) {
+        return data.get(position);
+    }
+
     protected abstract int layoutId();
 
     protected abstract VH createViewHolder(View v, int viewType);
 
-    protected BaseDiffCallback createDiffCallBack() {
+    private BaseDiffCallback createDiffCallBack() {
         return new BaseDiffCallback();
     }
 
-    public BaseDiffCallback getCallback() {
+    private BaseDiffCallback getCallback() {
         if (mCallback == null) {
             mCallback = createDiffCallBack();
         }
         return mCallback;
     }
 
-    public void update(List<Item> newData) {
+    public void update(List<ITEM> newData) {
         BaseDiffCallback callback = getCallback();
         if (callback == null) {
             data.clear();
@@ -72,8 +76,8 @@ public abstract class BaseAdapter<Item, VH extends BaseViewHolder<Item>> extends
     }
 
     public class BaseDiffCallback extends DiffUtil.Callback {
-        protected List<Item> oldData;
-        protected List<Item> newData;
+        protected List<ITEM> oldData;
+        protected List<ITEM> newData;
 
         @Override
         public int getOldListSize() {
@@ -95,7 +99,7 @@ public abstract class BaseAdapter<Item, VH extends BaseViewHolder<Item>> extends
             return true;
         }
 
-        void update(List<Item> newData, List<Item> oldData) {
+        void update(List<ITEM> newData, List<ITEM> oldData) {
             this.newData = newData;
             this.oldData = oldData;
         }
