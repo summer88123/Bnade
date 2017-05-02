@@ -13,17 +13,16 @@ import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
-import io.reactivex.SingleTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -46,7 +45,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
     @Override
     public void load(int hotType) {
-        Single.zip(mRepo.getHot(hotType), getHistories(),
+        Single.zip(mRepo.getHot(hotType), mHistorySearchRepo.getHistories().toList(),
                 new BiFunction<List<Hot>, List<String>, SearchVO>() {
                     @Override
                     public SearchVO apply(@NonNull List<Hot> hotlist, @NonNull List<String>
@@ -63,31 +62,17 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                 }, mErrorHandler);
     }
 
-    private Single<List<String>> getHistories() {
-        return Single.defer(new Callable<SingleSource<List<String>>>() {
-            @Override
-            public SingleSource<List<String>> call() throws Exception {
-                return Single.just(mHistorySearchRepo.getHistories());
-            }
-        });
-    }
-
     @Override
     public void search(final String name, final Realm realm) {
         mRepo.getItem(name)
-                .doOnSuccess(new Consumer<Item>() {
+                .flatMap(new Function<Item, SingleSource<Item>>() {
                     @Override
-                    public void accept(@NonNull Item item) throws Exception {
-                        mHistorySearchRepo.add(item.getName());
-                    }
-                })
-                .compose(new SingleTransformer<Item, Item>() {
-                    @Override
-                    public SingleSource<Item> apply(@NonNull Single<Item> upstream) {
+                    public SingleSource<Item> apply(@NonNull Item item) throws Exception {
+                        Single<Item> temp = mHistorySearchRepo.add(item.getName()).andThen(Single.just(item));
                         if (realm != null) {
-                            return mRealmRepo.add(realm).andThen(upstream);
+                            temp = mRealmRepo.add(realm).andThen(temp);
                         }
-                        return upstream;
+                        return temp;
                     }
                 })
                 .flatMap(new Function<Item, SingleSource<SearchResultVO>>() {
@@ -153,7 +138,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
     @Override
     public void updateHistory() {
-        getHistories()
+        mHistorySearchRepo.getHistories().toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<String>>() {
                     @Override
@@ -176,18 +161,12 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
     @Override
     public void clearHistories() {
-        getHistories()
-                .doOnSubscribe(new Consumer<Disposable>() {
-                    @Override
-                    public void accept(@NonNull Disposable disposable) throws Exception {
-                        mHistorySearchRepo.clear();
-                    }
-                })
+        mHistorySearchRepo.clear()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<String>>() {
+                .subscribe(new Action() {
                     @Override
-                    public void accept(@NonNull List<String> strings) throws Exception {
-                        mView.updateHistories(strings);
+                    public void run() throws Exception {
+                        mView.updateHistories(Collections.<String>emptyList());
                     }
                 });
     }
