@@ -54,7 +54,7 @@ public class RealmRankPresenter extends BasePresenter<RealmRankContract.View> im
                         mView.setRefreshing(false);
                         mView.show(auctionRealms, mSortType);
                     }
-                });
+                }, mErrorHandler);
     }
 
     private SingleTransformer<List<AuctionRealm>, List<AuctionRealm>> sortData(final AuctionRealm.SortType sortType) {
@@ -112,6 +112,6 @@ public class RealmRankPresenter extends BasePresenter<RealmRankContract.View> im
                         mSortType = sortType;
                         mView.show(auctionRealms, sortType);
                     }
-                });
+                }, mErrorHandler);
     }
 }

@@ -42,6 +42,6 @@ public class SearchRealmItemResultPresenter extends BasePresenter<SearchResultCo
                     public void accept(@NonNull SearchResultVO searchResultVO) throws Exception {
                         mView.show(searchResultVO);
                     }
-                });
+                }, mErrorHandler);
     }
 }

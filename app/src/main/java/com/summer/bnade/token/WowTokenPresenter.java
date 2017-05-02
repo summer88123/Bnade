@@ -93,7 +93,7 @@ public class WowTokenPresenter extends BasePresenter<WowTokenContract.View> impl
                         mView.showOneDayChart(wowTokenVO.getOneDayTokens());
                         mView.showHistoryChart(wowTokenVO.getAllTokens());
                     }
-                });
+                }, mErrorHandler);
     }
 
     private List<Entry> convert(List<WowTokens> list) {

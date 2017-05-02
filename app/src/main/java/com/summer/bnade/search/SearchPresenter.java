@@ -40,7 +40,6 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
     SearchPresenter(SearchContract.View view, BnadeRepo repo, HistorySearchRepo historySearchRepo,
                     HistoryRealmRepo realmRepo) {
         super(view, repo);
-
         this.mHistorySearchRepo = historySearchRepo;
         this.mRealmRepo = realmRepo;
     }
@@ -61,12 +60,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                     public void accept(@NonNull SearchVO searchVO) throws Exception {
                         mView.show(searchVO);
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        mView.showToast(throwable.getMessage());
-                    }
-                });
+                }, mErrorHandler);
     }
 
     private Single<List<String>> getHistories() {
@@ -154,12 +148,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                             mView.showResult(searchResultVO);
                         }
                     }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        mView.showToast("异常");
-                    }
-                });
+                }, mErrorHandler);
     }
 
     @Override
@@ -182,7 +171,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                     public void accept(@NonNull List<Hot> hots) throws Exception {
                         mView.updateHotSearch(hots);
                     }
-                });
+                }, mErrorHandler);
     }
 
     @Override

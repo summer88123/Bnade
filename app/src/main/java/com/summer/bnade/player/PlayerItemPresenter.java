@@ -39,7 +39,7 @@ public class PlayerItemPresenter extends BasePresenter<PlayerItemContract.View> 
                         public void accept(@NonNull List<Auction> auctions) throws Exception {
                             mView.showList(auctions);
                         }
-                    });
+                    }, mErrorHandler);
         }
     }
 

@@ -67,7 +67,7 @@ class RealmSelectPresenter extends BasePresenter<RealmSelectContract.View> imple
 
     @Override
     public void load() {
-        Observable.merge(mRealmRepo.getAll().map(mapUsed), mRepo.getAllRealm(false).map(mapNormal))
+        Observable.concat(mRealmRepo.getAll().map(mapUsed), mRepo.getAllRealm(false).map(mapNormal))
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<List<TypedRealm>>() {

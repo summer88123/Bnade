@@ -71,7 +71,7 @@ class SearchResultPresenter extends BasePresenter<SearchResultContract.View> imp
                     public void accept(@NonNull SearchResultVO searchResultVO) throws Exception {
                         mView.show(searchResultVO);
                     }
-                });
+                }, mErrorHandler);
 
     }
 
