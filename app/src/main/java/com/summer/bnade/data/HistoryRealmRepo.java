@@ -5,17 +5,17 @@ import android.content.SharedPreferences;
 import com.summer.lib.model.entity.Realm;
 import com.summer.lib.model.utils.RealmHelper;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
-import io.reactivex.CompletableSource;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by kevin.bai on 2017/4/30.
@@ -23,52 +23,64 @@ import io.reactivex.functions.Function;
 
 public class HistoryRealmRepo {
     private static final String HISTORY_REALM_KEY = "KEY_HISTORY_REALM";
-    private final SharedPreferences sp;
     private final SharedPreferences.Editor mEditor;
-    private final Set<String> cache;
     private final RealmHelper mRealmHelper;
+    private final SharedPreferences sp;
+    private Set<String> cache;
 
     public HistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
         this.mRealmHelper = realmHelper;
         this.sp = sp;
         this.mEditor = sp.edit();
-        cache = sp.getStringSet(HISTORY_REALM_KEY, new LinkedHashSet<String>());
     }
 
     public Completable add(final Realm realm) {
-
-        return Completable.defer(new Callable<CompletableSource>() {
+        return Completable.fromAction(new Action() {
             @Override
-            public CompletableSource call() throws Exception {
+            public void run() throws Exception {
+                initCache();
                 cache.add(realm.getConnected());
                 save();
-                return Completable.complete();
             }
-        });
-    }
-
-    private void save() {
-        mEditor.putStringSet(HISTORY_REALM_KEY, cache).commit();
+        }).subscribeOn(Schedulers.io());
     }
 
     public Completable clear() {
-        return Completable.defer(new Callable<CompletableSource>() {
+        return Completable.fromAction(new Action() {
             @Override
-            public CompletableSource call() throws Exception {
+            public void run() throws Exception {
+                initCache();
                 cache.clear();
                 save();
-                return Completable.complete();
             }
-        });
+        }).subscribeOn(Schedulers.io());
     }
 
     public Observable<Realm> getAll() {
-        return Observable.fromIterable(new ArrayList<>(cache))
+        return Observable
+                .defer(new Callable<ObservableSource<String>>() {
+                    @Override
+                    public ObservableSource<String> call() throws Exception {
+                        initCache();
+                        return Observable.fromIterable(cache);
+                    }
+                })
                 .flatMap(new Function<String, ObservableSource<Realm>>() {
                     @Override
                     public ObservableSource<Realm> apply(@NonNull String s) throws Exception {
                         return mRealmHelper.getRealmsByName(s);
                     }
-                });
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    private void initCache() {
+        if (cache == null) {
+            cache = sp.getStringSet(HISTORY_REALM_KEY, new LinkedHashSet<String>());
+        }
+    }
+
+    private void save() {
+        mEditor.putStringSet(HISTORY_REALM_KEY, cache).commit();
     }
 }
