@@ -41,4 +41,5 @@
     <string name="bid_price">当前竞价</string>
     <string name="buyout">一口价</string>
     <string name="search_query_hint_player">请输入玩家名</string>
+    <string name="filter">筛选</string>
 </resources>

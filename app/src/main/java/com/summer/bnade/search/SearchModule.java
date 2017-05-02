@@ -21,22 +21,17 @@ public class SearchModule {
     }
 
     @Provides
-    SearchContract.Presenter provideSearchPresenter(SearchPresenter presenter){
-        return presenter;
-    }
-
-    @Provides
     FuzzyItemAdapter provideFuzzyItemAdapter() {
         return new FuzzyItemAdapter();
     }
 
     @Provides
-    HistoryAdapter provideHistoryAdapter(SearchPresenter presenter){
-        return new HistoryAdapter(presenter);
+    HistoryAdapter provideHistoryAdapter(SearchContract.View view){
+        return new HistoryAdapter(view);
     }
 
     @Provides
-    HotSearchAdapter provideHotSearchAdapter(SearchPresenter presenter){
-        return new HotSearchAdapter(presenter);
+    HotSearchAdapter provideHotSearchAdapter(SearchContract.View view){
+        return new HotSearchAdapter(view);
     }
 }

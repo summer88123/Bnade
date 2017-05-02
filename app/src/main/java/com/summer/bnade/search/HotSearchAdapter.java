@@ -19,10 +19,10 @@ import butterknife.OnClick;
 
 class HotSearchAdapter extends BaseAdapter<Hot, HotSearchAdapter.ViewHolder> {
 
-    private final SearchContract.Presenter mPresenter;
+    private final SearchContract.View mView;
 
-    HotSearchAdapter(SearchContract.Presenter presenter) {
-        this.mPresenter = presenter;
+    HotSearchAdapter(SearchContract.View view) {
+        this.mView = view;
     }
 
     @Override
@@ -54,7 +54,7 @@ class HotSearchAdapter extends BaseAdapter<Hot, HotSearchAdapter.ViewHolder> {
 
         @OnClick(R.id.card_search_item)
         void onClick() {
-            mPresenter.search(item.getName(), false);
+            mView.search(item.getName());
         }
     }
 }

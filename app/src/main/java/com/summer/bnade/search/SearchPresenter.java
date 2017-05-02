@@ -39,7 +39,6 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
     private final HistorySearchRepo mHistorySearchRepo;
     private final HistoryRealmRepo mRealmRepo;
     private SearchVO mSearchVO;
-    private Realm currentRealm;
 
     @Inject
     SearchPresenter(SearchContract.View view, BnadeRepo repo, HistorySearchRepo historySearchRepo,
@@ -49,11 +48,6 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
         this.mHistorySearchRepo = historySearchRepo;
         this.mRealmRepo = realmRepo;
         mSearchVO = new SearchVO();
-    }
-
-    @Override
-    public void fuzzySearch(String text) {
-        search(text, true);
     }
 
     @Override
@@ -90,6 +84,11 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                     public void accept(@NonNull SearchVO searchVO) throws Exception {
                         mView.show(searchVO);
                     }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        mView.showToast(throwable.getMessage());
+                    }
                 });
     }
 
@@ -103,23 +102,19 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
     }
 
     @Override
-    public void search(final String name, final boolean saveHistory) {
+    public void search(final String name, final Realm realm) {
         mRepo.getItem(name)
                 .doOnSuccess(new Consumer<Item>() {
                     @Override
                     public void accept(@NonNull Item item) throws Exception {
-                        if (saveHistory) {
-                            mHistorySearchRepo.add(item.getName());
-                        }
+                        mHistorySearchRepo.add(item.getName());
                     }
                 })
                 .compose(new SingleTransformer<Item, Item>() {
                     @Override
                     public SingleSource<Item> apply(@NonNull Single<Item> upstream) {
-                        if (saveHistory) {
-                            if (currentRealm != null) {
-                                return mRealmRepo.add(currentRealm).andThen(upstream);
-                            }
+                        if (realm != null) {
+                            return mRealmRepo.add(realm).andThen(upstream);
                         }
                         return upstream;
                     }
@@ -127,8 +122,8 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                 .flatMap(new Function<Item, SingleSource<SearchResultVO>>() {
                     @Override
                     public SingleSource<SearchResultVO> apply(@NonNull Item item) throws Exception {
-                        if (currentRealm != null) {
-                            return Single.zip(mRepo.getAuctionRealmItem(currentRealm.getId(), item.getId()), Single
+                        if (realm != null) {
+                            return Single.zip(mRepo.getAuctionRealmItem(realm.getId(), item.getId()), Single
                                             .just(item),
                                     new BiFunction<List<AuctionRealmItem>, Item, SearchResultVO>() {
                                         @Override
@@ -188,11 +183,6 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                         mView.showToast("异常");
                     }
                 });
-    }
-
-    @Override
-    public void selectRealm(Realm realm) {
-        this.currentRealm = realm;
     }
 
     @Override

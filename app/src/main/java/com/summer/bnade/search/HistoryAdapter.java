@@ -18,10 +18,10 @@ import butterknife.OnClick;
 
 class HistoryAdapter extends BaseAdapter<String, HistoryAdapter.ViewHolder> {
 
-    private final SearchContract.Presenter mPresenter;
+    private final SearchContract.View mView;
 
-    HistoryAdapter(SearchContract.Presenter presenter) {
-        mPresenter = presenter;
+    HistoryAdapter(SearchContract.View view) {
+        this.mView = view;
     }
 
     @Override
@@ -52,7 +52,7 @@ class HistoryAdapter extends BaseAdapter<String, HistoryAdapter.ViewHolder> {
 
         @OnClick(R.id.card_search_item)
         void onClick() {
-            mPresenter.search(item, false);
+            mView.search(item);
         }
     }
 }

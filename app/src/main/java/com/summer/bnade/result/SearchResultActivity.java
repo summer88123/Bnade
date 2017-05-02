@@ -17,8 +17,6 @@ import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.CombinedChart.DrawOrder;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.XAxis.XAxisPosition;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
@@ -78,11 +76,12 @@ public class SearchResultActivity extends BaseActivity implements SearchResultCo
 
     private void initChart() {
         mChart.getDescription().setEnabled(false);
+        mChart.setScaleYEnabled(false);
         mChart.setDrawGridBackground(false);
         mChart.setDrawBarShadow(false);
         mChart.setHighlightFullBarEnabled(false);
+        mChart.getXAxis().setEnabled(false);
 
-        // draw bars behind lines
         mChart.setDrawOrder(new DrawOrder[]{DrawOrder.BAR, DrawOrder.LINE});
 
         Legend l = mChart.getLegend();
@@ -120,12 +119,6 @@ public class SearchResultActivity extends BaseActivity implements SearchResultCo
                 return -1;
             }
         });
-
-        XAxis xAxis = mChart.getXAxis();
-        xAxis.setDrawGridLines(false);
-        xAxis.setPosition(XAxisPosition.BOTTOM);
-        xAxis.setDrawLabels(false);
-
     }
 
     @Override

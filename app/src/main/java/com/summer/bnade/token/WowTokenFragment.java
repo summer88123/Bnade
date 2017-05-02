@@ -117,7 +117,7 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
     @Override
     public void showCurrentToken(WowTokenVO current) {
         mTvCurPrice.setText(getString(R.string.gold, current.getCurrentGold()));
-        mTvModifiedTime.setText(DateUtil.format(current.getLastModified(), "M月d日 H:m"));
+        mTvModifiedTime.setText(DateUtil.format(current.getLastModified(), "M月d日 H:mm"));
         mTvMinPrice.setText(getString(R.string.gold, current.getMinGold()));
         mTvMaxPrice.setText(getString(R.string.gold, current.getMaxGold()));
         animateIn(mCardView1, 0);

@@ -106,7 +106,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
                 mFuzzyList.dismiss();
-                mPresenter.fuzzySearch(((TextView) view).getText().toString());
+                search(((TextView) view).getText().toString());
             }
         });
 
@@ -131,7 +131,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                mPresenter.search(s, true);
+                search(s);
                 return false;
             }
 
@@ -168,7 +168,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
             Realm realm = data.getParcelableExtra(Content.EXTRA_DATA);
             mBtnRealmSelect.setText(realm.getConnected());
-            mPresenter.selectRealm(realm);
+            mBtnRealmSelect.setTag(realm);
         }
     }
 
@@ -176,6 +176,11 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     public void show(SearchVO searchVO) {
         updateHotSearch(searchVO.getHotList());
         updateHistories(searchVO.getHistories());
+    }
+
+    @Override
+    public void search(String query) {
+        mPresenter.search(query, (Realm) mBtnRealmSelect.getTag());
     }
 
     @Override
@@ -226,7 +231,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         } else {
             String query = mSearchView.getQuery().toString();
             if (!TextUtils.isEmpty(query)) {
-                mPresenter.search(query, true);
+                search(query);
             }
         }
     }
