@@ -13,10 +13,7 @@ import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
@@ -38,7 +35,6 @@ import io.reactivex.functions.Function;
 public class SearchPresenter extends BasePresenter<SearchContract.View> implements SearchContract.Presenter {
     private final HistorySearchRepo mHistorySearchRepo;
     private final HistoryRealmRepo mRealmRepo;
-    private SearchVO mSearchVO;
 
     @Inject
     SearchPresenter(SearchContract.View view, BnadeRepo repo, HistorySearchRepo historySearchRepo,
@@ -47,35 +43,16 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
         this.mHistorySearchRepo = historySearchRepo;
         this.mRealmRepo = realmRepo;
-        mSearchVO = new SearchVO();
     }
 
     @Override
-    public void load() {
-        mRepo.getHot()
-                .map(new Function<List<Hot>, Map<Integer, List<Hot>>>() {
+    public void load(int hotType) {
+        Single.zip(mRepo.getHot(hotType), getHistories(),
+                new BiFunction<List<Hot>, List<String>, SearchVO>() {
                     @Override
-                    public Map<Integer, List<Hot>> apply(@NonNull List<Hot> hots) throws Exception {
-                        Map<Integer, List<Hot>> map = new HashMap<>();
-                        for (Hot hot : hots) {
-                            List<Hot> typeList = map.get(hot.getType());
-                            if (typeList == null) {
-                                typeList = new ArrayList<>();
-                                map.put(hot.getType(), typeList);
-                            }
-                            typeList.add(hot);
-                        }
-                        return map;
-                    }
-                })
-                .zipWith(getHistories(), new BiFunction<Map<Integer, List<Hot>>, List<String>, SearchVO>() {
-                    @Override
-                    public SearchVO apply(@NonNull Map<Integer, List<Hot>> integerListMap, @NonNull List<String>
+                    public SearchVO apply(@NonNull List<Hot> hotlist, @NonNull List<String>
                             strings) throws Exception {
-                        mSearchVO.setMap(integerListMap);
-                        mSearchVO.setHistories(strings);
-                        mSearchVO.setCurrentType(Hot.MONTH);
-                        return mSearchVO;
+                        return new SearchVO(hotlist, strings);
                     }
                 })
                 .observeOn(AndroidSchedulers.mainThread())
@@ -199,8 +176,13 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
     @Override
     public void updateHotSearchType(int type) {
-        mSearchVO.setCurrentType(type);
-        mView.updateHotSearch(mSearchVO.getHotList());
+        mRepo.getHot(type).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Hot>>() {
+                    @Override
+                    public void accept(@NonNull List<Hot> hots) throws Exception {
+                        mView.updateHotSearch(hots);
+                    }
+                });
     }
 
     @Override

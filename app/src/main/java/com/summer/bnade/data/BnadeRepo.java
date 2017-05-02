@@ -1,5 +1,7 @@
 package com.summer.bnade.data;
 
+import android.util.SparseArray;
+
 import com.summer.bnade.data.error.EmptyDataException;
 import com.summer.lib.model.api.BnadeApi;
 import com.summer.lib.model.entity.Auction;
@@ -12,6 +14,7 @@ import com.summer.lib.model.entity.Realm;
 import com.summer.lib.model.entity.WowTokens;
 import com.summer.lib.model.utils.RealmHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -30,11 +33,13 @@ import io.reactivex.functions.Function;
 public class BnadeRepo {
     private final BnadeApi api;
     private final RealmHelper mRealmHelper;
+    private final SparseArray<List<Hot>> hotCache;
 
     @Inject
     BnadeRepo(BnadeApi api, RealmHelper realmHelper) {
         this.api = api;
         this.mRealmHelper = realmHelper;
+        hotCache = new SparseArray<>(3);
     }
 
     public Single<Item> getItem(String name) {
@@ -88,8 +93,38 @@ public class BnadeRepo {
         return api.getAhWowtokens();
     }
 
-    public Single<List<Hot>> getHot() {
-        return api.getHot();
+    public Single<List<Hot>> getHot(int type) {
+        return Observable.concat(getHotCache(type), getHotRemote(type)).firstOrError();
+    }
+
+    private Observable<List<Hot>> getHotRemote(final int type) {
+        return api.getHot().toObservable()
+                .map(new Function<List<Hot>, SparseArray<List<Hot>>>() {
+                    @Override
+                    public SparseArray<List<Hot>> apply(@NonNull List<Hot> hots) throws Exception {
+                        SparseArray<List<Hot>> map = hotCache;
+                        map.clear();
+                        for (Hot hot : hots) {
+                            List<Hot> typeList = map.get(hot.getType());
+                            if (typeList == null) {
+                                typeList = new ArrayList<>();
+                                map.put(hot.getType(), typeList);
+                            }
+                            typeList.add(hot);
+                        }
+                        return map;
+                    }
+                })
+                .map(new Function<SparseArray<List<Hot>>, List<Hot>>() {
+                    @Override
+                    public List<Hot> apply(@NonNull SparseArray<List<Hot>> listSparseArray) throws Exception {
+                        return listSparseArray.get(type);
+                    }
+                });
+    }
+
+    private Observable<List<Hot>> getHotCache(int type) {
+        return hotCache.get(type) == null ? Observable.<List<Hot>>empty() : Observable.just(hotCache.get(type));
     }
 
     public Single<List<AuctionRealm>> getAuctionRealm() {
@@ -133,7 +168,8 @@ public class BnadeRepo {
                         return Single.just(auction).zipWith(getItem(auction.getName()),
                                 new BiFunction<Auction, Item, Auction>() {
                                     @Override
-                                    public Auction apply(@NonNull Auction auction, @NonNull Item item) throws Exception {
+                                    public Auction apply(@NonNull Auction auction, @NonNull Item item) throws
+                                            Exception {
                                         auction.setItem(item);
                                         return auction;
                                     }

@@ -113,18 +113,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         mRgHotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-                switch (i) {
-                    case R.id.rb_week:
-                        mPresenter.updateHotSearchType(Hot.WEEK);
-                        break;
-                    case R.id.rb_day:
-                        mPresenter.updateHotSearchType(Hot.DAY);
-                        break;
-                    case R.id.rb_month:
-                    default:
-                        mPresenter.updateHotSearchType(Hot.MONTH);
-                        break;
-                }
+                mPresenter.updateHotSearchType(getHotType(i));
             }
         });
 
@@ -144,6 +133,18 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         return view;
     }
 
+    private int getHotType(@IdRes int resId) {
+        switch (resId) {
+            case R.id.rb_week:
+                return Hot.WEEK;
+            case R.id.rb_day:
+                return Hot.DAY;
+            case R.id.rb_month:
+            default:
+                return Hot.MONTH;
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -159,7 +160,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mPresenter.load();
+        mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
     }
 
     @Override

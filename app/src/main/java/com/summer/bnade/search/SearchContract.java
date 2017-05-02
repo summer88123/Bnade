@@ -30,7 +30,7 @@ public interface SearchContract {
     }
 
     interface Presenter {
-        void load();
+        void load(int hotType);
 
         void search(String name, Realm realm);
 
