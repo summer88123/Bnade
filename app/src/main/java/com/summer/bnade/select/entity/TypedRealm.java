@@ -7,7 +7,7 @@ import com.summer.lib.model.entity.Realm;
  */
 
 public class TypedRealm {
-    private static final String USED = "常用";
+    public static final String USED = "常用";
     private static final String NORMAL = "全部";
     private String type;
     private Realm realm;

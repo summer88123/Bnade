@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,7 +57,29 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
         mAdapter = new RealmAdapter(this);
         mList.setAdapter(mAdapter);
         mList.addItemDecoration(new StickyRecyclerHeadersDecoration(mAdapter));
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView
+                    .ViewHolder target) {
+                return false;
+            }
 
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                mAdapter.remove(position);
+                mPresenter.remove(mAdapter.getItem(position).getRealm());
+            }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(0, mAdapter.getItem(viewHolder.getAdapterPosition()).getType()
+                        .equals(TypedRealm.USED) ? ItemTouchHelper.RIGHT : 0);
+            }
+
+        };
+        ItemTouchHelper helper = new ItemTouchHelper(callback);
+        helper.attachToRecyclerView(mList);
         return view;
     }
 
@@ -64,6 +87,7 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mPresenter.load();
+
     }
 
     @Override

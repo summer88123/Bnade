@@ -77,4 +77,9 @@ class RealmSelectPresenter extends BasePresenter<RealmSelectContract.View> imple
                     }
                 });
     }
+
+    @Override
+    public void remove(Realm item) {
+        mRealmRepo.remove(item).subscribe();
+    }
 }

@@ -20,5 +20,7 @@ interface RealmSelectContract {
         void filter(CharSequence s);
 
         void load();
+
+        void remove(Realm item);
     }
 }

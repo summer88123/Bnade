@@ -74,6 +74,17 @@ public class HistoryRealmRepo {
                 .subscribeOn(Schedulers.io());
     }
 
+    public Completable remove(final Realm item) {
+        return Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                initCache();
+                cache.remove(item.getConnected());
+                save();
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+
     private void initCache() {
         if (cache == null) {
             cache = sp.getStringSet(HISTORY_REALM_KEY, new LinkedHashSet<String>());

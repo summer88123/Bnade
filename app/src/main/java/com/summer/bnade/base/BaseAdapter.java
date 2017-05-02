@@ -13,8 +13,8 @@ import java.util.List;
  * Created by kevin.bai on 2017/4/14.
  */
 
-public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends RecyclerView.Adapter<VH> {
-    private List<ITEM> data;
+public abstract class BaseAdapter<I, H extends BaseViewHolder<I>> extends RecyclerView.Adapter<H> {
+    private List<I> data;
     protected LayoutInflater mInflater;
     private BaseDiffCallback mCallback;
 
@@ -23,7 +23,7 @@ public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends
     }
 
     @Override
-    public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+    public H onCreateViewHolder(ViewGroup parent, int viewType) {
         if (mInflater == null) {
             mInflater = LayoutInflater.from(parent.getContext());
         }
@@ -32,7 +32,7 @@ public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends
     }
 
     @Override
-    public void onBindViewHolder(VH holder, int position) {
+    public void onBindViewHolder(H holder, int position) {
         holder.bind(data.get(position));
     }
 
@@ -41,13 +41,18 @@ public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends
         return data.size();
     }
 
-    public ITEM getItem(int position) {
+    public I getItem(int position) {
         return data.get(position);
+    }
+
+    public void remove(int position) {
+        data.remove(position);
+        notifyItemRemoved(position);
     }
 
     protected abstract int layoutId();
 
-    protected abstract VH createViewHolder(View v, int viewType);
+    protected abstract H createViewHolder(View v, int viewType);
 
     private BaseDiffCallback createDiffCallBack() {
         return new BaseDiffCallback();
@@ -60,7 +65,7 @@ public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends
         return mCallback;
     }
 
-    public void update(List<ITEM> newData) {
+    public void update(List<I> newData) {
         BaseDiffCallback callback = getCallback();
         if (callback == null) {
             data.clear();
@@ -75,9 +80,9 @@ public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends
         }
     }
 
-    public class BaseDiffCallback extends DiffUtil.Callback {
-        protected List<ITEM> oldData;
-        protected List<ITEM> newData;
+    private class BaseDiffCallback extends DiffUtil.Callback {
+        List<I> oldData;
+        List<I> newData;
 
         @Override
         public int getOldListSize() {
@@ -99,7 +104,7 @@ public abstract class BaseAdapter<ITEM, VH extends BaseViewHolder<ITEM>> extends
             return true;
         }
 
-        void update(List<ITEM> newData, List<ITEM> oldData) {
+        void update(List<I> newData, List<I> oldData) {
             this.newData = newData;
             this.oldData = oldData;
         }
