@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
@@ -38,8 +39,12 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
     private PlayerItemAdapter mAdapter;
 
     @SuppressWarnings("unused")
-    public static PlayerItemFragment newInstance() {
-        return new PlayerItemFragment();
+    public static PlayerItemFragment getInstance(FragmentManager fm) {
+        PlayerItemFragment fragment = (PlayerItemFragment) fm.findFragmentByTag(TAG);
+        if (fragment == null) {
+            fragment = new PlayerItemFragment();
+        }
+        return fragment;
     }
 
     @OnClick(R.id.btn_realm_select)

@@ -7,11 +7,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
 import android.support.transition.TransitionManager;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -77,8 +79,12 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     ConstraintSet hasRealmSet = new ConstraintSet();
     ConstraintSet noRealmSet = new ConstraintSet();
 
-    public static SearchFragment newInstance() {
-        return new SearchFragment();
+    public static SearchFragment getInstance(FragmentManager fm) {
+        SearchFragment fragment = (SearchFragment) fm.findFragmentByTag(TAG);
+        if (fragment == null) {
+            fragment = new SearchFragment();
+        }
+        return fragment;
     }
 
     @Override
@@ -89,21 +95,21 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         }
     }
 
-    private void selectRealm(Realm realm) {
-        mBtnRealmSelect.setText(realm.getConnected());
-        mBtnRealmSelect.setTag(realm);
-        TransitionManager.beginDelayedTransition(mContent);
-        hasRealmSet.setVisibility(R.id.btn_realm_clear, ConstraintSet.VISIBLE);
-        hasRealmSet.connect(R.id.btn_realm_select, ConstraintSet.RIGHT, R.id.btn_realm_clear, ConstraintSet.LEFT);
-        hasRealmSet.connect(R.id.btn_realm_clear, ConstraintSet.LEFT, R.id.btn_realm_select, ConstraintSet.RIGHT);
-        hasRealmSet.applyTo(mContent);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("REALM", (Parcelable) mBtnRealmSelect.getTag());
     }
 
-    private void clearRealm(){
-        mBtnRealmSelect.setTag(null);
-        mBtnRealmSelect.setText(R.string.btn_realm_select);
-        TransitionManager.beginDelayedTransition(mContent);
-        noRealmSet.applyTo(mContent);
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            Realm realm = savedInstanceState.getParcelable("REALM");
+            if (realm != null) {
+                selectRealm(realm);
+            }
+        }
     }
 
     @Override
@@ -254,6 +260,13 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         }
     }
 
+    private void clearRealm(){
+        mBtnRealmSelect.setTag(null);
+        mBtnRealmSelect.setText(R.string.btn_realm_select);
+        TransitionManager.beginDelayedTransition(mContent);
+        noRealmSet.applyTo(mContent);
+    }
+
     private int getHotType(@IdRes int resId) {
         switch (resId) {
             case R.id.rb_week:
@@ -264,5 +277,15 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
             default:
                 return Hot.MONTH;
         }
+    }
+
+    private void selectRealm(Realm realm) {
+        mBtnRealmSelect.setText(realm.getConnected());
+        mBtnRealmSelect.setTag(realm);
+        TransitionManager.beginDelayedTransition(mContent);
+        hasRealmSet.setVisibility(R.id.btn_realm_clear, ConstraintSet.VISIBLE);
+        hasRealmSet.connect(R.id.btn_realm_select, ConstraintSet.RIGHT, R.id.btn_realm_clear, ConstraintSet.LEFT);
+        hasRealmSet.connect(R.id.btn_realm_clear, ConstraintSet.LEFT, R.id.btn_realm_select, ConstraintSet.RIGHT);
+        hasRealmSet.applyTo(mContent);
     }
 }

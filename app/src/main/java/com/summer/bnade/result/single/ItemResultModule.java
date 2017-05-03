@@ -1,6 +1,5 @@
 package com.summer.bnade.result.single;
 
-import com.summer.bnade.result.all.SearchResultAdapter;
 
 import dagger.Module;
 import dagger.Provides;
@@ -19,11 +18,6 @@ class ItemResultModule {
     @Provides
     ItemResultContract.View provideResultView() {
         return mView;
-    }
-
-    @Provides
-    SearchResultAdapter provideAdapter() {
-        return new SearchResultAdapter();
     }
 
     @Provides

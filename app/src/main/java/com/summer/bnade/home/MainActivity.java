@@ -52,7 +52,6 @@ public class MainActivity extends BaseActivity
     @BindView(R.id.nav_view)
     NavigationView navigationView;
 
-    @Inject
     FragmentManager fm;
 
     MainComponent mMainComponent;
@@ -101,13 +100,14 @@ public class MainActivity extends BaseActivity
 
     @Override
     protected void injectComponent() {
+        fm = getSupportFragmentManager();
         mMainComponent = DaggerMainComponent.builder()
                 .applicationComponent(ComponentHolder.getComponent())
                 .mainModule(new MainModule(this))
-                .wowTokenModule(new WowTokenModule(WowTokenFragment.newInstance()))
-                .searchModule(new SearchModule(SearchFragment.newInstance()))
-                .realmRankModule(new RealmRankModule(RealmRankFragment.newInstance()))
-                .playerItemModule(new PlayerItemModule(PlayerItemFragment.newInstance()))
+                .wowTokenModule(new WowTokenModule(WowTokenFragment.getInstance(fm)))
+                .searchModule(new SearchModule(SearchFragment.getInstance(fm)))
+                .realmRankModule(new RealmRankModule(RealmRankFragment.getInstance(fm)))
+                .playerItemModule(new PlayerItemModule(PlayerItemFragment.getInstance(fm)))
                 .repoModule(new RepoModule())
                 .build();
         mMainComponent.inject(this);
@@ -153,22 +153,13 @@ public class MainActivity extends BaseActivity
         if (id == R.id.btn_item_search) {
             showSearch();
         } else if (id == R.id.btn_token) {
-            WowTokenFragment token = (WowTokenFragment) fm.findFragmentByTag(WowTokenFragment.TAG);
-            if (token == null) {
-                token = (WowTokenFragment) mMainComponent.wowTokenView();
-            }
+            WowTokenFragment token = (WowTokenFragment) mMainComponent.wowTokenView();
             fm.beginTransaction().replace(R.id.content_main, token, WowTokenFragment.TAG).commit();
         } else if (id == R.id.btn_realm_rank) {
-            RealmRankFragment token = (RealmRankFragment) fm.findFragmentByTag(RealmRankFragment.TAG);
-            if (token == null) {
-                token = (RealmRankFragment) mMainComponent.realmRankView();
-            }
+            RealmRankFragment token = (RealmRankFragment) mMainComponent.realmRankView();
             fm.beginTransaction().replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
         } else if (id == R.id.btn_player_item) {
-            PlayerItemFragment player = (PlayerItemFragment) fm.findFragmentByTag(PlayerItemFragment.TAG);
-            if (player == null) {
-                player = (PlayerItemFragment) mMainComponent.playerItemView();
-            }
+            PlayerItemFragment player = (PlayerItemFragment) mMainComponent.playerItemView();
             fm.beginTransaction().replace(R.id.content_main, player, PlayerItemFragment.TAG).commit();
         } else if (id == R.id.nav_share) {
 
@@ -187,10 +178,7 @@ public class MainActivity extends BaseActivity
     }
 
     private void showSearch() {
-        SearchFragment search = (SearchFragment) fm.findFragmentByTag(SearchFragment.TAG);
-        if (search == null) {
-            search = (SearchFragment) mMainComponent.searchView();
-        }
+        SearchFragment search = (SearchFragment) mMainComponent.searchView();
         mMainComponent.inject(search);
         fm.beginTransaction().replace(R.id.content_main, search, SearchFragment.TAG).commit();
     }

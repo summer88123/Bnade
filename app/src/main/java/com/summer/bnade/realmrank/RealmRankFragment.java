@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -70,8 +71,12 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
     };
 
     @SuppressWarnings("unused")
-    public static RealmRankFragment newInstance() {
-        return new RealmRankFragment();
+    public static RealmRankFragment getInstance(FragmentManager fm) {
+        RealmRankFragment fragment = (RealmRankFragment) fm.findFragmentByTag(TAG);
+        if (fragment == null) {
+            fragment = new RealmRankFragment();
+        }
+        return fragment;
     }
 
 

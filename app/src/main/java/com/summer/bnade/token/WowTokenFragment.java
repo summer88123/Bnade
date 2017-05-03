@@ -7,6 +7,7 @@ import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
@@ -80,10 +81,11 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
         }
     };
 
-    public static WowTokenFragment newInstance() {
-        WowTokenFragment fragment = new WowTokenFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
+    public static WowTokenFragment getInstance(FragmentManager fm) {
+        WowTokenFragment fragment = (WowTokenFragment) fm.findFragmentByTag(TAG);
+        if (fragment == null) {
+            fragment = new WowTokenFragment();
+        }
         return fragment;
     }
 
