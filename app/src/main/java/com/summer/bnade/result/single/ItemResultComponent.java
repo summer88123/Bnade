@@ -12,4 +12,6 @@ import dagger.Component;
 @Component(dependencies = {ApplicationComponent.class}, modules = ItemResultModule.class)
 interface ItemResultComponent {
     void inject(ItemResultActivity activity);
+
+    void inject(PriceFragment fragment);
 }

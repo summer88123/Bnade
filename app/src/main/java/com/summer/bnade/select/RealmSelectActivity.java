@@ -6,7 +6,7 @@ import android.widget.FrameLayout;
 
 import com.summer.bnade.R;
 import com.summer.bnade.data.RepoModule;
-import com.summer.lib.base.BaseActivity;
+import com.summer.bnade.base.BaseActivity;
 import com.summer.lib.model.di.ComponentHolder;
 
 import javax.inject.Inject;

@@ -32,7 +32,7 @@ import com.summer.bnade.search.SearchPresenter;
 import com.summer.bnade.token.WowTokenFragment;
 import com.summer.bnade.token.WowTokenModule;
 import com.summer.bnade.token.WowTokenPresenter;
-import com.summer.lib.base.BaseActivity;
+import com.summer.bnade.base.BaseActivity;
 import com.summer.lib.model.di.ComponentHolder;
 
 import javax.inject.Inject;

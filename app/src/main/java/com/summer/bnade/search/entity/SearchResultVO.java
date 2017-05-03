@@ -16,10 +16,20 @@ import java.util.List;
 
 public class SearchResultVO implements Parcelable {
     private Item item;
+
+    /**
+     * 单服务器数据
+     */
     private List<AuctionRealmItem> auctionRealmItems;
+    /**
+     * 全服务器数据
+     */
     private long avgBuyout;
     private List<AuctionItem> auctionItems;
     private CombinedData combinedData;
+    /**
+     * 模糊搜索数据
+     */
     private List<String> names;
 
     public SearchResultVO(Item item) {

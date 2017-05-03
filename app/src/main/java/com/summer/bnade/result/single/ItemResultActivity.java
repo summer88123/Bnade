@@ -1,12 +1,14 @@
 package com.summer.bnade.result.single;
 
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 
 import com.summer.bnade.R;
+import com.summer.bnade.base.BaseViewActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
-import com.summer.lib.base.BaseActivity;
 import com.summer.lib.model.di.ComponentHolder;
 
 import javax.inject.Inject;
@@ -14,15 +16,22 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ItemResultActivity extends BaseActivity implements ItemResultContract.View {
+public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Presenter>
+        implements ItemResultContract.View {
 
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    @BindView(R.id.tab_layout)
+    TabLayout mTabLayout;
+    @BindView(R.id.view_pager)
+    ViewPager mViewPager;
 
-    @BindView(R.id.list_view)
-    RecyclerView mListView;
     @Inject
-    ItemResultPresenter mPresenter;
+    PriceFragment mPriceFragment;
     @Inject
-    ItemResultAdapter mAdapter;
+    HistoryFragment mHistoryFragment;
+    @Inject
+    PageAdapter mPageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,25 +39,26 @@ public class ItemResultActivity extends BaseActivity implements ItemResultContra
         setContentView(R.layout.activity_search_realm_item_result);
         ButterKnife.bind(this);
 
-        mListView.setAdapter(mAdapter);
-        mPresenter.setData((SearchResultVO) getIntent().getParcelableExtra(Content.EXTRA_DATA));
+        mTabLayout.setupWithViewPager(mViewPager);
+        mViewPager.setAdapter(mPageAdapter);
+
+        mPresenter.setData(getIntent().<SearchResultVO>getParcelableExtra(Content.EXTRA_DATA));
         mPresenter.load();
     }
 
     @Override
     protected void injectComponent() {
-        DaggerItemResultComponent.builder()
+        ItemResultComponent component = DaggerItemResultComponent.builder()
                 .applicationComponent(ComponentHolder.getComponent())
                 .itemResultModule(new ItemResultModule(this))
-                .build().inject(this);
-    }
-
-    @Override
-    public void setPresenter(ItemResultContract.Presenter presenter) {
+                .build();
+        component.inject(this);
+        component.inject(mPriceFragment);
     }
 
     @Override
     public void show(SearchResultVO result) {
-        mAdapter.update(result.getAuctionRealmItems());
+        mToolbar.setTitle(result.getItem().getName());
+        mPriceFragment.updateList(result.getAuctionRealmItems());
     }
 }

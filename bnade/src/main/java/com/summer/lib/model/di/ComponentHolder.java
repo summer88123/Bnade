@@ -2,8 +2,6 @@ package com.summer.lib.model.di;
 
 import android.app.Application;
 
-import com.summer.lib.base.BaseActivity;
-
 /**
  * Created by kevin.bai on 2017/4/4.
  */

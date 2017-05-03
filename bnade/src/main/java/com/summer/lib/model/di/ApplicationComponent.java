@@ -3,7 +3,6 @@ package com.summer.lib.model.di;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.summer.lib.base.BaseActivity;
 import com.summer.lib.model.api.BnadeApi;
 import com.summer.lib.model.utils.RealmHelper;
 
@@ -17,8 +16,6 @@ import dagger.Component;
 @Singleton
 @Component(modules = {ApplicationModule.class, BnadeApiModule.class})
 public interface ApplicationComponent {
-
-    void inject(BaseActivity activity);
 
     Context context();
 

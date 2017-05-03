@@ -20,9 +20,9 @@ import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
+import com.summer.bnade.base.BaseViewActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
-import com.summer.lib.base.BaseActivity;
 import com.summer.lib.model.di.ComponentHolder;
 
 import javax.inject.Inject;
@@ -30,12 +30,11 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchResultActivity extends BaseActivity implements SearchResultContract.View, SearchView.OnQueryTextListener{
+public class SearchResultActivity extends BaseViewActivity<SearchResultContract.Presenter> implements
+        SearchResultContract.View, SearchView.OnQueryTextListener {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @Inject
-    SearchResultPresenter mPresenter;
     @Inject
     SearchResultAdapter mResultAdapter;
     @BindView(R.id.list)
@@ -141,11 +140,6 @@ public class SearchResultActivity extends BaseActivity implements SearchResultCo
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void setPresenter(SearchResultContract.Presenter presenter) {
-
     }
 
     @Override

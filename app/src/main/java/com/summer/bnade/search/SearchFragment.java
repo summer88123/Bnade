@@ -96,23 +96,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelable("REALM", (Parcelable) mBtnRealmSelect.getTag());
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        if (savedInstanceState != null) {
-            Realm realm = savedInstanceState.getParcelable("REALM");
-            if (realm != null) {
-                selectRealm(realm);
-            }
-        }
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -176,9 +159,26 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     }
 
     @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            Realm realm = savedInstanceState.getParcelable("REALM");
+            if (realm != null) {
+                selectRealm(realm);
+            }
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         mPresenter.updateHistory();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("REALM", (Parcelable) mBtnRealmSelect.getTag());
     }
 
     @Override

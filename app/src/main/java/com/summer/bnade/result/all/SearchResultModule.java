@@ -20,6 +20,11 @@ class SearchResultModule {
     }
 
     @Provides
+    SearchResultContract.Presenter providePresenter(SearchResultPresenter presenter) {
+        return presenter;
+    }
+
+    @Provides
     SearchResultAdapter provideAdapter() {
         return new SearchResultAdapter();
     }
