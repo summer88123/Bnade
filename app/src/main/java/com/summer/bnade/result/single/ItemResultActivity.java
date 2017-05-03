@@ -1,4 +1,4 @@
-package com.summer.bnade.result;
+package com.summer.bnade.result.single;
 
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -14,15 +14,15 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchRealmItemResultActivity extends BaseActivity implements SearchResultContract.View {
+public class ItemResultActivity extends BaseActivity implements ItemResultContract.View {
 
 
     @BindView(R.id.list_view)
     RecyclerView mListView;
     @Inject
-    SearchRealmItemResultPresenter mPresenter;
+    ItemResultPresenter mPresenter;
     @Inject
-    SearchRealmItemResultAdapter mAdapter;
+    ItemResultAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,14 +37,14 @@ public class SearchRealmItemResultActivity extends BaseActivity implements Searc
 
     @Override
     protected void injectComponent() {
-        DaggerSearchResultComponent.builder()
+        DaggerItemResultComponent.builder()
                 .applicationComponent(ComponentHolder.getComponent())
-                .searchResultModule(new SearchResultModule(this))
+                .itemResultModule(new ItemResultModule(this))
                 .build().inject(this);
     }
 
     @Override
-    public void setPresenter(SearchResultContract.Presenter presenter) {
+    public void setPresenter(ItemResultContract.Presenter presenter) {
     }
 
     @Override

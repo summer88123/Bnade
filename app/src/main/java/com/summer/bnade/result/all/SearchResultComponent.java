@@ -1,4 +1,4 @@
-package com.summer.bnade.result;
+package com.summer.bnade.result.all;
 
 import com.summer.lib.model.di.ApplicationComponent;
 import com.summer.lib.model.di.PreActivity;
@@ -12,6 +12,4 @@ import dagger.Component;
 @Component(dependencies = {ApplicationComponent.class}, modules = SearchResultModule.class)
 interface SearchResultComponent {
     void inject(SearchResultActivity activity);
-
-    void inject(SearchRealmItemResultActivity activity);
 }

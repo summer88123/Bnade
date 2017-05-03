@@ -1,4 +1,4 @@
-package com.summer.bnade.result;
+package com.summer.bnade.result.single;
 
 import com.summer.bnade.base.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
@@ -14,13 +14,13 @@ import io.reactivex.functions.Consumer;
  * Created by kevin.bai on 2017/4/28.
  */
 
-public class SearchRealmItemResultPresenter extends BasePresenter<SearchResultContract.View> implements
-        SearchResultContract.Presenter {
+class ItemResultPresenter extends BasePresenter<ItemResultContract.View> implements
+        ItemResultContract.Presenter {
 
     SearchResultVO mResultVO;
 
     @Inject
-    public SearchRealmItemResultPresenter(SearchResultContract.View view, BnadeRepo repo) {
+    ItemResultPresenter(ItemResultContract.View view, BnadeRepo repo) {
         super(view, repo);
     }
 

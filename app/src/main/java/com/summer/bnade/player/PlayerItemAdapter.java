@@ -1,6 +1,5 @@
 package com.summer.bnade.player;
 
-import android.content.res.Resources;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,13 +14,11 @@ import com.summer.lib.model.entity.Gold;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolder> {
+class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolder> {
     private final PlayerItemFragment mFragment;
-    private final Resources mResources;
 
-    public PlayerItemAdapter(PlayerItemFragment fragment) {
+    PlayerItemAdapter(PlayerItemFragment fragment) {
         mFragment = fragment;
-        mResources = fragment.getResources();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.summer.bnade.result;
+package com.summer.bnade.result.all;
 
 import dagger.Module;
 import dagger.Provides;
@@ -22,11 +22,6 @@ class SearchResultModule {
     @Provides
     SearchResultAdapter provideAdapter() {
         return new SearchResultAdapter();
-    }
-
-    @Provides
-    SearchRealmItemResultAdapter provideRealmItemAdapter(){
-        return new SearchRealmItemResultAdapter();
     }
 
 }

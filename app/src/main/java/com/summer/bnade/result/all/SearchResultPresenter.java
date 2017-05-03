@@ -1,4 +1,4 @@
-package com.summer.bnade.result;
+package com.summer.bnade.result.all;
 
 import android.graphics.Color;
 import android.text.TextUtils;

@@ -24,12 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".result.SearchResultActivity" />
+        <activity android:name=".result.all.SearchResultActivity" />
         <activity
             android:name=".select.RealmSelectActivity"
             android:theme="@style/AppTheme.Dialog"
             android:windowSoftInputMode="stateHidden|adjustPan" />
-        <activity android:name=".result.SearchRealmItemResultActivity"/>
+        <activity android:name=".result.single.ItemResultActivity"/>
     </application>
 
 </manifest>

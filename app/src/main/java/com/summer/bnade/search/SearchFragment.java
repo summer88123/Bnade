@@ -27,8 +27,8 @@ import android.widget.TextView;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
-import com.summer.bnade.result.SearchRealmItemResultActivity;
-import com.summer.bnade.result.SearchResultActivity;
+import com.summer.bnade.result.single.ItemResultActivity;
+import com.summer.bnade.result.all.SearchResultActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
 import com.summer.bnade.select.RealmSelectActivity;
@@ -205,7 +205,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
 
     @Override
     public void showRealmItemResult(SearchResultVO searchResultVO) {
-        Intent intent = new Intent(getActivity(), SearchRealmItemResultActivity.class);
+        Intent intent = new Intent(getActivity(), ItemResultActivity.class);
         intent.putExtra(Content.EXTRA_DATA, searchResultVO);
         startActivity(intent);
     }

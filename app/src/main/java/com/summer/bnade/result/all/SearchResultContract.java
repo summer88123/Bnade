@@ -1,4 +1,4 @@
-package com.summer.bnade.result;
+package com.summer.bnade.result.all;
 
 import com.summer.bnade.base.BaseView;
 import com.summer.bnade.search.entity.SearchResultVO;

@@ -1,4 +1,4 @@
-package com.summer.bnade.result;
+package com.summer.bnade.result.single;
 
 import android.view.View;
 import android.widget.TextView;
@@ -16,7 +16,7 @@ import butterknife.ButterKnife;
  * Created by kevin.bai on 2017/4/28.
  */
 
-class SearchRealmItemResultAdapter extends BaseAdapter<AuctionRealmItem, SearchRealmItemResultAdapter
+class ItemResultAdapter extends BaseAdapter<AuctionRealmItem, ItemResultAdapter
         .ViewHolder> {
 
     @Override
