@@ -24,7 +24,6 @@ public class RealmSelectActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.setFinishOnTouchOutside(true);
         setContentView(R.layout.activity_realm_select);
         ButterKnife.bind(this);
         RealmSelectFragment fragment = (RealmSelectFragment) getSupportFragmentManager()
