@@ -9,6 +9,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
+import android.support.transition.TransitionManager;
 import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -65,17 +68,42 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     FuzzyItemAdapter mFuzzyAdapter;
     @BindView(R.id.btn_realm_select)
     Button mBtnRealmSelect;
-
+    @BindView(R.id.btn_realm_clear)
+    Button mBtnRealmClear;
     ListPopupWindow mFuzzyList;
+    @BindView(R.id.content)
+    ConstraintLayout mContent;
 
-    @OnClick(R.id.ib_clear_histories)
-    public void onClick() {
-        mPresenter.clearHistories();
-    }
-
+    ConstraintSet hasRealmSet = new ConstraintSet();
+    ConstraintSet noRealmSet = new ConstraintSet();
 
     public static SearchFragment newInstance() {
         return new SearchFragment();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
+            selectRealm(data.<Realm>getParcelableExtra(Content.EXTRA_DATA));
+        }
+    }
+
+    private void selectRealm(Realm realm) {
+        mBtnRealmSelect.setText(realm.getConnected());
+        mBtnRealmSelect.setTag(realm);
+        TransitionManager.beginDelayedTransition(mContent);
+        hasRealmSet.setVisibility(R.id.btn_realm_clear, ConstraintSet.VISIBLE);
+        hasRealmSet.connect(R.id.btn_realm_select, ConstraintSet.RIGHT, R.id.btn_realm_clear, ConstraintSet.LEFT);
+        hasRealmSet.connect(R.id.btn_realm_clear, ConstraintSet.LEFT, R.id.btn_realm_select, ConstraintSet.RIGHT);
+        hasRealmSet.applyTo(mContent);
+    }
+
+    private void clearRealm(){
+        mBtnRealmSelect.setTag(null);
+        mBtnRealmSelect.setText(R.string.btn_realm_select);
+        TransitionManager.beginDelayedTransition(mContent);
+        noRealmSet.applyTo(mContent);
     }
 
     @Override
@@ -84,6 +112,8 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         unbinder = ButterKnife.bind(this, view);
+        hasRealmSet.clone(mContent);
+        noRealmSet.clone(mContent);
 
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager();
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
@@ -133,16 +163,10 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         return view;
     }
 
-    private int getHotType(@IdRes int resId) {
-        switch (resId) {
-            case R.id.rb_week:
-                return Hot.WEEK;
-            case R.id.rb_day:
-                return Hot.DAY;
-            case R.id.rb_month:
-            default:
-                return Hot.MONTH;
-        }
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
     }
 
     @Override
@@ -151,26 +175,10 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         mPresenter.updateHistory();
     }
 
-    @OnClick(R.id.btn_realm_select)
-    public void onViewClicked() {
-        startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
-    }
-
-
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
-            Realm realm = data.getParcelableExtra(Content.EXTRA_DATA);
-            mBtnRealmSelect.setText(realm.getConnected());
-            mBtnRealmSelect.setTag(realm);
-        }
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -220,10 +228,19 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         mHotAdapter.update(hotList);
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+    @OnClick(R.id.btn_realm_clear)
+    public void onClearClick() {
+        clearRealm();
+    }
+
+    @OnClick(R.id.ib_clear_histories)
+    public void onClick() {
+        mPresenter.clearHistories();
+    }
+
+    @OnClick(R.id.btn_realm_select)
+    public void onViewClicked() {
+        startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
     }
 
     public void search() {
@@ -234,6 +251,18 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
             if (!TextUtils.isEmpty(query)) {
                 search(query);
             }
+        }
+    }
+
+    private int getHotType(@IdRes int resId) {
+        switch (resId) {
+            case R.id.rb_week:
+                return Hot.WEEK;
+            case R.id.rb_day:
+                return Hot.DAY;
+            case R.id.rb_month:
+            default:
+                return Hot.MONTH;
         }
     }
 }

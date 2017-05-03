@@ -42,4 +42,5 @@
     <string name="buyout">一口价</string>
     <string name="search_query_hint_player">请输入玩家名</string>
     <string name="filter">筛选</string>
+    <string name="btn_clear">清除</string>
 </resources>
