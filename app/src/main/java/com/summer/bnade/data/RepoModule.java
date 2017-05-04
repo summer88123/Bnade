@@ -1,9 +1,13 @@
 package com.summer.bnade.data;
 
+import android.app.Activity;
+import android.app.Application;
 import android.content.SharedPreferences;
 
-import com.summer.lib.model.di.PreActivity;
+import com.summer.lib.model.api.BnadeApi;
 import com.summer.lib.model.utils.RealmHelper;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -13,15 +17,31 @@ import dagger.Provides;
  */
 @Module
 public class RepoModule {
-    @PreActivity
+    private final Application mApp;
+
+    public RepoModule(Application app) {
+        mApp = app;
+    }
     @Provides
-    public HistoryRealmRepo provideHistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
+    SharedPreferences provideSharedPreferences() {
+        return mApp.getSharedPreferences("app", Activity.MODE_PRIVATE);
+    }
+
+    @Singleton
+    @Provides
+    HistoryRealmRepo provideHistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
         return new HistoryRealmRepo(sp, realmHelper);
     }
 
-    @PreActivity
+    @Singleton
     @Provides
-    public HistorySearchRepo provideHistorySearchRepo(SharedPreferences sp) {
+    HistorySearchRepo provideHistorySearchRepo(SharedPreferences sp) {
         return new HistorySearchRepo(sp);
+    }
+
+    @Singleton
+    @Provides
+    BnadeRepo provideBnadeRepo(BnadeApi api, RealmHelper helper){
+        return new BnadeRepo(api, helper);
     }
 }

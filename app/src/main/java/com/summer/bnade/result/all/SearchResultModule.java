@@ -8,9 +8,9 @@ import dagger.Provides;
  */
 @Module
 class SearchResultModule {
-    final SearchResultContract.View mView;
+    private final SearchResultContract.View mView;
 
-    public SearchResultModule(SearchResultContract.View view) {
+    SearchResultModule(SearchResultContract.View view) {
         this.mView = view;
     }
 

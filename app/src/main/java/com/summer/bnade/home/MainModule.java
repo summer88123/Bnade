@@ -1,4 +1,4 @@
-package com.summer.bnade.home.di;
+package com.summer.bnade.home;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;

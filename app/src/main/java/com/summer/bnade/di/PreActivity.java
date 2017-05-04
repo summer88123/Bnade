@@ -1,4 +1,4 @@
-package com.summer.lib.model.di;
+package com.summer.bnade.di;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

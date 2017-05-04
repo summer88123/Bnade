@@ -16,10 +16,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.summer.bnade.R;
-import com.summer.bnade.data.RepoModule;
-import com.summer.bnade.home.di.DaggerMainComponent;
-import com.summer.bnade.home.di.MainComponent;
-import com.summer.bnade.home.di.MainModule;
+import com.summer.bnade.base.BaseActivity;
+import com.summer.bnade.di.ComponentHolder;
 import com.summer.bnade.player.PlayerItemFragment;
 import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.player.PlayerItemPresenter;
@@ -32,8 +30,6 @@ import com.summer.bnade.search.SearchPresenter;
 import com.summer.bnade.token.WowTokenFragment;
 import com.summer.bnade.token.WowTokenModule;
 import com.summer.bnade.token.WowTokenPresenter;
-import com.summer.bnade.base.BaseActivity;
-import com.summer.lib.model.di.ComponentHolder;
 
 import javax.inject.Inject;
 
@@ -102,13 +98,12 @@ public class MainActivity extends BaseActivity
     protected void injectComponent() {
         fm = getSupportFragmentManager();
         mMainComponent = DaggerMainComponent.builder()
-                .applicationComponent(ComponentHolder.getComponent())
+                .appComponent(ComponentHolder.getComponent())
                 .mainModule(new MainModule(this))
                 .wowTokenModule(new WowTokenModule(WowTokenFragment.getInstance(fm)))
                 .searchModule(new SearchModule(SearchFragment.getInstance(fm)))
                 .realmRankModule(new RealmRankModule(RealmRankFragment.getInstance(fm)))
                 .playerItemModule(new PlayerItemModule(PlayerItemFragment.getInstance(fm)))
-                .repoModule(new RepoModule())
                 .build();
         mMainComponent.inject(this);
     }

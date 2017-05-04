@@ -5,21 +5,20 @@ import com.google.gson.reflect.TypeToken;
 
 import android.support.annotation.WorkerThread;
 
+import com.summer.lib.model.di.BnadeModule;
 import com.summer.lib.model.entity.Realm;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
+import javax.inject.Named;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
@@ -113,7 +112,7 @@ public class RealmHelper {
     private Gson mGson;
 
     @Inject
-    public RealmHelper(Gson gson) {
+    public RealmHelper(@Named(BnadeModule.BNADE) Gson gson) {
         this.mGson = gson;
     }
 

@@ -1,7 +1,7 @@
 package com.summer.bnade.result.single;
 
 
-import com.summer.lib.model.di.PreActivity;
+import com.summer.bnade.di.PreActivity;
 
 import dagger.Module;
 import dagger.Provides;
@@ -11,7 +11,7 @@ import dagger.Provides;
  */
 @Module
 class ItemResultModule {
-    final ItemResultActivity mView;
+    private final ItemResultActivity mView;
 
     ItemResultModule(ItemResultActivity view) {
         this.mView = view;

@@ -1,11 +1,7 @@
-package com.summer.bnade.home.di;
+package com.summer.bnade.home;
 
-import android.support.v4.app.FragmentManager;
-
-import com.summer.bnade.data.HistoryRealmRepo;
-import com.summer.bnade.data.HistorySearchRepo;
-import com.summer.bnade.data.RepoModule;
-import com.summer.bnade.home.MainActivity;
+import com.summer.bnade.di.AppComponent;
+import com.summer.bnade.di.PreActivity;
 import com.summer.bnade.player.PlayerItemContract;
 import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.realmrank.RealmRankContract;
@@ -15,8 +11,6 @@ import com.summer.bnade.search.SearchFragment;
 import com.summer.bnade.search.SearchModule;
 import com.summer.bnade.token.WowTokenContract;
 import com.summer.bnade.token.WowTokenModule;
-import com.summer.lib.model.di.ApplicationComponent;
-import com.summer.lib.model.di.PreActivity;
 
 import dagger.Component;
 
@@ -25,14 +19,13 @@ import dagger.Component;
  */
 @PreActivity
 @Component(
-        dependencies = ApplicationComponent.class,
+        dependencies = AppComponent.class,
         modules = {
                 MainModule.class,
                 WowTokenModule.class,
                 SearchModule.class,
                 RealmRankModule.class,
                 PlayerItemModule.class,
-                RepoModule.class,
         })
 public interface MainComponent {
     void inject(MainActivity activity);
@@ -47,9 +40,4 @@ public interface MainComponent {
 
     PlayerItemContract.View playerItemView();
 
-    FragmentManager fragmentManager();
-
-    HistoryRealmRepo historyRealmRepo();
-
-    HistorySearchRepo historySearchRepo();
 }

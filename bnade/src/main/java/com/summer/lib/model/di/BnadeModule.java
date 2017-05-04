@@ -1,13 +1,23 @@
 package com.summer.lib.model.di;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import com.summer.lib.model.api.BnadeApi;
+import com.summer.lib.model.entity.Auction;
+import com.summer.lib.model.entity.AuctionItem;
+import com.summer.lib.model.entity.AuctionRealmItem;
+import com.summer.lib.model.entity.WowTokens;
+import com.summer.lib.model.gson.AuctionItemParser;
+import com.summer.lib.model.gson.AuctionParser;
+import com.summer.lib.model.gson.AuctionRealmItemParser;
+import com.summer.lib.model.gson.WowTokensParser;
 
 import java.security.GeneralSecurityException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -28,11 +38,24 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 @Module
-public class BnadeApiModule {
+public class BnadeModule {
+    public static final String BNADE = "BNADE";
+
+    @Singleton
+    @Named(BNADE)
+    @Provides
+    Gson provideGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(AuctionItem.class, AuctionItemParser.create())
+                .registerTypeAdapter(WowTokens.class, WowTokensParser.create())
+                .registerTypeAdapter(Auction.class, AuctionParser.create())
+                .registerTypeAdapter(AuctionRealmItem.class, AuctionRealmItemParser.create())
+                .create();
+    }
 
     @Singleton
     @Provides
-    public OkHttpClient provideOkHttpClient() {
+    OkHttpClient provideOkHttpClient() {
         X509TrustManager trustManager;
         SSLSocketFactory sslSocketFactory;
 
@@ -56,13 +79,14 @@ public class BnadeApiModule {
         try {
             SSLContext sslContext;
             sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(null,new X509TrustManager[]{trustManager},null);
+            sslContext.init(null, new X509TrustManager[]{trustManager}, null);
             sslSocketFactory = sslContext.getSocketFactory();
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
         return new OkHttpClient.Builder()
-                .sslSocketFactory(sslSocketFactory).hostnameVerifier(new HostnameVerifier() {
+                .sslSocketFactory(sslSocketFactory, trustManager)
+                .hostnameVerifier(new HostnameVerifier() {
                     @Override
                     public boolean verify(String hostname, SSLSession session) {
                         return true;
@@ -73,7 +97,7 @@ public class BnadeApiModule {
 
     @Singleton
     @Provides
-    public Retrofit provideRetrofit(OkHttpClient client, Gson gson) {
+    Retrofit provideRetrofit(OkHttpClient client, @Named(BNADE) Gson gson) {
         return new Retrofit.Builder()
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -84,7 +108,7 @@ public class BnadeApiModule {
 
     @Singleton
     @Provides
-    public BnadeApi provideBnadeApi(Retrofit retrofit) {
+    BnadeApi provideBnadeApi(Retrofit retrofit) {
         return retrofit.create(BnadeApi.class);
     }
 

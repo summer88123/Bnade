@@ -17,8 +17,6 @@ import com.summer.lib.model.utils.RealmHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
@@ -35,7 +33,6 @@ public class BnadeRepo {
     private final RealmHelper mRealmHelper;
     private final SparseArray<List<Hot>> hotCache;
 
-    @Inject
     BnadeRepo(BnadeApi api, RealmHelper realmHelper) {
         this.api = api;
         this.mRealmHelper = realmHelper;

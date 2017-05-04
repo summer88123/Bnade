@@ -9,7 +9,7 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
-import com.summer.lib.model.di.ComponentHolder;
+import com.summer.bnade.di.ComponentHolder;
 
 import javax.inject.Inject;
 
@@ -49,7 +49,7 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
     @Override
     protected void injectComponent() {
         ItemResultComponent component = DaggerItemResultComponent.builder()
-                .applicationComponent(ComponentHolder.getComponent())
+                .appComponent(ComponentHolder.getComponent())
                 .itemResultModule(new ItemResultModule(this))
                 .build();
         component.inject(this);

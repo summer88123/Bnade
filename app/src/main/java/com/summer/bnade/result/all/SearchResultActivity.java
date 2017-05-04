@@ -23,7 +23,7 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
-import com.summer.lib.model.di.ComponentHolder;
+import com.summer.bnade.di.ComponentHolder;
 import com.summer.lib.model.entity.Gold;
 
 import javax.inject.Inject;
@@ -157,7 +157,7 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
 
     @Override
     protected void injectComponent() {
-        DaggerSearchResultComponent.builder().applicationComponent(ComponentHolder.getComponent())
+        DaggerSearchResultComponent.builder().appComponent(ComponentHolder.getComponent())
                 .searchResultModule(new SearchResultModule(this)).build().inject(this);
     }
 

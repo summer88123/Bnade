@@ -1,8 +1,7 @@
 package com.summer.bnade.select;
 
-import com.summer.bnade.data.RepoModule;
-import com.summer.lib.model.di.ApplicationComponent;
-import com.summer.lib.model.di.PreActivity;
+import com.summer.bnade.di.AppComponent;
+import com.summer.bnade.di.PreActivity;
 
 import dagger.Component;
 
@@ -10,8 +9,8 @@ import dagger.Component;
  * Created by kevin.bai on 2017/4/20.
  */
 @PreActivity
-@Component(dependencies = {ApplicationComponent.class},
-        modules = {RealmSelectModule.class, RepoModule.class})
+@Component(dependencies = {AppComponent.class},
+        modules = {RealmSelectModule.class})
 interface RealmSelectComponent {
     void inject(RealmSelectActivity activity);
 

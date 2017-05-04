@@ -5,9 +5,8 @@ import android.view.Window;
 import android.widget.FrameLayout;
 
 import com.summer.bnade.R;
-import com.summer.bnade.data.RepoModule;
 import com.summer.bnade.base.BaseActivity;
-import com.summer.lib.model.di.ComponentHolder;
+import com.summer.bnade.di.ComponentHolder;
 
 import javax.inject.Inject;
 
@@ -33,9 +32,8 @@ public class RealmSelectActivity extends BaseActivity {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.contentFrame, fragment, RealmSelectFragment.TAG).commit();
         }
-        DaggerRealmSelectComponent.builder().applicationComponent(ComponentHolder.getComponent())
+        DaggerRealmSelectComponent.builder().appComponent(ComponentHolder.getComponent())
                 .realmSelectModule(new RealmSelectModule(fragment))
-                .repoModule(new RepoModule())
                 .build().inject(this);
     }
 
