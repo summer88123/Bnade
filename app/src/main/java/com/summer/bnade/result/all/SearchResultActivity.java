@@ -24,6 +24,7 @@ import com.summer.bnade.base.BaseViewActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
 import com.summer.lib.model.di.ComponentHolder;
+import com.summer.lib.model.entity.Gold;
 
 import javax.inject.Inject;
 
@@ -146,8 +147,9 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     public void show(SearchResultVO result) {
         mResultAdapter.update(result.getAuctionItems());
         Glide.with(this).load(result.getItem().getUrl()).into(mIvItemIcon);
-        mTvAvgBuyout.setText(getString(R.string.result_avg_buyout, getString(R.string.full_gold, result
-                .getAvgBuyout() / 10000, result.getAvgBuyout() % 10000 / 100, result.getAvgBuyout() % 100)));
+        Gold avgBuyout = result.getAvgBuyout();
+        mTvAvgBuyout.setText(getString(R.string.result_avg_buyout,
+                getString(R.string.full_gold, avgBuyout.getGold(), avgBuyout.getSilver(), avgBuyout.getCopper())));
         mChart.setData(result.getCombinedData());
         mChart.invalidate();
         mCollapsingToolbarLayout.setTitle(result.getItem().getName());

@@ -15,6 +15,7 @@ import com.summer.bnade.base.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.lib.model.entity.AuctionItem;
+import com.summer.lib.model.entity.Gold;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -109,11 +110,11 @@ class SearchResultPresenter extends BasePresenter<SearchResultContract.View> imp
                                 searchResultVO.setCombinedData(data);
                                 BigDecimal sum = new BigDecimal(0);
                                 for (AuctionItem auctionItem : searchResultVO.getAuctionItems()) {
-                                    sum = sum.add(new BigDecimal(auctionItem.getMinBuyOut()));
+                                    sum = sum.add(new BigDecimal(auctionItem.getMinBuyOut().getMoney()));
                                 }
-                                searchResultVO.setAvgBuyout(sum.divide(new BigDecimal(searchResultVO.getAuctionItems()
-                                        .size()), 0, BigDecimal.ROUND_CEILING)
-                                        .longValue());
+                                searchResultVO.setAvgBuyout(new Gold(sum
+                                        .divide(new BigDecimal(searchResultVO.getAuctionItems()
+                                                .size()), 0, BigDecimal.ROUND_CEILING).longValue()));
                                 return searchResultVO;
                             }
                         })
@@ -130,7 +131,7 @@ class SearchResultPresenter extends BasePresenter<SearchResultContract.View> imp
         ArrayList<Entry> entries = new ArrayList<>();
         for (int i = 0, size = items.size(); i < size; i++) {
             AuctionItem item = items.get(i);
-            entries.add(new Entry(i, item.getMinBuyOut(), item));
+            entries.add(new Entry(i, item.getMinBuyOut().getMoney(), item));
         }
 
         LineDataSet set = new LineDataSet(entries, "价格");

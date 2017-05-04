@@ -8,6 +8,7 @@ import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.lib.model.entity.AuctionItem;
+import com.summer.lib.model.entity.Gold;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -52,11 +53,9 @@ class SearchResultAdapter extends BaseAdapter<AuctionItem, SearchResultAdapter.V
             mTvLastTime.setText(auctionItem.getLastTime().getResult());
             mTvUpdateTime.setText(DateUtil.format(auctionItem.getLastUpdateTime(), "H:mm"));
             mTvTotal.setText(auctionItem.getTotal() + "");
+            Gold minBuyout = auctionItem.getMinBuyOut();
             mTvMinBuyout.setText(mTvMinBuyout.getContext()
-                    .getString(R.string.full_gold,
-                            auctionItem.getMinBuyOut() / 10000,
-                            auctionItem.getMinBuyOut() % 10000 / 100,
-                            auctionItem.getMinBuyOut() % 100));
+                    .getString(R.string.full_gold, minBuyout.getGold(), minBuyout.getSilver(), minBuyout.getCopper()));
         }
 
     }

@@ -2,12 +2,18 @@ package com.summer.lib.model.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 /**
  * Created by kevin.bai on 2017/4/23.
  */
 
-public class Gold implements Parcelable {
+public class Gold implements Parcelable, Comparable<Gold> {
+    private static final NumberFormat format = new DecimalFormat("00");
+    private static final NumberFormat goldFormat = new DecimalFormat("0");
     private final long money;
 
     private long gold = -1;
@@ -18,25 +24,34 @@ public class Gold implements Parcelable {
         this.money = money;
     }
 
-    public long getGold() {
+    @Override
+    public int compareTo(@NonNull Gold o) {
+        return (int) (money - o.money);
+    }
+
+    public String getGold() {
         if (gold < 0) {
             gold = money / 10000;
         }
-        return gold;
+        return goldFormat.format(gold);
     }
 
-    public int getSilver() {
+    public String getSilver() {
         if (silver < 0) {
             silver = (int) (money % 10000 / 100);
         }
-        return silver;
+        return format.format(silver);
     }
 
-    public int getCopper() {
+    public String getCopper() {
         if (copper < 0) {
             copper = (int) (money % 100);
         }
-        return copper;
+        return format.format(copper);
+    }
+
+    public long getMoney() {
+        return money;
     }
 
     @Override

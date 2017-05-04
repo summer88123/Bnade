@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import com.github.mikephil.charting.data.CombinedData;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealmItem;
+import com.summer.lib.model.entity.Gold;
 import com.summer.lib.model.entity.Item;
 
 import java.util.List;
@@ -24,7 +25,7 @@ public class SearchResultVO implements Parcelable {
     /**
      * 全服务器数据
      */
-    private long avgBuyout;
+    private Gold avgBuyout;
     private List<AuctionItem> auctionItems;
     private CombinedData combinedData;
     /**
@@ -61,11 +62,11 @@ public class SearchResultVO implements Parcelable {
         this.auctionRealmItems = auctionRealmItems;
     }
 
-    public long getAvgBuyout() {
+    public Gold getAvgBuyout() {
         return avgBuyout;
     }
 
-    public void setAvgBuyout(long avgBuyout) {
+    public void setAvgBuyout(Gold avgBuyout) {
         this.avgBuyout = avgBuyout;
     }
 
