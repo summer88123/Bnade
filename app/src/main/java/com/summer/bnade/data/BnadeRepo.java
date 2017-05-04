@@ -187,7 +187,4 @@ public class BnadeRepo {
         return mRealmHelper.getAllRealm(hasAllItem);
     }
 
-    public Single<Realm> getRealm(String name) {
-        return mRealmHelper.getRealmsByName(name).firstOrError();
-    }
 }

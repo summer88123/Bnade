@@ -118,14 +118,10 @@ public class RealmHelper {
     }
 
     @WorkerThread
-    private List<Realm> getRealms() {
+    private synchronized List<Realm> getRealms() {
         if (mRealms == null) {
-            synchronized (this) {
-                if (mRealms == null) {
-                    this.mRealms = mGson.fromJson(data, new TypeToken<List<Realm>>() {
-                    }.getType());
-                }
-            }
+            this.mRealms = mGson.fromJson(data, new TypeToken<List<Realm>>() {
+            }.getType());
         }
         return mRealms;
     }

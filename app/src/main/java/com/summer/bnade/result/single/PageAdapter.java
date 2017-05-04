@@ -4,13 +4,13 @@ import android.content.Context;
 import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 
 /**
  * Created by kevin.bai on 2017/5/3.
  */
 
-class PageAdapter extends FragmentPagerAdapter {
+class PageAdapter extends FragmentStatePagerAdapter {
     private PageFragment[] mFragments;
     private Context mContext;
 

@@ -59,6 +59,6 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
     @Override
     public void show(SearchResultVO result) {
         mToolbar.setTitle(result.getItem().getName());
-        mPriceFragment.updateList(result.getAuctionRealmItems());
+        mPriceFragment.updateList(result);
     }
 }
