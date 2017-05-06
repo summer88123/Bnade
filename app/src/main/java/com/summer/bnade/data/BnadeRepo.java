@@ -3,8 +3,10 @@ package com.summer.bnade.data;
 import android.util.SparseArray;
 
 import com.summer.bnade.data.error.EmptyDataException;
+import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.lib.model.api.BnadeApi;
 import com.summer.lib.model.entity.Auction;
+import com.summer.lib.model.entity.AuctionHistory;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealm;
 import com.summer.lib.model.entity.AuctionRealmItem;
@@ -24,6 +26,7 @@ import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Function3;
 
 /**
  * Created by kevin.bai on 2017/4/9.
@@ -92,6 +95,21 @@ public class BnadeRepo {
 
     public Single<List<Hot>> getHot(int type) {
         return Observable.concat(getHotCache(type), getHotRemote(type)).firstOrError();
+    }
+
+    public Single<SearchResultVO> search(@NonNull Item item, Realm realm) {
+        return Single.zip(api.getAuctionRealmItem(realm.getId(), item.getId()), Single.just(item),
+                api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
+                new Function3<List<AuctionRealmItem>, Item, List<AuctionHistory>, SearchResultVO>() {
+                    @Override
+                    public SearchResultVO apply(@NonNull List<AuctionRealmItem> auctionRealmItems, @NonNull Item
+                            item, @NonNull List<AuctionHistory> auctionHistories) throws Exception {
+                        SearchResultVO result = new SearchResultVO(item);
+                        result.setAuctionRealmItems(auctionRealmItems);
+                        result.setAuctionHistories(auctionHistories);
+                        return result;
+                    }
+                });
     }
 
     private Observable<List<Hot>> getHotRemote(final int type) {
@@ -174,10 +192,6 @@ public class BnadeRepo {
                     }
                 })
                 .toList();
-    }
-
-    public Single<List<AuctionRealmItem>> getAuctionRealmItem(long realmId, long itemId) {
-        return api.getAuctionRealmItem(realmId, itemId);
     }
 
     public Observable<Realm> getAllRealm(boolean hasAllItem) {

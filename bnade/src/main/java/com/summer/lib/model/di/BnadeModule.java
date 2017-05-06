@@ -5,9 +5,11 @@ import com.google.gson.GsonBuilder;
 
 import com.summer.lib.model.api.BnadeApi;
 import com.summer.lib.model.entity.Auction;
+import com.summer.lib.model.entity.AuctionHistory;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.WowTokens;
+import com.summer.lib.model.gson.AuctionHistoryParser;
 import com.summer.lib.model.gson.AuctionItemParser;
 import com.summer.lib.model.gson.AuctionParser;
 import com.summer.lib.model.gson.AuctionRealmItemParser;
@@ -50,6 +52,7 @@ public class BnadeModule {
                 .registerTypeAdapter(WowTokens.class, WowTokensParser.create())
                 .registerTypeAdapter(Auction.class, AuctionParser.create())
                 .registerTypeAdapter(AuctionRealmItem.class, AuctionRealmItemParser.create())
+                .registerTypeAdapter(AuctionHistory.class, AuctionHistoryParser.create())
                 .create();
     }
 

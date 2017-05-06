@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.github.mikephil.charting.data.CombinedData;
+import com.summer.lib.model.entity.AuctionHistory;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Gold;
@@ -22,6 +23,7 @@ public class SearchResultVO implements Parcelable {
      * 单服务器数据
      */
     private List<AuctionRealmItem> auctionRealmItems;
+    private List<AuctionHistory> auctionHistories;
     /**
      * 全服务器数据
      */
@@ -44,6 +46,14 @@ public class SearchResultVO implements Parcelable {
 
     public SearchResultVO(List<String> names) {
         this.names = names;
+    }
+
+    public List<AuctionHistory> getAuctionHistories() {
+        return auctionHistories;
+    }
+
+    public void setAuctionHistories(List<AuctionHistory> auctionHistories) {
+        this.auctionHistories = auctionHistories;
     }
 
     public List<AuctionItem> getAuctionItems() {
@@ -100,12 +110,14 @@ public class SearchResultVO implements Parcelable {
         dest.writeParcelable(this.item, flags);
         dest.writeTypedList(this.auctionRealmItems);
         dest.writeTypedList(this.auctionItems);
+        dest.writeTypedList(this.auctionHistories);
     }
 
     protected SearchResultVO(Parcel in) {
         this.item = in.readParcelable(Item.class.getClassLoader());
         this.auctionRealmItems = in.createTypedArrayList(AuctionRealmItem.CREATOR);
         this.auctionItems = in.createTypedArrayList(AuctionItem.CREATOR);
+        this.auctionHistories = in.createTypedArrayList(AuctionHistory.CREATOR);
     }
 
     public static final Creator<SearchResultVO> CREATOR = new Creator<SearchResultVO>() {

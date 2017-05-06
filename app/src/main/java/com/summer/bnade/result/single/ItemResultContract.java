@@ -13,8 +13,6 @@ interface ItemResultContract {
     }
 
     interface Presenter {
-        void filter(String query);
-
         void setData(SearchResultVO data);
 
         void load();

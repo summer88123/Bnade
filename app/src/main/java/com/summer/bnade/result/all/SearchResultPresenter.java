@@ -1,24 +1,18 @@
 package com.summer.bnade.result.all;
 
-import android.graphics.Color;
 import android.text.TextUtils;
 
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
 import com.summer.bnade.base.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.search.entity.SearchResultVO;
+import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.Gold;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -29,10 +23,13 @@ import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
+
+import static com.summer.bnade.utils.ChartHelper.generateBarData;
 
 /**
  * Created by kevin.bai on 2017/4/14.
@@ -105,9 +102,24 @@ class SearchResultPresenter extends BasePresenter<SearchResultContract.View> imp
                             public SearchResultVO apply(@NonNull SearchResultVO searchResultVO) throws Exception {
                                 CombinedData data = new CombinedData();
 
-                                data.setData(generateLineData(searchResultVO.getAuctionItems()));
-                                data.setData(generateBarData(searchResultVO.getAuctionItems()));
+                                data.setData(ChartHelper.generateLineData(searchResultVO
+                                        .getAuctionItems(), new BiFunction<Integer, AuctionItem, Entry>() {
+                                    @Override
+                                    public Entry apply(Integer index, @NonNull AuctionItem auctionItem) throws
+                                            Exception {
+                                        return new Entry(index, auctionItem.getMinBuyOut().getMoney(), auctionItem);
+                                    }
+                                }));
+                                data.setData(generateBarData(searchResultVO
+                                        .getAuctionItems(), new BiFunction<Integer, AuctionItem, BarEntry>() {
+                                    @Override
+                                    public BarEntry apply(@NonNull Integer integer, @NonNull AuctionItem auctionItem)
+                                            throws Exception {
+                                        return new BarEntry(integer, auctionItem.getTotal(), auctionItem);
+                                    }
+                                }));
                                 searchResultVO.setCombinedData(data);
+
                                 BigDecimal sum = new BigDecimal(0);
                                 for (AuctionItem auctionItem : searchResultVO.getAuctionItems()) {
                                     sum = sum.add(new BigDecimal(auctionItem.getMinBuyOut().getMoney()));
@@ -124,43 +136,5 @@ class SearchResultPresenter extends BasePresenter<SearchResultContract.View> imp
         };
     }
 
-    private LineData generateLineData(List<AuctionItem> items) {
 
-        LineData d = new LineData();
-
-        ArrayList<Entry> entries = new ArrayList<>();
-        for (int i = 0, size = items.size(); i < size; i++) {
-            AuctionItem item = items.get(i);
-            entries.add(new Entry(i, item.getMinBuyOut().getMoney(), item));
-        }
-
-        LineDataSet set = new LineDataSet(entries, "价格");
-        set.setColor(Color.rgb(240, 238, 70));
-        set.setLineWidth(1.5f);
-        set.setCircleColor(Color.rgb(240, 238, 70));
-        set.setCircleRadius(2f);
-        set.setFillColor(Color.rgb(240, 238, 70));
-        set.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        set.setDrawValues(false);
-
-        set.setAxisDependency(YAxis.AxisDependency.LEFT);
-        d.addDataSet(set);
-
-        return d;
-    }
-
-    private BarData generateBarData(List<AuctionItem> items) {
-        ArrayList<BarEntry> entries = new ArrayList<>();
-        for (int i = 0, size = items.size(); i < size; i++) {
-            AuctionItem item = items.get(i);
-            entries.add(new BarEntry(i, item.getTotal(), item));
-        }
-
-        BarDataSet set = new BarDataSet(entries, "数量");
-        set.setColor(Color.rgb(60, 220, 78));
-        set.setDrawValues(false);
-        set.setAxisDependency(YAxis.AxisDependency.RIGHT);
-
-        return new BarData(set);
-    }
 }

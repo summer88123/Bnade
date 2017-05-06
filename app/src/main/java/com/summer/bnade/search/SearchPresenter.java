@@ -8,7 +8,6 @@ import com.summer.bnade.data.error.EmptyDataException;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
 import com.summer.lib.model.entity.AuctionItem;
-import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
@@ -68,38 +67,22 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                 .flatMap(new Function<Item, SingleSource<Item>>() {
                     @Override
                     public SingleSource<Item> apply(@NonNull Item item) throws Exception {
-                        Single<Item> temp = mHistorySearchRepo.add(item.getName()).andThen(Single.just(item));
-                        if (realm != null) {
-                            temp = mRealmRepo.add(realm).andThen(temp);
-                        }
-                        return temp;
+                        return saveHistory(item, realm);
                     }
                 })
                 .flatMap(new Function<Item, SingleSource<SearchResultVO>>() {
                     @Override
                     public SingleSource<SearchResultVO> apply(@NonNull Item item) throws Exception {
-                        if (realm != null) {
-                            return Single.zip(mRepo.getAuctionRealmItem(realm.getId(), item.getId()), Single
-                                            .just(item),
-                                    new BiFunction<List<AuctionRealmItem>, Item, SearchResultVO>() {
-                                        @Override
-                                        public SearchResultVO apply(@NonNull List<AuctionRealmItem> strings, @NonNull
-                                                Item item) throws Exception {
-                                            SearchResultVO result = new SearchResultVO(item);
-                                            result.setAuctionRealmItems(strings);
-                                            return result;
-                                        }
-                                    });
-                        } else {
-                            return Single.zip(mRepo.getAuction(item.getId()), Single
-                                    .just(item), new BiFunction<List<AuctionItem>, Item, SearchResultVO>() {
-                                @Override
-                                public SearchResultVO apply(@NonNull List<AuctionItem> auctionItems, @NonNull Item item)
-                                        throws Exception {
-                                    return new SearchResultVO(item, auctionItems);
-                                }
-                            });
-                        }
+                        return realm != null ? mRepo.search(item, realm) :
+                                Single.zip(mRepo.getAuction(item.getId()), Single
+                                        .just(item), new BiFunction<List<AuctionItem>, Item, SearchResultVO>() {
+                                    @Override
+                                    public SearchResultVO apply(@NonNull List<AuctionItem> auctionItems, @NonNull
+                                            Item item)
+                                            throws Exception {
+                                        return new SearchResultVO(item, auctionItems);
+                                    }
+                                });
                     }
                 })
                 .onErrorResumeNext(new Function<Throwable, SingleSource<? extends SearchResultVO>>() {
@@ -135,6 +118,15 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                     }
                 }, mErrorHandler);
     }
+
+    private Single<Item> saveHistory(@NonNull Item item, Realm realm) {
+        Single<Item> temp = mHistorySearchRepo.add(item.getName()).andThen(Single.just(item));
+        if (realm != null) {
+            temp = mRealmRepo.add(realm).andThen(temp);
+        }
+        return temp;
+    }
+
 
     @Override
     public void updateHistory() {
