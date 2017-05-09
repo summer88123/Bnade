@@ -20,31 +20,20 @@ import io.reactivex.functions.Consumer;
 public class PlayerItemPresenter extends BasePresenter<PlayerItemContract.View> implements PlayerItemContract
         .Presenter {
 
-    private Realm current;
-
     @Inject
-    public PlayerItemPresenter(PlayerItemContract.View view, BnadeRepo repo) {
+    PlayerItemPresenter(PlayerItemContract.View view, BnadeRepo repo) {
         super(view, repo);
     }
 
     @Override
-    public void search(String player) {
-        if (current == null) {
-            mView.showToastNoRealm();
-        } else {
-            mRepo.getAuctionRealmOwner(current.getId(), player)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<List<Auction>>() {
-                        @Override
-                        public void accept(@NonNull List<Auction> auctions) throws Exception {
-                            mView.showList(auctions);
-                        }
-                    }, mErrorHandler);
-        }
-    }
-
-    @Override
-    public void selectRealm(Realm realm) {
-        this.current = realm;
+    public void search(String player, Realm realm) {
+        mRepo.getAuctionRealmOwner(realm.getId(), player)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<Auction>>() {
+                    @Override
+                    public void accept(@NonNull List<Auction> auctions) throws Exception {
+                        mView.showList(auctions);
+                    }
+                }, mErrorHandler);
     }
 }

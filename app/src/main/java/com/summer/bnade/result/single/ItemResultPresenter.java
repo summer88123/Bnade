@@ -26,7 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 class ItemResultPresenter extends BasePresenter<ItemResultContract.View> implements
         ItemResultContract.Presenter {
 
-    SearchResultVO mResultVO;
+    private SearchResultVO mResultVO;
 
     @Inject
     ItemResultPresenter(ItemResultContract.View view, BnadeRepo repo) {

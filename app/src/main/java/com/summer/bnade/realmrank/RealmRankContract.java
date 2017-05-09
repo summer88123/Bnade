@@ -13,13 +13,11 @@ public interface RealmRankContract {
     interface View extends BaseView<Presenter> {
         void show(List<AuctionRealm> list, AuctionRealm.SortType sortType);
 
-        void setDependency(RealmRankAdapter adapter);
-
         void setRefreshing(boolean refreshing);
     }
 
     interface Presenter {
-        void load();
+        void load(AuctionRealm.SortType sortType);
 
         void sort(AuctionRealm.SortType sortType);
     }

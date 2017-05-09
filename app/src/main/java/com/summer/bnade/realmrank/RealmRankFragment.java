@@ -22,6 +22,8 @@ import com.summer.lib.model.entity.AuctionRealm;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.BindViews;
@@ -34,7 +36,7 @@ import butterknife.Unbinder;
  */
 public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter> implements RealmRankContract.View,
         SwipeRefreshLayout
-        .OnRefreshListener {
+                .OnRefreshListener {
     public static final String TAG = RealmRankFragment.class.getSimpleName();
     @BindView(R.id.list)
     RecyclerView mList;
@@ -58,11 +60,9 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
 
     Drawable tintUp;
     Drawable tintDown;
-
-
-    private RealmRankAdapter mAdapter;
-    private AuctionRealm.SortType lastType;
-
+    @Inject
+    RealmRankAdapter mAdapter;
+    private AuctionRealm.SortType current = AuctionRealm.SortType.TotalDown;
     private ButterKnife.Action<TextView> DisableRightDrawable = new ButterKnife.Action<TextView>() {
         @Override
         public void apply(@NonNull TextView view, int index) {
@@ -99,7 +99,13 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mPresenter.load();
+        mPresenter.load(current);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -108,8 +114,48 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
         this.mAdapter.update(list);
     }
 
+    @Override
+    public void setRefreshing(boolean refreshing) {
+        mRefreshLayout.setRefreshing(refreshing);
+    }
+
+    @Override
+    public void onRefresh() {
+        mPresenter.load(current);
+    }
+
+    @OnClick({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})
+    public void onViewClicked(View view) {
+        AuctionRealm.SortType last = current;
+        AuctionRealm.SortType current;
+        switch (view.getId()) {
+            case R.id.tv_user_count:
+                current = last == AuctionRealm.SortType.PlayerDown
+                        ? AuctionRealm.SortType.PlayerUp
+                        : AuctionRealm.SortType.PlayerDown;
+                break;
+            case R.id.tv_item_kind:
+                current = last == AuctionRealm.SortType.ItemDown
+                        ? AuctionRealm.SortType.ItemUp
+                        : AuctionRealm.SortType.ItemDown;
+                break;
+            case R.id.tv_update_time:
+                current = last == AuctionRealm.SortType.TimeDown
+                        ? AuctionRealm.SortType.TimeUp
+                        : AuctionRealm.SortType.TimeDown;
+                break;
+            case R.id.tv_total_count:
+            default:
+                current = last == AuctionRealm.SortType.TotalDown
+                        ? AuctionRealm.SortType.TotalUp
+                        : AuctionRealm.SortType.TotalDown;
+                break;
+        }
+        mPresenter.sort(current);
+    }
+
     private void updateSortType(AuctionRealm.SortType sortType) {
-        this.lastType = sortType;
+        this.current = sortType;
         ButterKnife.apply(labels, DisableRightDrawable);
         switch (sortType) {
             case TotalUp:
@@ -137,56 +183,5 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
                 mTvUpdateTime.setCompoundDrawablesWithIntrinsicBounds(null, null, tintDown, null);
                 break;
         }
-    }
-
-    @Override
-    public void setDependency(RealmRankAdapter adapter) {
-        this.mAdapter = adapter;
-    }
-
-    @Override
-    public void setRefreshing(boolean refreshing) {
-        mRefreshLayout.setRefreshing(refreshing);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
-    public void onRefresh() {
-        mPresenter.load();
-    }
-
-    @OnClick({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})
-    public void onViewClicked(View view) {
-        AuctionRealm.SortType last = lastType;
-        AuctionRealm.SortType current;
-        switch (view.getId()) {
-            case R.id.tv_user_count:
-                current = last == AuctionRealm.SortType.PlayerDown
-                        ? AuctionRealm.SortType.PlayerUp
-                        : AuctionRealm.SortType.PlayerDown;
-                break;
-            case R.id.tv_item_kind:
-                current = last == AuctionRealm.SortType.ItemDown
-                        ? AuctionRealm.SortType.ItemUp
-                        : AuctionRealm.SortType.ItemDown;
-                break;
-            case R.id.tv_update_time:
-                current = last == AuctionRealm.SortType.TimeDown
-                        ? AuctionRealm.SortType.TimeUp
-                        : AuctionRealm.SortType.TimeDown;
-                break;
-            case R.id.tv_total_count:
-            default:
-                current = last == AuctionRealm.SortType.TotalDown
-                        ? AuctionRealm.SortType.TotalUp
-                        : AuctionRealm.SortType.TotalDown;
-                break;
-        }
-        mPresenter.sort(current);
     }
 }

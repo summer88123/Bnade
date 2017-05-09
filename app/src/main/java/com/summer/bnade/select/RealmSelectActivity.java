@@ -2,7 +2,6 @@ package com.summer.bnade.select;
 
 import android.os.Bundle;
 import android.view.Window;
-import android.widget.FrameLayout;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseActivity;
@@ -10,21 +9,15 @@ import com.summer.bnade.di.ComponentHolder;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class RealmSelectActivity extends BaseActivity {
     @Inject
     RealmSelectPresenter mPresenter;
-    @BindView(R.id.contentFrame)
-    FrameLayout mContentFrame;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_realm_select);
-        ButterKnife.bind(this);
         RealmSelectFragment fragment = (RealmSelectFragment) getSupportFragmentManager()
                 .findFragmentByTag(RealmSelectFragment.TAG);
         if (fragment == null) {

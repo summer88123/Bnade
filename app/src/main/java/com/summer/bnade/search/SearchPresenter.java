@@ -119,15 +119,6 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                 }, mErrorHandler);
     }
 
-    private Single<Item> saveHistory(@NonNull Item item, Realm realm) {
-        Single<Item> temp = mHistorySearchRepo.add(item.getName()).andThen(Single.just(item));
-        if (realm != null) {
-            temp = mRealmRepo.add(realm).andThen(temp);
-        }
-        return temp;
-    }
-
-
     @Override
     public void updateHistory() {
         mHistorySearchRepo.getHistories().toList()
@@ -161,5 +152,13 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                         mView.updateHistories(Collections.<String>emptyList());
                     }
                 });
+    }
+
+    private Single<Item> saveHistory(@NonNull Item item, Realm realm) {
+        Single<Item> temp = mHistorySearchRepo.add(item.getName()).andThen(Single.just(item));
+        if (realm != null) {
+            temp = mRealmRepo.add(realm).andThen(temp);
+        }
+        return temp;
     }
 }

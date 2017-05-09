@@ -7,12 +7,12 @@ import com.summer.lib.model.entity.Realm;
  */
 
 public class TypedRealm {
-    public static final String USED = "常用";
-    private static final String NORMAL = "全部";
+    public static final String LABEL_USED = "常用";
+    private static final String LABEL_NORMAL = "全部";
     private String type;
     private Realm realm;
 
-    public TypedRealm(String type, Realm realm) {
+    private TypedRealm(String type, Realm realm) {
         this.type  = type;
         this.realm = realm;
     }
@@ -34,10 +34,10 @@ public class TypedRealm {
     }
 
     public static TypedRealm USED(Realm realm){
-        return new TypedRealm(USED, realm);
+        return new TypedRealm(LABEL_USED, realm);
     }
 
     public static TypedRealm NORMAL(Realm realm) {
-        return new TypedRealm(NORMAL, realm);
+        return new TypedRealm(LABEL_NORMAL, realm);
     }
 }

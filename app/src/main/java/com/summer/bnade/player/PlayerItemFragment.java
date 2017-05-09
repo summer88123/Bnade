@@ -37,6 +37,7 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
     Unbinder unbinder;
 
     private PlayerItemAdapter mAdapter;
+    private Realm current;
 
     @SuppressWarnings("unused")
     public static PlayerItemFragment getInstance(FragmentManager fm) {
@@ -47,9 +48,14 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
         return fragment;
     }
 
-    @OnClick(R.id.btn_realm_select)
-    public void onClick() {
-        startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
+            Realm realm = data.getParcelableExtra(Content.EXTRA_DATA);
+            mBtnRealmSelect.setText(realm.getConnected());
+            current = realm;
+        }
     }
 
     @Override
@@ -67,7 +73,11 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                mPresenter.search(s);
+                if (current == null) {
+                    showToast(R.string.toast_player_item_no_select_realm);
+                } else {
+                    mPresenter.search(s, current);
+                }
                 return false;
             }
 
@@ -77,16 +87,6 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
             }
         });
         return view;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
-            Realm realm = data.getParcelableExtra(Content.EXTRA_DATA);
-            mBtnRealmSelect.setText(realm.getConnected());
-            mPresenter.selectRealm(realm);
-        }
     }
 
     @Override
@@ -100,8 +100,9 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
         mAdapter.update(auctions);
     }
 
-    @Override
-    public void showToastNoRealm() {
-        showToast(R.string.toast_player_item_no_select_realm);
+    @OnClick(R.id.btn_realm_select)
+    public void onClick() {
+        startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
     }
+
 }

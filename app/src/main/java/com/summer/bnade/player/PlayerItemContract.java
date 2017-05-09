@@ -12,15 +12,10 @@ import java.util.List;
 
 public interface PlayerItemContract {
     interface View extends BaseView<Presenter> {
-
         void showList(List<Auction> auctions);
-
-        void showToastNoRealm();
     }
 
     interface Presenter {
-        void search(String player);
-
-        void selectRealm(Realm realm);
+        void search(String player, Realm realm);
     }
 }

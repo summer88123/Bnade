@@ -5,6 +5,7 @@ import com.summer.bnade.di.PreActivity;
 import com.summer.bnade.player.PlayerItemContract;
 import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.realmrank.RealmRankContract;
+import com.summer.bnade.realmrank.RealmRankFragment;
 import com.summer.bnade.realmrank.RealmRankModule;
 import com.summer.bnade.search.SearchContract;
 import com.summer.bnade.search.SearchFragment;
@@ -31,6 +32,8 @@ public interface MainComponent {
     void inject(MainActivity activity);
 
     void inject(SearchFragment fragment);
+
+    void inject(RealmRankFragment fragment);
 
     WowTokenContract.View wowTokenView();
 

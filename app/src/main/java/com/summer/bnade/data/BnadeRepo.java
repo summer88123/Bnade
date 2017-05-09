@@ -25,37 +25,30 @@ import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.functions.Function3;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by kevin.bai on 2017/4/9.
  */
 public class BnadeRepo {
     private final BnadeApi api;
-    private final RealmHelper mRealmHelper;
+    // TODO 缓存需要设置失效
     private final SparseArray<List<Hot>> hotCache;
+    private final List<AuctionRealm> mAuctionRealmsCache;
+    private final RealmHelper mRealmHelper;
 
     BnadeRepo(BnadeApi api, RealmHelper realmHelper) {
         this.api = api;
         this.mRealmHelper = realmHelper;
         hotCache = new SparseArray<>(3);
+        mAuctionRealmsCache = new ArrayList<>();
     }
 
-    public Single<Item> getItem(String name) {
-        return api.getItem(name).map(new Function<List<Item>, Item>() {
-            @Override
-            public Item apply(@NonNull List<Item> items) throws Exception {
-                if (!items.isEmpty()) {
-                    return items.get(0);
-                }
-                throw new EmptyDataException();
-            }
-        });
-    }
-
-    public Single<List<String>> getItemNames(String name) {
-        return api.getItemNames(name);
+    public Observable<Realm> getAllRealm(boolean hasAllItem) {
+        return mRealmHelper.getAllRealm(hasAllItem);
     }
 
     public Single<List<AuctionItem>> getAuction(long itemId) {
@@ -85,88 +78,8 @@ public class BnadeRepo {
                 .toSortedList();
     }
 
-    public Observable<Realm> getRealmsByName(CharSequence s) {
-        return mRealmHelper.getRealmsByName(s.toString());
-    }
-
-    public Single<List<WowTokens>> getWowTokens() {
-        return api.getAhWowtokens();
-    }
-
-    public Single<List<Hot>> getHot(int type) {
-        return Observable.concat(getHotCache(type), getHotRemote(type)).firstOrError();
-    }
-
-    public Single<SearchResultVO> search(@NonNull Item item, Realm realm) {
-        return Single.zip(api.getAuctionRealmItem(realm.getId(), item.getId()), Single.just(item),
-                api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
-                new Function3<List<AuctionRealmItem>, Item, List<AuctionHistory>, SearchResultVO>() {
-                    @Override
-                    public SearchResultVO apply(@NonNull List<AuctionRealmItem> auctionRealmItems, @NonNull Item
-                            item, @NonNull List<AuctionHistory> auctionHistories) throws Exception {
-                        SearchResultVO result = new SearchResultVO(item);
-                        result.setAuctionRealmItems(auctionRealmItems);
-                        result.setAuctionHistories(auctionHistories);
-                        return result;
-                    }
-                });
-    }
-
-    private Observable<List<Hot>> getHotRemote(final int type) {
-        return api.getHot().toObservable()
-                .map(new Function<List<Hot>, SparseArray<List<Hot>>>() {
-                    @Override
-                    public SparseArray<List<Hot>> apply(@NonNull List<Hot> hots) throws Exception {
-                        SparseArray<List<Hot>> map = hotCache;
-                        map.clear();
-                        for (Hot hot : hots) {
-                            List<Hot> typeList = map.get(hot.getType());
-                            if (typeList == null) {
-                                typeList = new ArrayList<>();
-                                map.put(hot.getType(), typeList);
-                            }
-                            typeList.add(hot);
-                        }
-                        return map;
-                    }
-                })
-                .map(new Function<SparseArray<List<Hot>>, List<Hot>>() {
-                    @Override
-                    public List<Hot> apply(@NonNull SparseArray<List<Hot>> listSparseArray) throws Exception {
-                        return listSparseArray.get(type);
-                    }
-                });
-    }
-
-    private Observable<List<Hot>> getHotCache(int type) {
-        return hotCache.get(type) == null ? Observable.<List<Hot>>empty() : Observable.just(hotCache.get(type));
-    }
-
-    public Single<List<AuctionRealm>> getAuctionRealm() {
-        return api.getAuctionRealmsSummary()
-                .flatMapObservable(new Function<List<AuctionRealm>, ObservableSource<AuctionRealm>>() {
-                    @Override
-                    public ObservableSource<AuctionRealm> apply(@NonNull List<AuctionRealm> auctionRealms) throws
-                            Exception {
-                        return Observable.fromIterable(auctionRealms);
-                    }
-                })
-                .flatMapSingle(new Function<AuctionRealm, SingleSource<AuctionRealm>>() {
-                    @Override
-                    public SingleSource<AuctionRealm> apply(@NonNull AuctionRealm auctionRealm) throws Exception {
-                        return Single.just(auctionRealm)
-                                .zipWith(mRealmHelper.getRealmById(auctionRealm.getId()),
-                                        new BiFunction<AuctionRealm, Realm, AuctionRealm>() {
-                                            @Override
-                                            public AuctionRealm apply(@NonNull AuctionRealm auctionRealm, @NonNull
-                                                    Realm realm) throws Exception {
-                                                auctionRealm.setRealm(realm);
-                                                return auctionRealm;
-                                            }
-                                        });
-                    }
-                })
-                .toList();
+    public Single<List<AuctionRealm>> getAuctionRealm(boolean useCache) {
+        return Observable.concat(getAuctionRealmCache(useCache), getAuctionRealmRemote()).firstOrError();
     }
 
     public Single<List<Auction>> getAuctionRealmOwner(long realmId, String name) {
@@ -194,8 +107,119 @@ public class BnadeRepo {
                 .toList();
     }
 
-    public Observable<Realm> getAllRealm(boolean hasAllItem) {
-        return mRealmHelper.getAllRealm(hasAllItem);
+    public Single<List<Hot>> getHot(int type) {
+        return Observable.concat(getHotCache(type), getHotRemote(type)).firstOrError();
+    }
+
+    public Single<Item> getItem(String name) {
+        return api.getItem(name).map(new Function<List<Item>, Item>() {
+            @Override
+            public Item apply(@NonNull List<Item> items) throws Exception {
+                if (!items.isEmpty()) {
+                    return items.get(0);
+                }
+                throw new EmptyDataException();
+            }
+        });
+    }
+
+    public Single<List<String>> getItemNames(String name) {
+        return api.getItemNames(name);
+    }
+
+    public Observable<Realm> getRealmsByName(CharSequence s) {
+        return mRealmHelper.getRealmsByName(s.toString());
+    }
+
+    public Single<List<WowTokens>> getWowTokens() {
+        return api.getAhWowtokens();
+    }
+
+    public Single<SearchResultVO> search(@NonNull Item item, Realm realm) {
+        return Single.zip(api.getAuctionRealmItem(realm.getId(), item.getId()), Single.just(item),
+                api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
+                new Function3<List<AuctionRealmItem>, Item, List<AuctionHistory>, SearchResultVO>() {
+                    @Override
+                    public SearchResultVO apply(@NonNull List<AuctionRealmItem> auctionRealmItems, @NonNull Item
+                            item, @NonNull List<AuctionHistory> auctionHistories) throws Exception {
+                        SearchResultVO result = new SearchResultVO(item);
+                        result.setAuctionRealmItems(auctionRealmItems);
+                        result.setAuctionHistories(auctionHistories);
+                        return result;
+                    }
+                });
+    }
+
+    private Observable<List<AuctionRealm>> getAuctionRealmCache(boolean useCache) {
+        return (useCache && !mAuctionRealmsCache.isEmpty() ? Observable
+                .just(mAuctionRealmsCache) : Observable.<List<AuctionRealm>>empty())
+                .subscribeOn(Schedulers.computation());
+    }
+
+    private Observable<List<AuctionRealm>> getAuctionRealmRemote() {
+        return api.getAuctionRealmsSummary()
+                .doOnSuccess(new Consumer<List<AuctionRealm>>() {
+                    @Override
+                    public void accept(@NonNull List<AuctionRealm> auctionRealms) throws Exception {
+                        mAuctionRealmsCache.clear();
+                        mAuctionRealmsCache.addAll(auctionRealms);
+                    }
+                })
+                .flatMapObservable(new Function<List<AuctionRealm>, ObservableSource<AuctionRealm>>() {
+                    @Override
+                    public ObservableSource<AuctionRealm> apply(@NonNull List<AuctionRealm> auctionRealms) throws
+                            Exception {
+                        return Observable.fromIterable(auctionRealms);
+                    }
+                })
+                .flatMapSingle(new Function<AuctionRealm, SingleSource<AuctionRealm>>() {
+                    @Override
+                    public SingleSource<AuctionRealm> apply(@NonNull AuctionRealm auctionRealm) throws Exception {
+                        return Single.just(auctionRealm)
+                                .zipWith(mRealmHelper.getRealmById(auctionRealm.getId()),
+                                        new BiFunction<AuctionRealm, Realm, AuctionRealm>() {
+                                            @Override
+                                            public AuctionRealm apply(@NonNull AuctionRealm auctionRealm, @NonNull
+                                                    Realm realm) throws Exception {
+                                                auctionRealm.setRealm(realm);
+                                                return auctionRealm;
+                                            }
+                                        });
+                    }
+                })
+                .toList()
+                .toObservable();
+    }
+
+    private Observable<List<Hot>> getHotCache(int type) {
+        return (hotCache.get(type) == null ? Observable.<List<Hot>>empty() : Observable.just(hotCache.get(type)))
+                .subscribeOn(Schedulers.computation());
+    }
+
+    private Observable<List<Hot>> getHotRemote(final int type) {
+        return api.getHot().toObservable()
+                .map(new Function<List<Hot>, SparseArray<List<Hot>>>() {
+                    @Override
+                    public SparseArray<List<Hot>> apply(@NonNull List<Hot> hots) throws Exception {
+                        SparseArray<List<Hot>> map = hotCache;
+                        map.clear();
+                        for (Hot hot : hots) {
+                            List<Hot> typeList = map.get(hot.getType());
+                            if (typeList == null) {
+                                typeList = new ArrayList<>();
+                                map.put(hot.getType(), typeList);
+                            }
+                            typeList.add(hot);
+                        }
+                        return map;
+                    }
+                })
+                .map(new Function<SparseArray<List<Hot>>, List<Hot>>() {
+                    @Override
+                    public List<Hot> apply(@NonNull SparseArray<List<Hot>> listSparseArray) throws Exception {
+                        return listSparseArray.get(type);
+                    }
+                });
     }
 
 }

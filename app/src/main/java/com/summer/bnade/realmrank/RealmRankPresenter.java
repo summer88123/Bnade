@@ -11,6 +11,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
@@ -19,27 +20,22 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by kevin.bai on 2017/4/16.
  */
 
 public class RealmRankPresenter extends BasePresenter<RealmRankContract.View> implements RealmRankContract.Presenter {
-    private List<AuctionRealm> data;
-    private AuctionRealm.SortType mSortType;
 
     @Inject
-    RealmRankPresenter(RealmRankContract.View view, BnadeRepo repo, RealmRankAdapter adapter) {
+    RealmRankPresenter(RealmRankContract.View view, BnadeRepo repo) {
         super(view, repo);
-        mView.setDependency(adapter);
-        mSortType = AuctionRealm.SortType.TotalDown;
     }
 
     @Override
-    public void load() {
-        mRepo.getAuctionRealm()
-                .compose(sortData(mSortType))
+    public void load(final AuctionRealm.SortType sortType) {
+        mRepo.getAuctionRealm(false)
+                .compose(sortData(sortType))
                 .doOnSubscribe(new Consumer<Disposable>() {
                     @Override
                     public void accept(@NonNull Disposable disposable) throws Exception {
@@ -50,26 +46,30 @@ public class RealmRankPresenter extends BasePresenter<RealmRankContract.View> im
                 .subscribe(new Consumer<List<AuctionRealm>>() {
                     @Override
                     public void accept(@NonNull List<AuctionRealm> auctionRealms) throws Exception {
-                        data = auctionRealms;
                         mView.setRefreshing(false);
-                        mView.show(auctionRealms, mSortType);
+                        mView.show(auctionRealms, sortType);
                     }
                 }, mErrorHandler);
     }
 
-    private SingleTransformer<List<AuctionRealm>, List<AuctionRealm>> sortData(final AuctionRealm.SortType sortType) {
-        return new SingleTransformer<List<AuctionRealm>, List<AuctionRealm>>() {
-            @Override
-            public SingleSource<List<AuctionRealm>> apply(@NonNull Single<List<AuctionRealm>> upstream) {
-                return upstream.map(new Function<List<AuctionRealm>, List<AuctionRealm>>() {
+    @Override
+    public void sort(final AuctionRealm.SortType sortType) {
+        mRepo.getAuctionRealm(true)
+                .flatMapObservable(new Function<List<AuctionRealm>, ObservableSource<AuctionRealm>>() {
                     @Override
-                    public List<AuctionRealm> apply(@NonNull List<AuctionRealm> auctionRealms) throws Exception {
-                        Collections.sort(auctionRealms, getComparator(sortType));
-                        return auctionRealms;
+                    public ObservableSource<AuctionRealm> apply(@NonNull List<AuctionRealm> auctionRealms) throws
+                            Exception {
+                        return Observable.fromIterable(auctionRealms);
                     }
-                });
-            }
-        };
+                })
+                .toSortedList(getComparator(sortType))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<List<AuctionRealm>>() {
+                    @Override
+                    public void accept(@NonNull List<AuctionRealm> auctionRealms) throws Exception {
+                        mView.show(auctionRealms, sortType);
+                    }
+                }, mErrorHandler);
     }
 
     private Comparator<? super AuctionRealm> getComparator(final AuctionRealm.SortType sortType) {
@@ -99,19 +99,18 @@ public class RealmRankPresenter extends BasePresenter<RealmRankContract.View> im
         };
     }
 
-
-    @Override
-    public void sort(final AuctionRealm.SortType sortType) {
-        Observable.fromIterable(data)
-                .toSortedList(getComparator(sortType))
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<AuctionRealm>>() {
+    private SingleTransformer<List<AuctionRealm>, List<AuctionRealm>> sortData(final AuctionRealm.SortType sortType) {
+        return new SingleTransformer<List<AuctionRealm>, List<AuctionRealm>>() {
+            @Override
+            public SingleSource<List<AuctionRealm>> apply(@NonNull Single<List<AuctionRealm>> upstream) {
+                return upstream.map(new Function<List<AuctionRealm>, List<AuctionRealm>>() {
                     @Override
-                    public void accept(@NonNull List<AuctionRealm> auctionRealms) throws Exception {
-                        mSortType = sortType;
-                        mView.show(auctionRealms, sortType);
+                    public List<AuctionRealm> apply(@NonNull List<AuctionRealm> auctionRealms) throws Exception {
+                        Collections.sort(auctionRealms, getComparator(sortType));
+                        return auctionRealms;
                     }
-                }, mErrorHandler);
+                });
+            }
+        };
     }
 }

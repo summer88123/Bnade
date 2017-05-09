@@ -152,6 +152,7 @@ public class MainActivity extends BaseActivity
             fm.beginTransaction().replace(R.id.content_main, token, WowTokenFragment.TAG).commit();
         } else if (id == R.id.btn_realm_rank) {
             RealmRankFragment token = (RealmRankFragment) mMainComponent.realmRankView();
+            mMainComponent.inject(token);
             fm.beginTransaction().replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
         } else if (id == R.id.btn_player_item) {
             PlayerItemFragment player = (PlayerItemFragment) mMainComponent.playerItemView();

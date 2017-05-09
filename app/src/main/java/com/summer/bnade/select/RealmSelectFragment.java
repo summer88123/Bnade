@@ -74,7 +74,7 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
             @Override
             public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 return makeMovementFlags(0, mAdapter.getItem(viewHolder.getAdapterPosition()).getType()
-                        .equals(TypedRealm.USED) ? ItemTouchHelper.RIGHT : 0);
+                        .equals(TypedRealm.LABEL_USED) ? ItemTouchHelper.RIGHT : 0);
             }
 
         };
