@@ -10,12 +10,12 @@ import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.select.RealmSelectActivity;
 import com.summer.bnade.utils.Content;
+import com.summer.bnade.widget.RealmSelectButton;
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.Realm;
 
@@ -28,8 +28,8 @@ import butterknife.Unbinder;
 
 public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presenter> implements PlayerItemContract.View {
     public static final String TAG = PlayerItemFragment.class.getSimpleName();
-    @BindView(R.id.btn_realm_select)
-    Button mBtnRealmSelect;
+    @BindView(R.id.select_btn)
+    RealmSelectButton mBtnRealmSelect;
     @BindView(R.id.searchView)
     SearchView mSearchView;
     @BindView(R.id.list)
@@ -37,7 +37,6 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
     Unbinder unbinder;
 
     private PlayerItemAdapter mAdapter;
-    private Realm current;
 
     @SuppressWarnings("unused")
     public static PlayerItemFragment getInstance(FragmentManager fm) {
@@ -53,8 +52,7 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
             Realm realm = data.getParcelableExtra(Content.EXTRA_DATA);
-            mBtnRealmSelect.setText(realm.getConnected());
-            current = realm;
+            mBtnRealmSelect.setRealm(realm);
         }
     }
 
@@ -73,6 +71,7 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
+                Realm current = mBtnRealmSelect.getRealm();
                 if (current == null) {
                     showToast(R.string.toast_player_item_no_select_realm);
                 } else {
@@ -100,7 +99,7 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
         mAdapter.update(auctions);
     }
 
-    @OnClick(R.id.btn_realm_select)
+    @OnClick(R.id.select_btn)
     public void onClick() {
         startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
     }

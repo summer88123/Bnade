@@ -7,12 +7,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
-import android.support.transition.TransitionManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
@@ -22,19 +19,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
-import com.summer.bnade.result.single.ItemResultActivity;
 import com.summer.bnade.result.all.SearchResultActivity;
+import com.summer.bnade.result.single.ItemResultActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
 import com.summer.bnade.select.RealmSelectActivity;
 import com.summer.bnade.utils.Content;
+import com.summer.bnade.widget.RealmSelectButton;
 import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Realm;
 
@@ -68,16 +65,11 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     HistoryAdapter mHistoriesAdapter;
     @Inject
     FuzzyItemAdapter mFuzzyAdapter;
-    @BindView(R.id.btn_realm_select)
-    Button mBtnRealmSelect;
-    @BindView(R.id.btn_realm_clear)
-    Button mBtnRealmClear;
     ListPopupWindow mFuzzyList;
     @BindView(R.id.content)
     ConstraintLayout mContent;
-
-    ConstraintSet hasRealmSet = new ConstraintSet();
-    ConstraintSet noRealmSet = new ConstraintSet();
+    @BindView(R.id.select_btn)
+    RealmSelectButton mSelectBtn;
 
     public static SearchFragment getInstance(FragmentManager fm) {
         SearchFragment fragment = (SearchFragment) fm.findFragmentByTag(TAG);
@@ -91,7 +83,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
-            selectRealm(data.<Realm>getParcelableExtra(Content.EXTRA_DATA));
+            mSelectBtn.setRealm(data.<Realm>getParcelableExtra(Content.EXTRA_DATA));
         }
     }
 
@@ -101,8 +93,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
         unbinder = ButterKnife.bind(this, view);
-        hasRealmSet.clone(mContent);
-        noRealmSet.clone(mContent);
 
         FlexboxLayoutManager layoutManager = new FlexboxLayoutManager();
         layoutManager.setJustifyContent(JustifyContent.FLEX_START);
@@ -164,7 +154,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         if (savedInstanceState != null) {
             Realm realm = savedInstanceState.getParcelable("REALM");
             if (realm != null) {
-                selectRealm(realm);
+                mSelectBtn.setRealm(realm);
             }
         }
     }
@@ -178,7 +168,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("REALM", (Parcelable) mBtnRealmSelect.getTag());
+        outState.putParcelable("REALM", mSelectBtn.getRealm());
     }
 
     @Override
@@ -195,7 +185,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
 
     @Override
     public void search(String query) {
-        mPresenter.search(query, (Realm) mBtnRealmSelect.getTag());
+        mPresenter.search(query, mSelectBtn.getRealm());
     }
 
     @Override
@@ -234,19 +224,15 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         mHotAdapter.update(hotList);
     }
 
-    @OnClick(R.id.btn_realm_clear)
-    public void onClearClick() {
-        clearRealm();
-    }
-
     @OnClick(R.id.ib_clear_histories)
     public void onClick() {
         mPresenter.clearHistories();
     }
 
-    @OnClick(R.id.btn_realm_select)
+    @OnClick(R.id.select_btn)
     public void onViewClicked() {
-        startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content.REQUEST_SELECT_REALM);
+        startActivityForResult(new Intent(getContext(), RealmSelectActivity.class), Content
+                .REQUEST_SELECT_REALM);
     }
 
     public void search() {
@@ -260,12 +246,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         }
     }
 
-    private void clearRealm(){
-        mBtnRealmSelect.setTag(null);
-        mBtnRealmSelect.setText(R.string.btn_realm_select);
-        TransitionManager.beginDelayedTransition(mContent);
-        noRealmSet.applyTo(mContent);
-    }
 
     private int getHotType(@IdRes int resId) {
         switch (resId) {
@@ -279,13 +259,5 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         }
     }
 
-    private void selectRealm(Realm realm) {
-        mBtnRealmSelect.setText(realm.getConnected());
-        mBtnRealmSelect.setTag(realm);
-        TransitionManager.beginDelayedTransition(mContent);
-        hasRealmSet.setVisibility(R.id.btn_realm_clear, ConstraintSet.VISIBLE);
-        hasRealmSet.connect(R.id.btn_realm_select, ConstraintSet.RIGHT, R.id.btn_realm_clear, ConstraintSet.LEFT);
-        hasRealmSet.connect(R.id.btn_realm_clear, ConstraintSet.LEFT, R.id.btn_realm_select, ConstraintSet.RIGHT);
-        hasRealmSet.applyTo(mContent);
-    }
+
 }

@@ -8,29 +8,15 @@
     tools:context="com.summer.bnade.search.SearchFragment"
     >
 
-    <Button
-        android:id="@+id/btn_realm_select"
-        style="@style/Widget.AppCompat.Button.Colored"
+    <com.summer.bnade.widget.RealmSelectButton
+        android:id="@+id/select_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/btn_realm_select"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        />
-
-    <Button
-        android:id="@+id/btn_realm_clear"
-        style="@style/Widget.AppCompat.Button.Borderless.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_clear"
-        android:visibility="gone"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btn_realm_select"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="0dp"
         />
 
     <android.support.v7.widget.SearchView
@@ -39,14 +25,13 @@
         android:layout_height="48dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_realm_select"
+        app:layout_constraintTop_toBottomOf="@+id/select_btn"
         app:queryHint="@string/search_query_hint"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1"
+        tools:layout_editor_absoluteY="0dp"
         />
 
     <TextView

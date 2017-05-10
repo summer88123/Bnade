@@ -7,14 +7,10 @@
     android:layout_height="match_parent"
     >
 
-    <Button
-        android:id="@+id/btn_realm_select"
-        style="@style/Widget.AppCompat.Button.Colored"
+    <com.summer.bnade.widget.RealmSelectButton
+        android:id="@+id/select_btn"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="8dp"
         android:text="@string/btn_realm_select"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -30,7 +26,7 @@
         android:layout_marginTop="0dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_realm_select"
+        app:layout_constraintTop_toBottomOf="@+id/select_btn"
         app:queryHint="@string/search_query_hint_player"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
