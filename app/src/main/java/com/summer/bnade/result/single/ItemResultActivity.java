@@ -10,6 +10,8 @@ import com.summer.bnade.base.BaseViewActivity;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.di.ComponentHolder;
+import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import javax.inject.Inject;
 
@@ -33,6 +35,9 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
     @Inject
     PageAdapter mPageAdapter;
 
+    Item item;
+    Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,8 +47,10 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
         mTabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(mPageAdapter);
 
-        mPresenter.setData(getIntent().<SearchResultVO>getParcelableExtra(Content.EXTRA_DATA));
-        mPresenter.load();
+        item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
+        realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
+
+        mPresenter.load(item, realm);
     }
 
     @Override

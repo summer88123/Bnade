@@ -4,6 +4,7 @@ import com.summer.bnade.base.BaseView;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
 import com.summer.lib.model.entity.Hot;
+import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 
 import java.util.List;
@@ -18,11 +19,11 @@ public interface SearchContract {
 
         void search(String query);
 
-        void showFuzzySearch(SearchResultVO searchResultVO);
+        void showFuzzySearch(List<String> names);
 
-        void showRealmItemResult(SearchResultVO searchResultVO);
+        void showRealmItemResult(Item item, Realm realm);
 
-        void showResult(SearchResultVO searchResultVO);
+        void showResult(Item item, Realm realm);
 
         void updateHistories(List<String> histories);
 

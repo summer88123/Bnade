@@ -7,4 +7,5 @@ package com.summer.bnade.utils;
 public class Content {
     public static final int REQUEST_SELECT_REALM = 101;
     public static final String EXTRA_DATA = "EXTRA_DATA";
+    public static final String EXTRA_SUB_DATA = "EXTRA_SUB_DATA";
 }

@@ -7,7 +7,6 @@ import com.summer.bnade.data.HistorySearchRepo;
 import com.summer.bnade.data.error.EmptyDataException;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
-import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
@@ -73,16 +72,7 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                 .flatMap(new Function<Item, SingleSource<SearchResultVO>>() {
                     @Override
                     public SingleSource<SearchResultVO> apply(@NonNull Item item) throws Exception {
-                        return realm != null ? mRepo.search(item, realm) :
-                                Single.zip(mRepo.getAuction(item.getId()), Single
-                                        .just(item), new BiFunction<List<AuctionItem>, Item, SearchResultVO>() {
-                                    @Override
-                                    public SearchResultVO apply(@NonNull List<AuctionItem> auctionItems, @NonNull
-                                            Item item)
-                                            throws Exception {
-                                        return new SearchResultVO(item, auctionItems);
-                                    }
-                                });
+                        return mRepo.search(item, realm);
                     }
                 })
                 .onErrorResumeNext(new Function<Throwable, SingleSource<? extends SearchResultVO>>() {
@@ -105,15 +95,15 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
                     @Override
                     public void accept(@NonNull SearchResultVO searchResultVO) throws Exception {
                         if (searchResultVO.getItem() == null) {
-                            mView.showFuzzySearch(searchResultVO);
+                            mView.showFuzzySearch(searchResultVO.getNames());
                         } else if (searchResultVO.getAuctionRealmItems() != null) {
                             if (searchResultVO.getAuctionRealmItems().isEmpty()) {
                                 mView.showToast("无拍卖数据");
                             } else {
-                                mView.showRealmItemResult(searchResultVO);
+                                mView.showRealmItemResult(searchResultVO.getItem(), realm);
                             }
                         } else {
-                            mView.showResult(searchResultVO);
+                            mView.showResult(searchResultVO.getItem(), realm);
                         }
                     }
                 }, mErrorHandler);

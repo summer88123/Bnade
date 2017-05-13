@@ -27,12 +27,12 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.result.all.SearchResultActivity;
 import com.summer.bnade.result.single.ItemResultActivity;
-import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
 import com.summer.bnade.select.RealmSelectActivity;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.widget.RealmSelectButton;
 import com.summer.lib.model.entity.Hot;
+import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 
 import java.util.List;
@@ -189,8 +189,8 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     }
 
     @Override
-    public void showFuzzySearch(SearchResultVO searchResultVO) {
-        mFuzzyAdapter.update(searchResultVO.getNames());
+    public void showFuzzySearch(List<String> names) {
+        mFuzzyAdapter.update(names);
         if (Build.VERSION.SDK_INT == 24) {
             int[] a = new int[2];
             mSearchView.getLocationInWindow(a);
@@ -200,16 +200,18 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     }
 
     @Override
-    public void showRealmItemResult(SearchResultVO searchResultVO) {
+    public void showRealmItemResult(Item item, Realm realm) {
         Intent intent = new Intent(getActivity(), ItemResultActivity.class);
-        intent.putExtra(Content.EXTRA_DATA, searchResultVO);
+        intent.putExtra(Content.EXTRA_DATA, item);
+        intent.putExtra(Content.EXTRA_SUB_DATA, realm);
         startActivity(intent);
     }
 
     @Override
-    public void showResult(SearchResultVO searchResultVO) {
+    public void showResult(Item item, Realm realm) {
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
-        intent.putExtra(Content.EXTRA_DATA, searchResultVO);
+        intent.putExtra(Content.EXTRA_DATA, item);
+        intent.putExtra(Content.EXTRA_SUB_DATA, realm);
         startActivity(intent);
     }
 

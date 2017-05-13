@@ -11,6 +11,8 @@ import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.Gold;
+import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,30 +39,34 @@ import static com.summer.bnade.utils.ChartHelper.generateBarData;
 
 class SearchResultPresenter extends BasePresenter<SearchResultContract.View> implements SearchResultContract.Presenter {
 
-    private SearchResultVO mResult;
-
-    private List<AuctionItem> mRealData;
-
     @Inject
     SearchResultPresenter(SearchResultContract.View view, BnadeRepo repo) {
         super(view, repo);
     }
 
     @Override
-    public void filter(final String query) {
-        Observable.fromIterable(mRealData)
-                .filter(new Predicate<AuctionItem>() {
+    public void filter(final String query, Item item, Realm realm) {
+        mRepo.search(item, realm)
+                .flatMap(new Function<SearchResultVO, SingleSource<SearchResultVO>>() {
                     @Override
-                    public boolean test(@NonNull AuctionItem auctionItem) throws Exception {
-                        return TextUtils.isEmpty(query) || auctionItem.getRealm().getConnected().contains(query);
-                    }
-                })
-                .toList()
-                .map(new Function<List<AuctionItem>, SearchResultVO>() {
-                    @Override
-                    public SearchResultVO apply(@NonNull List<AuctionItem> auctionItems) throws Exception {
-                        mResult.setAuctionItems(auctionItems);
-                        return mResult;
+                    public SingleSource<SearchResultVO> apply(@NonNull final SearchResultVO resultVO) throws Exception {
+                        return Observable.fromIterable(resultVO.getAuctionItems())
+                                .filter(new Predicate<AuctionItem>() {
+                                    @Override
+                                    public boolean test(@NonNull AuctionItem auctionItem) throws Exception {
+                                        return TextUtils.isEmpty(query) || auctionItem.getRealm().getConnected()
+                                                .contains(query);
+                                    }
+                                })
+                                .toList()
+                                .map(new Function<List<AuctionItem>, SearchResultVO>() {
+                                    @Override
+                                    public SearchResultVO apply(@NonNull List<AuctionItem> auctionItems) throws
+                                            Exception {
+                                        resultVO.setAuctionItems(auctionItems);
+                                        return resultVO;
+                                    }
+                                });
                     }
                 })
                 .compose(computeData())
@@ -74,14 +80,8 @@ class SearchResultPresenter extends BasePresenter<SearchResultContract.View> imp
     }
 
     @Override
-    public void setData(SearchResultVO data) {
-        this.mResult = data;
-        this.mRealData = mResult.getAuctionItems();
-    }
-
-    @Override
-    public void load() {
-        Single.just(mResult)
+    public void load(Item item, Realm realm) {
+        mRepo.search(item, realm)
                 .compose(computeData())
                 .subscribe(new Consumer<SearchResultVO>() {
                     @Override

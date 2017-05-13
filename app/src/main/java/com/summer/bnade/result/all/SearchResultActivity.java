@@ -25,6 +25,8 @@ import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.di.ComponentHolder;
 import com.summer.lib.model.entity.Gold;
+import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import javax.inject.Inject;
 
@@ -49,6 +51,9 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     @BindView(R.id.chart)
     CombinedChart mChart;
 
+    Item item;
+    Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,19 +63,20 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
         mList.setAdapter(mResultAdapter);
         initChart();
 
-        mPresenter.setData((SearchResultVO) getIntent().getParcelableExtra(Content.EXTRA_DATA));
-        mPresenter.load();
+        item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
+        realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
+        mPresenter.load(item, realm);
     }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        mPresenter.filter(query);
+        mPresenter.filter(query, item, realm);
         return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        mPresenter.filter(newText);
+        mPresenter.filter(newText, item, realm);
         return true;
     }
 

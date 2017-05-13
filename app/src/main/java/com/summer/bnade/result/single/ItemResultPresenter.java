@@ -8,10 +8,11 @@ import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.AuctionHistory;
+import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import javax.inject.Inject;
 
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
@@ -26,21 +27,14 @@ import io.reactivex.schedulers.Schedulers;
 class ItemResultPresenter extends BasePresenter<ItemResultContract.View> implements
         ItemResultContract.Presenter {
 
-    private SearchResultVO mResultVO;
-
     @Inject
     ItemResultPresenter(ItemResultContract.View view, BnadeRepo repo) {
         super(view, repo);
     }
 
     @Override
-    public void setData(SearchResultVO data) {
-        this.mResultVO = data;
-    }
-
-    @Override
-    public void load() {
-        Single.just(mResultVO)
+    public void load(Item item, Realm realm) {
+        mRepo.search(item, realm)
                 .map(new Function<SearchResultVO, SearchResultVO>() {
                     @Override
                     public SearchResultVO apply(@NonNull SearchResultVO resultVO) throws Exception {

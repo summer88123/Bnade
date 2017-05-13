@@ -1,5 +1,6 @@
 package com.summer.bnade.data;
 
+import android.support.annotation.NonNull;
 import android.util.SparseArray;
 
 import com.summer.bnade.data.error.EmptyDataException;
@@ -23,7 +24,6 @@ import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -39,12 +39,14 @@ public class BnadeRepo {
     private final SparseArray<List<Hot>> hotCache;
     private final List<AuctionRealm> mAuctionRealmsCache;
     private final RealmHelper mRealmHelper;
+    private final SearchResultVO mSearchResultVO;
 
     BnadeRepo(BnadeApi api, RealmHelper realmHelper) {
         this.api = api;
         this.mRealmHelper = realmHelper;
         hotCache = new SparseArray<>(3);
         mAuctionRealmsCache = new ArrayList<>();
+        mSearchResultVO = new SearchResultVO();
     }
 
     public Observable<Realm> getAllRealm(boolean hasAllItem) {
@@ -135,17 +137,42 @@ public class BnadeRepo {
         return api.getAhWowtokens();
     }
 
-    public Single<SearchResultVO> search(@NonNull Item item, Realm realm) {
+
+    public Single<SearchResultVO> search(Item item, Realm realm) {
+        return Observable.concat(searchCache(item), searchRemote(item, realm).toObservable()).firstOrError();
+    }
+
+    private Observable<SearchResultVO> searchCache(@NonNull Item item) {
+        return item.equals(mSearchResultVO.getItem())
+                ? Observable.just(mSearchResultVO) : Observable.<SearchResultVO>empty();
+    }
+
+    private Single<SearchResultVO> searchRemote(@NonNull Item item, Realm realm) {
+        if (realm == null) {
+            return Single.zip(getAuction(item.getId()), Single
+                    .just(item), new BiFunction<List<AuctionItem>, Item, SearchResultVO>() {
+                @Override
+                public SearchResultVO apply(@NonNull List<AuctionItem> auctionItems, @NonNull
+                        Item item)
+                        throws Exception {
+                    mSearchResultVO.reset();
+                    mSearchResultVO.setItem(item);
+                    mSearchResultVO.setAuctionItems(auctionItems);
+                    return mSearchResultVO;
+                }
+            });
+        }
         return Single.zip(api.getAuctionRealmItem(realm.getId(), item.getId()), Single.just(item),
                 api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
                 new Function3<List<AuctionRealmItem>, Item, List<AuctionHistory>, SearchResultVO>() {
                     @Override
                     public SearchResultVO apply(@NonNull List<AuctionRealmItem> auctionRealmItems, @NonNull Item
                             item, @NonNull List<AuctionHistory> auctionHistories) throws Exception {
-                        SearchResultVO result = new SearchResultVO(item);
-                        result.setAuctionRealmItems(auctionRealmItems);
-                        result.setAuctionHistories(auctionHistories);
-                        return result;
+                        mSearchResultVO.reset();
+                        mSearchResultVO.setItem(item);
+                        mSearchResultVO.setAuctionRealmItems(auctionRealmItems);
+                        mSearchResultVO.setAuctionHistories(auctionHistories);
+                        return mSearchResultVO;
                     }
                 });
     }

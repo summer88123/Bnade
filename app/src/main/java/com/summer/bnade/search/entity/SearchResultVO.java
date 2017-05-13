@@ -35,6 +35,9 @@ public class SearchResultVO implements Parcelable {
      */
     private List<String> names;
 
+    public SearchResultVO() {
+    }
+
     public SearchResultVO(Item item) {
         this.item = item;
     }
@@ -50,6 +53,16 @@ public class SearchResultVO implements Parcelable {
 
     public List<AuctionHistory> getAuctionHistories() {
         return auctionHistories;
+    }
+
+    public void reset() {
+        this.item = null;
+        auctionRealmItems = null;
+        auctionHistories = null;
+        avgBuyout = null;
+        auctionItems = null;
+        combinedData = null;
+        names = null;
     }
 
     public void setAuctionHistories(List<AuctionHistory> auctionHistories) {
