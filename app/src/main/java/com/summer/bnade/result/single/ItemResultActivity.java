@@ -50,7 +50,12 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
         item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
         realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
 
-        mPresenter.load(item, realm);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mPresenter.load(item, realm);
+            }
+        });
     }
 
     @Override

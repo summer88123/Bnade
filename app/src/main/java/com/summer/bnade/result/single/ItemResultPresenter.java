@@ -8,8 +8,14 @@ import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.AuctionHistory;
+import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -26,6 +32,37 @@ import io.reactivex.schedulers.Schedulers;
 
 class ItemResultPresenter extends BasePresenter<ItemResultContract.View> implements
         ItemResultContract.Presenter {
+
+    private Function<SearchResultVO, SearchResultVO> polySameRealmItem = new Function<SearchResultVO, SearchResultVO>
+            () {
+        @Override
+        public SearchResultVO apply(@NonNull SearchResultVO resultVO) throws Exception {
+            List<AuctionRealmItem> realmItems = resultVO.getAuctionRealmItems();
+            List<AuctionRealmItem> result = new ArrayList<>();
+            for (AuctionRealmItem realmItem : realmItems) {
+                int index = result.indexOf(realmItem);
+                if (index != -1) {
+                    result.get(index).add(realmItem);
+                } else {
+                    result.add(realmItem);
+                }
+            }
+
+            Collections.sort(result, new Comparator<AuctionRealmItem>() {
+                @Override
+                public int compare(AuctionRealmItem o1, AuctionRealmItem o2) {
+                    long result = o1.getUnitBuyout().getMoney() - o2.getUnitBuyout().getMoney();
+                    if (result == 0) {
+                        result = o1.getUnitBidPrice().getMoney() - o2.getUnitBidPrice().getMoney();
+                    }
+                    if (result > 0) return 1;
+                    else return result == 0 ? 0 : -1;
+                }
+            });
+            resultVO.setAuctionRealmItems(result);
+            return resultVO;
+        }
+    };
 
     @Inject
     ItemResultPresenter(ItemResultContract.View view, BnadeRepo repo) {
@@ -60,6 +97,7 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
                         return resultVO;
                     }
                 })
+                .map(polySameRealmItem)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<SearchResultVO>() {

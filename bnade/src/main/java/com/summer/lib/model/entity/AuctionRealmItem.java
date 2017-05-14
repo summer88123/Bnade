@@ -8,6 +8,17 @@ import android.os.Parcelable;
  */
 
 public class AuctionRealmItem implements Parcelable {
+    public static final Parcelable.Creator<AuctionRealmItem> CREATOR = new Parcelable.Creator<AuctionRealmItem>() {
+        @Override
+        public AuctionRealmItem createFromParcel(Parcel source) {
+            return new AuctionRealmItem(source);
+        }
+
+        @Override
+        public AuctionRealmItem[] newArray(int size) {
+            return new AuctionRealmItem[size];
+        }
+    };
     private String playerName;
     private String realmName;
     private Gold bidPrice;
@@ -15,20 +26,65 @@ public class AuctionRealmItem implements Parcelable {
     private int count;
     private LastTime lastTime;
 
-    public String getPlayerName() {
-        return playerName;
+
+    private Gold unitBidPrice;
+    private Gold unitBuyout;
+
+    public AuctionRealmItem() {
     }
 
-    public void setPlayerName(String playerName) {
-        this.playerName = playerName;
+    protected AuctionRealmItem(Parcel in) {
+        this.playerName = in.readString();
+        this.realmName = in.readString();
+        this.bidPrice = in.readParcelable(Gold.class.getClassLoader());
+        this.buyout = in.readParcelable(Gold.class.getClassLoader());
+        this.count = in.readInt();
+        int tmpLastTime = in.readInt();
+        this.lastTime = tmpLastTime == -1 ? null : LastTime.values()[tmpLastTime];
     }
 
-    public String getRealmName() {
-        return realmName;
+    @Override
+    public int hashCode() {
+        int result = getPlayerName().hashCode();
+        result = 31 * result + getRealmName().hashCode();
+        result = 31 * result + getLastTime().hashCode();
+        return result;
     }
 
-    public void setRealmName(String realmName) {
-        this.realmName = realmName;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuctionRealmItem)) return false;
+
+        AuctionRealmItem that = (AuctionRealmItem) o;
+
+        if (!getPlayerName().equals(that.getPlayerName())) return false;
+        if (!getRealmName().equals(that.getRealmName())) return false;
+        if (!getUnitBidPrice().equals(that.getUnitBidPrice())) return false;
+        if (!getUnitBuyout().equals(that.getUnitBuyout())) return false;
+        return getLastTime() == that.getLastTime();
+
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.playerName);
+        dest.writeString(this.realmName);
+        dest.writeParcelable(this.bidPrice, flags);
+        dest.writeParcelable(this.buyout, flags);
+        dest.writeInt(this.count);
+        dest.writeInt(this.lastTime == null ? -1 : this.lastTime.ordinal());
+    }
+
+    public void add(AuctionRealmItem realmItem) {
+        count = realmItem.count + count;
+        bidPrice = new Gold(bidPrice.getMoney() + realmItem.getBidPrice().getMoney());
+        buyout = new Gold(buyout.getMoney() + realmItem.getBuyout().getMoney());
     }
 
     public Gold getBidPrice() {
@@ -63,43 +119,33 @@ public class AuctionRealmItem implements Parcelable {
         this.lastTime = lastTime;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getPlayerName() {
+        return playerName;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.playerName);
-        dest.writeString(this.realmName);
-        dest.writeParcelable(this.bidPrice, flags);
-        dest.writeParcelable(this.buyout, flags);
-        dest.writeInt(this.count);
-        dest.writeInt(this.lastTime == null ? -1 : this.lastTime.ordinal());
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
     }
 
-    public AuctionRealmItem() {
+    public String getRealmName() {
+        return realmName;
     }
 
-    protected AuctionRealmItem(Parcel in) {
-        this.playerName = in.readString();
-        this.realmName = in.readString();
-        this.bidPrice = in.readParcelable(Gold.class.getClassLoader());
-        this.buyout = in.readParcelable(Gold.class.getClassLoader());
-        this.count = in.readInt();
-        int tmpLastTime = in.readInt();
-        this.lastTime = tmpLastTime == -1 ? null : LastTime.values()[tmpLastTime];
+    public void setRealmName(String realmName) {
+        this.realmName = realmName;
     }
 
-    public static final Parcelable.Creator<AuctionRealmItem> CREATOR = new Parcelable.Creator<AuctionRealmItem>() {
-        @Override
-        public AuctionRealmItem createFromParcel(Parcel source) {
-            return new AuctionRealmItem(source);
+    public Gold getUnitBidPrice() {
+        if (unitBidPrice == null) {
+            unitBidPrice = new Gold(bidPrice.getMoney() / count);
         }
+        return unitBidPrice;
+    }
 
-        @Override
-        public AuctionRealmItem[] newArray(int size) {
-            return new AuctionRealmItem[size];
+    public Gold getUnitBuyout() {
+        if (unitBuyout == null) {
+            unitBuyout = new Gold(buyout.getMoney() / count);
         }
-    };
+        return unitBuyout;
+    }
 }

@@ -17,8 +17,18 @@ import java.util.List;
  */
 
 public class SearchResultVO implements Parcelable {
-    private Item item;
+    public static final Creator<SearchResultVO> CREATOR = new Creator<SearchResultVO>() {
+        @Override
+        public SearchResultVO createFromParcel(Parcel source) {
+            return new SearchResultVO(source);
+        }
 
+        @Override
+        public SearchResultVO[] newArray(int size) {
+            return new SearchResultVO[size];
+        }
+    };
+    private Item item;
     /**
      * 单服务器数据
      */
@@ -51,18 +61,28 @@ public class SearchResultVO implements Parcelable {
         this.names = names;
     }
 
-    public List<AuctionHistory> getAuctionHistories() {
-        return auctionHistories;
+    protected SearchResultVO(Parcel in) {
+        this.item = in.readParcelable(Item.class.getClassLoader());
+        this.auctionRealmItems = in.createTypedArrayList(AuctionRealmItem.CREATOR);
+        this.auctionItems = in.createTypedArrayList(AuctionItem.CREATOR);
+        this.auctionHistories = in.createTypedArrayList(AuctionHistory.CREATOR);
     }
 
-    public void reset() {
-        this.item = null;
-        auctionRealmItems = null;
-        auctionHistories = null;
-        avgBuyout = null;
-        auctionItems = null;
-        combinedData = null;
-        names = null;
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(this.item, flags);
+        dest.writeTypedList(this.auctionRealmItems);
+        dest.writeTypedList(this.auctionItems);
+        dest.writeTypedList(this.auctionHistories);
+    }
+
+    public List<AuctionHistory> getAuctionHistories() {
+        return auctionHistories;
     }
 
     public void setAuctionHistories(List<AuctionHistory> auctionHistories) {
@@ -113,35 +133,13 @@ public class SearchResultVO implements Parcelable {
         return names;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public void reset() {
+        this.item = null;
+        auctionRealmItems = null;
+        auctionHistories = null;
+        avgBuyout = null;
+        auctionItems = null;
+        combinedData = null;
+        names = null;
     }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(this.item, flags);
-        dest.writeTypedList(this.auctionRealmItems);
-        dest.writeTypedList(this.auctionItems);
-        dest.writeTypedList(this.auctionHistories);
-    }
-
-    protected SearchResultVO(Parcel in) {
-        this.item = in.readParcelable(Item.class.getClassLoader());
-        this.auctionRealmItems = in.createTypedArrayList(AuctionRealmItem.CREATOR);
-        this.auctionItems = in.createTypedArrayList(AuctionItem.CREATOR);
-        this.auctionHistories = in.createTypedArrayList(AuctionHistory.CREATOR);
-    }
-
-    public static final Creator<SearchResultVO> CREATOR = new Creator<SearchResultVO>() {
-        @Override
-        public SearchResultVO createFromParcel(Parcel source) {
-            return new SearchResultVO(source);
-        }
-
-        @Override
-        public SearchResultVO[] newArray(int size) {
-            return new SearchResultVO[size];
-        }
-    };
 }
