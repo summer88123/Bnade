@@ -22,6 +22,8 @@ public class RepoModule {
     public RepoModule(Application app) {
         mApp = app;
     }
+
+    @Singleton
     @Provides
     SharedPreferences provideSharedPreferences() {
         return mApp.getSharedPreferences("app", Activity.MODE_PRIVATE);

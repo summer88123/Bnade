@@ -76,8 +76,7 @@ public class MainActivity extends BaseActivity
                 if (searchFragment != null) {
                     searchFragment.search();
                 } else {
-                    showSearch();
-                    navigationView.setCheckedItem(R.id.btn_item_search);
+                    selectSearch();
                 }
             }
         });
@@ -89,6 +88,10 @@ public class MainActivity extends BaseActivity
 
         navigationView.setNavigationItemSelectedListener(this);
 
+        selectSearch();
+    }
+
+    private void selectSearch() {
         showSearch();
         navigationView.setCheckedItem(R.id.btn_item_search);
         setTitle(R.string.item_search);
