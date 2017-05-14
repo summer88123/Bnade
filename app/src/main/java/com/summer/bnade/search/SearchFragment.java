@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
@@ -115,7 +114,7 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
                 mFuzzyList.dismiss();
-                search(((TextView) view).getText().toString());
+                mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
             }
         });
 
