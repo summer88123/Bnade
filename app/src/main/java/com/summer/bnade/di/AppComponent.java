@@ -5,6 +5,7 @@ import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.data.HistoryRealmRepo;
 import com.summer.bnade.data.HistorySearchRepo;
 import com.summer.bnade.data.RepoModule;
+import com.summer.bnade.widget.RealmSelectButton;
 import com.summer.lib.model.di.BnadeModule;
 
 import javax.inject.Singleton;
@@ -19,6 +20,7 @@ import dagger.Component;
 @Component(modules = {RepoModule.class, BnadeModule.class})
 public interface AppComponent {
     void inject(BnadeApplication application);
+    void inject(RealmSelectButton button);
 
     BnadeRepo bnadeRepo();
 

@@ -10,11 +10,17 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 
 import com.summer.bnade.R;
+import com.summer.bnade.data.HistoryRealmRepo;
+import com.summer.bnade.di.ComponentHolder;
 import com.summer.lib.model.entity.Realm;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by kevin.bai on 2017/5/10.
@@ -26,11 +32,13 @@ public class RealmSelectButton extends ConstraintLayout {
     @BindView(R.id.btn_realm_clear)
     Button mBtnRealmClear;
 
+    @Inject
+    HistoryRealmRepo mRealmRepo;
+
     ConstraintSet hasRealmSet = new ConstraintSet();
     ConstraintSet noRealmSet = new ConstraintSet();
 
     private Realm realm;
-
 
     @OnClick(R.id.btn_realm_clear)
     public void onClearClick() {
@@ -44,9 +52,9 @@ public class RealmSelectButton extends ConstraintLayout {
 
     private void clearRealm() {
         this.realm = null;
+        TransitionManager.beginDelayedTransition(this);
         mBtnRealmSelect.setText(R.string.btn_realm_select);
         mBtnRealmSelect.postInvalidate();
-        TransitionManager.beginDelayedTransition(this);
         noRealmSet.applyTo(this);
     }
 
@@ -68,7 +76,6 @@ public class RealmSelectButton extends ConstraintLayout {
     public void setRealm(Realm realm) {
         this.realm = realm;
         mBtnRealmSelect.setText(realm.getConnected());
-        mBtnRealmSelect.postInvalidate();
         TransitionManager.beginDelayedTransition(this);
         hasRealmSet.setVisibility(R.id.btn_realm_clear, ConstraintSet.VISIBLE);
         hasRealmSet.connect(R.id.btn_realm_select, ConstraintSet.RIGHT, R.id.btn_realm_clear, ConstraintSet.LEFT);
@@ -83,7 +90,14 @@ public class RealmSelectButton extends ConstraintLayout {
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.realm_select_button, this);
         ButterKnife.bind(this);
+        ComponentHolder.getComponent().inject(this);
         hasRealmSet.clone(this);
         noRealmSet.clone(this);
+        mRealmRepo.last().subscribe(new Consumer<Realm>() {
+            @Override
+            public void accept(@NonNull Realm realm) throws Exception {
+                setRealm(realm);
+            }
+        });
     }
 }

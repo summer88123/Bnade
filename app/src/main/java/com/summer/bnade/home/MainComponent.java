@@ -22,13 +22,12 @@ import dagger.Component;
 @Component(
         dependencies = AppComponent.class,
         modules = {
-                MainModule.class,
                 WowTokenModule.class,
                 SearchModule.class,
                 RealmRankModule.class,
                 PlayerItemModule.class,
         })
-public interface MainComponent {
+interface MainComponent {
     void inject(MainActivity activity);
 
     void inject(SearchFragment fragment);

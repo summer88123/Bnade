@@ -99,7 +99,6 @@ public class MainActivity extends BaseActivity
         fm = getSupportFragmentManager();
         mMainComponent = DaggerMainComponent.builder()
                 .appComponent(ComponentHolder.getComponent())
-                .mainModule(new MainModule(this))
                 .wowTokenModule(new WowTokenModule(WowTokenFragment.getInstance(fm)))
                 .searchModule(new SearchModule(SearchFragment.getInstance(fm)))
                 .realmRankModule(new RealmRankModule(RealmRankFragment.getInstance(fm)))

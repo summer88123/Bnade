@@ -10,8 +10,11 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
+import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Function;
@@ -23,6 +26,8 @@ import io.reactivex.schedulers.Schedulers;
 
 public class HistoryRealmRepo {
     private static final String HISTORY_REALM_KEY = "KEY_HISTORY_REALM";
+    private static final String LAST_REALM_KEY = "KEY_LAST_REALM";
+    private static final String NONE = "NONE";
     private final SharedPreferences.Editor mEditor;
     private final RealmHelper mRealmHelper;
     private final SharedPreferences sp;
@@ -40,7 +45,22 @@ public class HistoryRealmRepo {
             public void run() throws Exception {
                 initCache();
                 cache.add(realm.getConnected());
+                mEditor.putString(LAST_REALM_KEY, realm.getConnected()).apply();
                 save();
+            }
+        }).subscribeOn(Schedulers.io());
+    }
+
+    public Maybe<Realm> last() {
+        return Single.fromCallable(new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return sp.getString(LAST_REALM_KEY, NONE);
+            }
+        }).flatMapMaybe(new Function<String, MaybeSource<Realm>>() {
+            @Override
+            public MaybeSource<Realm> apply(@NonNull String s) throws Exception {
+                return mRealmHelper.getRealmsByName(s).firstElement();
             }
         }).subscribeOn(Schedulers.io());
     }

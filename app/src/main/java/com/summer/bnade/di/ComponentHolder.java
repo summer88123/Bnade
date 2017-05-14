@@ -12,6 +12,10 @@ import com.summer.lib.model.di.BnadeModule;
 public class ComponentHolder {
     private static AppComponent component;
 
+    private ComponentHolder() {
+        throw new RuntimeException("不能实例化ComponentHolder");
+    }
+
     public static void initComponent(Application application) {
         component = DaggerAppComponent
                 .builder()
