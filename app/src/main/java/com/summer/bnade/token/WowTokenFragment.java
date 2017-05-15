@@ -44,7 +44,7 @@ import butterknife.Unbinder;
 public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> implements WowTokenContract.View,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String TAG = WowTokenFragment.class.getSimpleName();
-    private static final NumberFormat format = new DecimalFormat("0.#");
+    private static final NumberFormat format = new DecimalFormat("0.0");
     @BindView(R.id.tv_cur_price)
     TextView mTvCurPrice;
     @BindView(R.id.tv_modified_time)

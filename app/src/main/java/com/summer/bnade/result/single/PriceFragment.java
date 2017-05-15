@@ -8,7 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.summer.bnade.R;
-import com.summer.bnade.search.entity.SearchResultVO;
+import com.summer.lib.model.entity.AuctionRealmItem;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -53,7 +55,7 @@ public class PriceFragment extends PageAdapter.PageFragment {
         return R.string.fragment_title_current_price;
     }
 
-    public void updateList(SearchResultVO vo) {
-        mAdapter.update(vo.getAuctionRealmItems());
+    public void updateList(List<AuctionRealmItem> list) {
+        mAdapter.update(list);
     }
 }

@@ -1,6 +1,7 @@
 package com.summer.bnade.result.single;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,8 +12,17 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
+import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
-import com.summer.bnade.search.entity.SearchResultVO;
+import com.summer.bnade.result.single.entity.AuctionHistoryVO;
+import com.summer.bnade.utils.DateUtil;
+import com.summer.bnade.utils.StringHelper;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,6 +35,7 @@ import butterknife.Unbinder;
  */
 public class HistoryFragment extends PageAdapter.PageFragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
+    private static final NumberFormat format = new DecimalFormat("0.0");
     @BindView(R.id.tv_one_day)
     TextView mTvOneDay;
     @BindView(R.id.tv_week)
@@ -77,7 +88,15 @@ public class HistoryFragment extends PageAdapter.PageFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         unbinder = ButterKnife.bind(this, view);
+        initChart(mChartHistory, "MM-dd");
+        initChart(mChartOneDay, "HH:mm");
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
     @Override
@@ -85,29 +104,71 @@ public class HistoryFragment extends PageAdapter.PageFragment {
         return R.string.fragment_title_history_trand;
     }
 
-    public void update(SearchResultVO resultVO) {
-        mTvDayMin.setText(getString(R.string.gold, 15));
-        mTvDayMax.setText(getString(R.string.gold, 19));
-        mTvDayAvg.setText(getString(R.string.gold, 19));
-        mTvDayCountAvg.setText("1111");
-        mTvWeekMin.setText(getString(R.string.gold, 19));
-        mTvWeekMax.setText(getString(R.string.gold, 19));
-        mTvWeekAvg.setText(getString(R.string.gold, 19));
-        mTvWeekCountAvg.setText("1112");
-        mTvHistoryMin.setText(getString(R.string.gold, 19));
-        mTvHistoryMax.setText(getString(R.string.gold, 19));
-        mTvHistoryAvg.setText(getString(R.string.gold, 19));
-        mTvHistoryCountAvg.setText("1123");
+    public void update(AuctionHistoryVO historyVO) {
+        mTvDayMin.setText(StringHelper.fullGold(getContext(), historyVO.getOneDay().getMin()));
+        mTvDayMax.setText(StringHelper.fullGold(getContext(), historyVO.getOneDay().getMax()));
+        mTvDayAvg.setText(StringHelper.fullGold(getContext(), historyVO.getOneDay().getAvg()));
+        mTvDayCountAvg.setText(String.valueOf(historyVO.getOneDay().getAvgCount()));
+        mTvWeekMin.setText(StringHelper.fullGold(getContext(), historyVO.getLastWeek().getMin()));
+        mTvWeekMax.setText(StringHelper.fullGold(getContext(), historyVO.getLastWeek().getMax()));
+        mTvWeekAvg.setText(StringHelper.fullGold(getContext(), historyVO.getLastWeek().getAvg()));
+        mTvWeekCountAvg.setText(String.valueOf(historyVO.getLastWeek().getAvgCount()));
+        mTvHistoryMin.setText(StringHelper.fullGold(getContext(), historyVO.getHistory().getMin()));
+        mTvHistoryMax.setText(StringHelper.fullGold(getContext(), historyVO.getHistory().getMax()));
+        mTvHistoryAvg.setText(StringHelper.fullGold(getContext(), historyVO.getHistory().getAvg()));
+        mTvHistoryCountAvg.setText(String.valueOf(historyVO.getHistory().getAvgCount()));
 
-        mChartHistory.setData(resultVO.getCombinedData());
+        mChartHistory.setData(historyVO.getDataHistory());
         mChartHistory.invalidate();
-        mChartOneDay.setData(resultVO.getCombinedData());
+        mChartOneDay.setData(historyVO.getDataOneDay());
         mChartOneDay.invalidate();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
+    private void initChart(CombinedChart chart, final String pattern) {
+        chart.setScaleYEnabled(false);
+        chart.getDescription().setEnabled(false);
+        chart.getAxisLeft().setEnabled(false);
+        chart.getLegend().setEnabled(false);
+        chart.setViewPortOffsets(0, 0, 0, 0);
+
+        YAxis y = chart.getAxisLeft();
+        y.setLabelCount(4);
+        y.setDrawGridLines(false);
+        y.setDrawAxisLine(false);
+        y.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return format.format(value / 10000) + "wG";
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return -1;
+            }
+        });
+
+        YAxis rightAxis = chart.getAxisRight();
+        rightAxis.setDrawGridLines(false);
+        rightAxis.setDrawZeroLine(false);
+        rightAxis.setLabelCount(4);
+        rightAxis.setTextColor(Color.rgb(60, 220, 78));
+        rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        XAxis x = chart.getXAxis();
+        x.setPosition(XAxis.XAxisPosition.BOTTOM_INSIDE);
+        x.setDrawGridLines(false);
+        x.setDrawAxisLine(false);
+        x.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return DateUtil.format((long) value, pattern);
+            }
+
+            @Override
+            public int getDecimalDigits() {
+                return -1;
+            }
+        });
+
     }
 }

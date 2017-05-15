@@ -143,8 +143,8 @@ public class BnadeRepo {
     }
 
     private Observable<SearchResultVO> searchCache(@NonNull Item item) {
-        return item.equals(mSearchResultVO.getItem())
-                ? Observable.just(mSearchResultVO) : Observable.<SearchResultVO>empty();
+        return (item.equals(mSearchResultVO.getItem())
+                ? Observable.just(mSearchResultVO) : Observable.<SearchResultVO>empty()).subscribeOn(Schedulers.io());
     }
 
     private Single<SearchResultVO> searchRemote(@NonNull Item item, Realm realm) {
