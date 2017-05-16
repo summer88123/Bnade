@@ -10,12 +10,11 @@ import android.widget.Toast;
  * Created by kevin.bai on 2017/4/4.
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
-
+public abstract class BaseActivity extends AppCompatActivity implements IActivityCreated{
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         injectComponent();
+        super.onCreate(savedInstanceState);
     }
 
     public void showToast(String message) {

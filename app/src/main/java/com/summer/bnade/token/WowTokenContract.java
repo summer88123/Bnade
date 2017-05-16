@@ -1,7 +1,7 @@
 package com.summer.bnade.token;
 
 import com.github.mikephil.charting.data.Entry;
-import com.summer.bnade.base.BaseView;
+import com.summer.bnade.base.mvp.BaseView;
 import com.summer.bnade.token.entity.WowTokenVO;
 
 import java.util.List;

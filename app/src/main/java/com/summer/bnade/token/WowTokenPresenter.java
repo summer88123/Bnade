@@ -1,7 +1,7 @@
 package com.summer.bnade.token;
 
 import com.github.mikephil.charting.data.Entry;
-import com.summer.bnade.base.BasePresenter;
+import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.token.entity.WowTokenVO;
 import com.summer.lib.model.entity.WowTokens;

@@ -1,7 +1,7 @@
 package com.summer.bnade.result.all;
 
-import com.summer.bnade.di.AppComponent;
-import com.summer.bnade.di.PreActivity;
+import com.summer.bnade.base.di.AppComponent;
+import com.summer.bnade.base.di.PreActivity;
 
 import dagger.Component;
 

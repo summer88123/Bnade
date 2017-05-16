@@ -1,6 +1,6 @@
 package com.summer.bnade.search;
 
-import com.summer.bnade.base.BasePresenter;
+import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.data.HistoryRealmRepo;
 import com.summer.bnade.data.HistorySearchRepo;

@@ -2,7 +2,7 @@ package com.summer.bnade.select;
 
 import android.text.TextUtils;
 
-import com.summer.bnade.base.BasePresenter;
+import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.data.HistoryRealmRepo;
 import com.summer.bnade.select.entity.TypedRealm;

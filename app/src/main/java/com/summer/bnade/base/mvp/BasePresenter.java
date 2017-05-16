@@ -1,4 +1,4 @@
-package com.summer.bnade.base;
+package com.summer.bnade.base.mvp;
 
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.utils.RxUtil;

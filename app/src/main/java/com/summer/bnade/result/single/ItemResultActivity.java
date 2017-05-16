@@ -7,16 +7,15 @@ import android.support.v7.widget.Toolbar;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewActivity;
+import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
-import com.summer.bnade.di.ComponentHolder;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Presenter>
         implements ItemResultContract.View {
@@ -41,11 +40,6 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_realm_item_result);
-        ButterKnife.bind(this);
-
-        mTabLayout.setupWithViewPager(mViewPager);
-        mViewPager.setAdapter(mPageAdapter);
 
         item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
         realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
@@ -56,6 +50,7 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
                 mPresenter.load(item, realm);
             }
         });
+
     }
 
     @Override
@@ -73,5 +68,16 @@ public class ItemResultActivity extends BaseViewActivity<ItemResultContract.Pres
         mToolbar.setTitle(result.getItem().getName());
         mPriceFragment.updateList(result.getAuctionRealmItems());
         mHistoryFragment.update(result.getAuctionHistoryVO());
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.activity_search_realm_item_result;
+    }
+
+    @Override
+    public void setUpView() {
+        mTabLayout.setupWithViewPager(mViewPager);
+        mViewPager.setAdapter(mPageAdapter);
     }
 }

@@ -1,7 +1,7 @@
 package com.summer.bnade.result.single;
 
 
-import com.summer.bnade.di.PreActivity;
+import com.summer.bnade.base.di.PreActivity;
 
 import dagger.Module;
 import dagger.Provides;

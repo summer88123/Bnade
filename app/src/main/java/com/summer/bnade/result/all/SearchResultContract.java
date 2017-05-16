@@ -1,6 +1,6 @@
 package com.summer.bnade.result.all;
 
-import com.summer.bnade.base.BaseView;
+import com.summer.bnade.base.mvp.BaseView;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;

@@ -1,7 +1,7 @@
-package com.summer.bnade.di;
+package com.summer.bnade.base.di;
 
-import android.app.Application;
-
+import com.summer.bnade.base.BaseModule;
+import com.summer.bnade.base.BnadeApplication;
 import com.summer.bnade.data.RepoModule;
 import com.summer.lib.model.di.BnadeModule;
 
@@ -16,12 +16,14 @@ public class ComponentHolder {
         throw new RuntimeException("不能实例化ComponentHolder");
     }
 
-    public static void initComponent(Application application) {
+    public static void initComponent(BnadeApplication application) {
         component = DaggerAppComponent
                 .builder()
+                .baseModule(new BaseModule())
                 .bnadeModule(new BnadeModule())
                 .repoModule(new RepoModule(application))
                 .build();
+        component.inject(application);
     }
 
     public static AppComponent getComponent() {

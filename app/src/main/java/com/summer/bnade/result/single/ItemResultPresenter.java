@@ -3,7 +3,7 @@ package com.summer.bnade.result.single;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
-import com.summer.bnade.base.BasePresenter;
+import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.result.single.entity.AuctionHistoryVO;
 import com.summer.bnade.search.entity.SearchResultVO;

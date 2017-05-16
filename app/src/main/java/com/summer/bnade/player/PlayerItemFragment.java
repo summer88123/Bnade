@@ -7,9 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
@@ -22,9 +19,7 @@ import com.summer.lib.model.entity.Realm;
 import java.util.List;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presenter> implements PlayerItemContract.View {
     public static final String TAG = PlayerItemFragment.class.getSimpleName();
@@ -34,7 +29,6 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
     SearchView mSearchView;
     @BindView(R.id.list)
     RecyclerView mList;
-    Unbinder unbinder;
 
     private PlayerItemAdapter mAdapter;
 
@@ -63,10 +57,17 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_auction_list, container, false);
-        unbinder = ButterKnife.bind(this, view);
+    public void showList(List<Auction> auctions) {
+        mAdapter.update(auctions);
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.fragment_auction_list;
+    }
+
+    @Override
+    public void setUpView() {
         mList.setAdapter(mAdapter);
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -85,18 +86,6 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
                 return false;
             }
         });
-        return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
-    public void showList(List<Auction> auctions) {
-        mAdapter.update(auctions);
     }
 
     @OnClick(R.id.select_btn)

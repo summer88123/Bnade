@@ -2,13 +2,9 @@ package com.summer.bnade.result.single;
 
 
 import android.graphics.Color;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.CardView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
@@ -17,6 +13,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
+import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.result.single.entity.AuctionHistoryVO;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.bnade.utils.StringHelper;
@@ -25,15 +22,13 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HistoryFragment#getInstance} factory method to
  * create an instance of this fragment.
  */
-public class HistoryFragment extends PageAdapter.PageFragment {
+public class HistoryFragment extends BaseFragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
     private static final NumberFormat format = new DecimalFormat("0.0");
     @BindView(R.id.tv_one_day)
@@ -72,7 +67,6 @@ public class HistoryFragment extends PageAdapter.PageFragment {
     CombinedChart mChartOneDay;
     @BindView(R.id.chart_history)
     CombinedChart mChartHistory;
-    Unbinder unbinder;
 
     public static HistoryFragment getInstance(FragmentManager fm) {
         HistoryFragment fragment = (HistoryFragment) fm.findFragmentByTag(TAG);
@@ -83,25 +77,19 @@ public class HistoryFragment extends PageAdapter.PageFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_history, container, false);
-        unbinder = ButterKnife.bind(this, view);
+    public int title() {
+        return R.string.fragment_title_history_trand;
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.fragment_history;
+    }
+
+    @Override
+    public void setUpView() {
         initChart(mChartHistory, "MM-dd");
         initChart(mChartOneDay, "HH:mm");
-        return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
-    }
-
-    @Override
-    int title() {
-        return R.string.fragment_title_history_trand;
     }
 
     public void update(AuctionHistoryVO historyVO) {

@@ -1,7 +1,7 @@
 package com.summer.bnade.home;
 
-import com.summer.bnade.di.AppComponent;
-import com.summer.bnade.di.PreActivity;
+import com.summer.bnade.base.di.AppComponent;
+import com.summer.bnade.base.di.PreActivity;
 import com.summer.bnade.player.PlayerItemContract;
 import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.realmrank.RealmRankContract;

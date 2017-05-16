@@ -1,6 +1,8 @@
 package com.summer.bnade.utils;
 
-import com.summer.bnade.base.BaseView;
+import android.util.Log;
+
+import com.summer.bnade.base.mvp.BaseView;
 
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
@@ -10,7 +12,7 @@ import io.reactivex.functions.Consumer;
  */
 
 public class RxUtil {
-
+    private static final String TAG = RxUtil.class.getSimpleName();
     public static class BaseErrorHandler implements Consumer<Throwable> {
         BaseView mBaseView;
 
@@ -20,6 +22,7 @@ public class RxUtil {
 
         @Override
         public void accept(@NonNull Throwable throwable) throws Exception {
+            Log.e(TAG, throwable.getMessage(), throwable);
             mBaseView.showToast(throwable.getMessage());
         }
     }

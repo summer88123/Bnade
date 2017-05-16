@@ -5,7 +5,7 @@ import android.view.Window;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseActivity;
-import com.summer.bnade.di.ComponentHolder;
+import com.summer.bnade.base.di.ComponentHolder;
 
 import javax.inject.Inject;
 
@@ -15,9 +15,8 @@ public class RealmSelectActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.activity_realm_select);
+        super.onCreate(savedInstanceState);
         RealmSelectFragment fragment = (RealmSelectFragment) getSupportFragmentManager()
                 .findFragmentByTag(RealmSelectFragment.TAG);
         if (fragment == null) {
@@ -32,6 +31,16 @@ public class RealmSelectActivity extends BaseActivity {
 
     @Override
     protected void injectComponent() {
+
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.activity_realm_select;
+    }
+
+    @Override
+    public void setUpView() {
 
     }
 }

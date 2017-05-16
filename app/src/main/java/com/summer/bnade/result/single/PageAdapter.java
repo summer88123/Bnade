@@ -1,20 +1,21 @@
 package com.summer.bnade.result.single;
 
 import android.content.Context;
-import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import com.summer.bnade.base.BaseFragment;
 
 /**
  * Created by kevin.bai on 2017/5/3.
  */
 
 class PageAdapter extends FragmentStatePagerAdapter {
-    private PageFragment[] mFragments;
+    private BaseFragment[] mFragments;
     private Context mContext;
 
-    PageAdapter(Context context, FragmentManager fm, PageFragment... fragments) {
+    PageAdapter(Context context, FragmentManager fm, BaseFragment... fragments) {
         super(fm);
         this.mFragments = fragments;
         this.mContext = context;
@@ -35,8 +36,4 @@ class PageAdapter extends FragmentStatePagerAdapter {
         return mContext.getString(mFragments[position].title());
     }
 
-    public static abstract class PageFragment extends Fragment {
-        @StringRes
-        abstract int title();
-    }
 }

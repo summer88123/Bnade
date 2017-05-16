@@ -15,9 +15,7 @@ import android.support.v7.widget.ListPopupWindow;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
@@ -39,9 +37,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 import static com.summer.bnade.R.id.searchView;
 
@@ -53,7 +49,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     RadioGroup mRgHotType;
     @BindView(R.id.rv_hot)
     RecyclerView mRvHot;
-    Unbinder unbinder;
     @BindView(R.id.ib_clear_histories)
     ImageButton mIbClearHistories;
     @BindView(R.id.list_histories)
@@ -87,61 +82,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
-        unbinder = ButterKnife.bind(this, view);
-
-        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager();
-        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
-
-        mRvHot.setLayoutManager(layoutManager);
-        mRvHot.setAdapter(mHotAdapter);
-
-        layoutManager = new FlexboxLayoutManager();
-        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
-        mListHistories.setLayoutManager(layoutManager);
-        mListHistories.setAdapter(mHistoriesAdapter);
-
-        mFuzzyList = new ListPopupWindow(getContext());
-        mFuzzyList.setWidth(ListPopupWindow.WRAP_CONTENT);//设置宽度
-        mFuzzyList.setHeight(ListPopupWindow.WRAP_CONTENT);//设置高度
-        mFuzzyList.setAdapter(mFuzzyAdapter);
-        mFuzzyList.setAnchorView(mSearchView);
-        mFuzzyList.setModal(true);
-        mFuzzyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView parent, View view, int position, long id) {
-                mFuzzyList.dismiss();
-                mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
-            }
-        });
-
-        mRgHotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-                mPresenter.updateHotSearchType(getHotType(i));
-            }
-        });
-
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                search(s);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
-
-        return view;
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
@@ -168,12 +108,6 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable("REALM", mSelectBtn.getRealm());
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -223,6 +157,59 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
     @Override
     public void updateHotSearch(List<Hot> hotList) {
         mHotAdapter.update(hotList);
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.fragment_search;
+    }
+
+    @Override
+    public void setUpView() {
+        FlexboxLayoutManager layoutManager = new FlexboxLayoutManager();
+        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
+
+        mRvHot.setLayoutManager(layoutManager);
+        mRvHot.setAdapter(mHotAdapter);
+
+        layoutManager = new FlexboxLayoutManager();
+        layoutManager.setJustifyContent(JustifyContent.FLEX_START);
+        mListHistories.setLayoutManager(layoutManager);
+        mListHistories.setAdapter(mHistoriesAdapter);
+
+        mFuzzyList = new ListPopupWindow(getContext());
+        mFuzzyList.setWidth(ListPopupWindow.WRAP_CONTENT);//设置宽度
+        mFuzzyList.setHeight(ListPopupWindow.WRAP_CONTENT);//设置高度
+        mFuzzyList.setAdapter(mFuzzyAdapter);
+        mFuzzyList.setAnchorView(mSearchView);
+        mFuzzyList.setModal(true);
+        mFuzzyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView parent, View view, int position, long id) {
+                mFuzzyList.dismiss();
+                mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
+            }
+        });
+
+        mRgHotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
+                mPresenter.updateHotSearchType(getHotType(i));
+            }
+        });
+
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                search(s);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
     }
 
     @OnClick(R.id.ib_clear_histories)

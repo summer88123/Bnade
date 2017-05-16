@@ -1,6 +1,6 @@
 package com.summer.bnade.select;
 
-import com.summer.bnade.base.BaseView;
+import com.summer.bnade.base.mvp.BaseView;
 import com.summer.bnade.select.entity.TypedRealm;
 import com.summer.lib.model.entity.Realm;
 

@@ -11,7 +11,7 @@ import android.widget.Button;
 
 import com.summer.bnade.R;
 import com.summer.bnade.data.HistoryRealmRepo;
-import com.summer.bnade.di.ComponentHolder;
+import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.lib.model.entity.Realm;
 
 import javax.inject.Inject;

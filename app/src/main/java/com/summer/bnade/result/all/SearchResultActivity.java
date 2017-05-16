@@ -21,9 +21,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewActivity;
+import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.Content;
-import com.summer.bnade.di.ComponentHolder;
 import com.summer.lib.model.entity.Gold;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
@@ -31,7 +31,6 @@ import com.summer.lib.model.entity.Realm;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class SearchResultActivity extends BaseViewActivity<SearchResultContract.Presenter> implements
         SearchResultContract.View, SearchView.OnQueryTextListener {
@@ -57,11 +56,6 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search_result);
-        ButterKnife.bind(this);
-        initToolbar();
-        mList.setAdapter(mResultAdapter);
-        initChart();
 
         item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
         realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
@@ -78,6 +72,18 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     public boolean onQueryTextChange(String newText) {
         mPresenter.filter(newText, item, realm);
         return true;
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.activity_search_result;
+    }
+
+    @Override
+    public void setUpView() {
+        initToolbar();
+        mList.setAdapter(mResultAdapter);
+        initChart();
     }
 
     private void initChart() {

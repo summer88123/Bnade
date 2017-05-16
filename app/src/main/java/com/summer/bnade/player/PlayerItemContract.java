@@ -1,6 +1,6 @@
 package com.summer.bnade.player;
 
-import com.summer.bnade.base.BaseView;
+import com.summer.bnade.base.mvp.BaseView;
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.Realm;
 

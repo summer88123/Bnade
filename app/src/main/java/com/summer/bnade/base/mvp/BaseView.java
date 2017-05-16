@@ -1,4 +1,4 @@
-package com.summer.bnade.base;
+package com.summer.bnade.base.mvp;
 
 /**
  * Created by kevin.bai on 2017/4/11.

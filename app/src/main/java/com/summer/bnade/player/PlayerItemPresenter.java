@@ -1,6 +1,6 @@
 package com.summer.bnade.player;
 
-import com.summer.bnade.base.BasePresenter;
+import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.Realm;

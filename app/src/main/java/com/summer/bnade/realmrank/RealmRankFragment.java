@@ -10,9 +10,7 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.summer.bnade.R;
@@ -29,18 +27,15 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.Unbinder;
 
 /**
  * interface.
  */
 public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter> implements RealmRankContract.View,
-        SwipeRefreshLayout
-                .OnRefreshListener {
+        SwipeRefreshLayout.OnRefreshListener {
     public static final String TAG = RealmRankFragment.class.getSimpleName();
     @BindView(R.id.list)
     RecyclerView mList;
-    Unbinder unbinder;
     @BindView(R.id.tv_total_count)
     TextView mTvTotalCount;
     @BindView(R.id.tv_user_count)
@@ -79,33 +74,10 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
         return fragment;
     }
 
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_item_list, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        mList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mList.setAdapter(mAdapter);
-        DefaultViewUtil.defaultRefresh(mRefreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
-        tintUp = DrawableCompat.wrap(up);
-        DrawableCompat.setTint(tintUp, ContextCompat.getColor(getContext(), R.color.colorAccent));
-        tintDown = DrawableCompat.wrap(down);
-        DrawableCompat.setTint(tintDown, ContextCompat.getColor(getContext(), R.color.colorAccent));
-        return view;
-    }
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mPresenter.load(current);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -122,6 +94,23 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
     @Override
     public void onRefresh() {
         mPresenter.load(current);
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.fragment_item_list;
+    }
+
+    @Override
+    public void setUpView() {
+        mList.setLayoutManager(new LinearLayoutManager(getContext()));
+        mList.setAdapter(mAdapter);
+        DefaultViewUtil.defaultRefresh(mRefreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
+        tintUp = DrawableCompat.wrap(up);
+        DrawableCompat.setTint(tintUp, ContextCompat.getColor(getContext(), R.color.colorAccent));
+        tintDown = DrawableCompat.wrap(down);
+        DrawableCompat.setTint(tintDown, ContextCompat.getColor(getContext(), R.color.colorAccent));
     }
 
     @OnClick({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})

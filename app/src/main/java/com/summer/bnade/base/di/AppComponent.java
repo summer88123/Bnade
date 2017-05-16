@@ -1,5 +1,6 @@
-package com.summer.bnade.di;
+package com.summer.bnade.base.di;
 
+import com.summer.bnade.base.BaseModule;
 import com.summer.bnade.base.BnadeApplication;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.data.HistoryRealmRepo;
@@ -17,7 +18,10 @@ import dagger.Component;
  * Created by kevin.bai on 2017/5/4.
  */
 @Singleton
-@Component(modules = {RepoModule.class, BnadeModule.class})
+@Component(modules = {
+        BaseModule.class,
+        RepoModule.class,
+        BnadeModule.class})
 public interface AppComponent {
     void inject(BnadeApplication application);
     void inject(RealmSelectButton button);

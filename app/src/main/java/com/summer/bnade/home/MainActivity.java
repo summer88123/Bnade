@@ -1,7 +1,6 @@
 package com.summer.bnade.home;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -17,7 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseActivity;
-import com.summer.bnade.di.ComponentHolder;
+import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.player.PlayerItemFragment;
 import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.player.PlayerItemPresenter;
@@ -34,7 +33,6 @@ import com.summer.bnade.token.WowTokenPresenter;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -62,11 +60,12 @@ public class MainActivity extends BaseActivity
     PlayerItemPresenter mPlayerItemPresenter;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+    public int layout() {
+        return R.layout.activity_main;
+    }
 
+    @Override
+    public void setUpView() {
         setSupportActionBar(toolbar);
 
         fab.setOnClickListener(new View.OnClickListener() {

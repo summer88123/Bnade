@@ -1,5 +1,7 @@
 package com.summer.bnade.base;
 
+import com.summer.bnade.base.mvp.BaseView;
+
 import javax.inject.Inject;
 
 /**

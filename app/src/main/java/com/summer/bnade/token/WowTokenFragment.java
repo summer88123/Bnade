@@ -10,9 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 
@@ -39,7 +37,6 @@ import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> implements WowTokenContract.View,
         SwipeRefreshLayout.OnRefreshListener {
@@ -60,7 +57,6 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
     @BindView(R.id.chart_history)
     LineChart mChartHistory;
 
-    Unbinder unbinder;
     @BindView(R.id.cardView1)
     CardView mCardView1;
     @BindView(R.id.cardView2)
@@ -90,30 +86,10 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_wow_toke, container, false);
-        unbinder = ButterKnife.bind(this, view);
-
-        DefaultViewUtil.defaultRefresh(mRefreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
-
-        setupChart(mChart, "HH:mm");
-        setupChart(mChartHistory, "MM-dd");
-        return view;
-    }
-
-    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         hideCardView();
         mPresenter.load();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        unbinder.unbind();
     }
 
     @Override
@@ -166,6 +142,20 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
                 mPresenter.load();
             }
         });
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.fragment_wow_toke;
+    }
+
+    @Override
+    public void setUpView() {
+        DefaultViewUtil.defaultRefresh(mRefreshLayout);
+        mRefreshLayout.setOnRefreshListener(this);
+
+        setupChart(mChart, "HH:mm");
+        setupChart(mChartHistory, "MM-dd");
     }
 
     private void animateIn(CardView cardView, int startDelay) {
@@ -244,7 +234,7 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
             chart.getData().notifyDataChanged();
             chart.notifyDataSetChanged();
         } else {
-            set = new LineDataSet(data,"");
+            set = new LineDataSet(data, "");
 
             set.setMode(LineDataSet.Mode.LINEAR);
             set.setDrawFilled(true);
