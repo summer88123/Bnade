@@ -36,6 +36,20 @@ import io.reactivex.schedulers.Schedulers;
 class ItemResultPresenter extends BasePresenter<ItemResultContract.View> implements
         ItemResultContract.Presenter {
 
+    private Comparator<AuctionHistory> goldComparator = new Comparator<AuctionHistory>() {
+        @Override
+        public int compare(AuctionHistory o1, AuctionHistory o2) {
+            return (int) (o1.getMinBuyout().getMoney() - o2.getMinBuyout().getMoney());
+        }
+    };
+
+    private Comparator<AuctionHistory> timeComparator = new Comparator<AuctionHistory>() {
+        @Override
+        public int compare(AuctionHistory o1, AuctionHistory o2) {
+            return (int) (o1.getLastModifited() - o2.getLastModifited());
+        }
+    };
+
     @Inject
     ItemResultPresenter(ItemResultContract.View view, BnadeRepo repo) {
         super(view, repo);
@@ -48,7 +62,10 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
                     @Override
                     public SearchResultVO apply(@NonNull SearchResultVO resultVO) throws Exception {
                         resultVO.setAuctionRealmItems(polySameRealmItem(resultVO.getAuctionRealmItems()));
-                        resultVO.setAuctionHistoryVO(computeHistory(resultVO.getAuctionHistories()));
+                        AuctionHistoryVO result = new AuctionHistoryVO();
+                        computeHistory(resultVO.getAuctionHistories(), result);
+                        computePast(resultVO.getAuctionPast(), result);
+                        resultVO.setAuctionHistoryVO(result);
                         return resultVO;
                     }
                 })
@@ -62,37 +79,22 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
                 }, mErrorHandler);
     }
 
-    private AuctionHistoryVO computeHistory(List<AuctionHistory> auctionHistories) {
-        AuctionHistoryVO result = new AuctionHistoryVO();
+    private AuctionHistoryVO computeHistory(List<AuctionHistory> auctionHistories, AuctionHistoryVO result) {
 
-        Collections.sort(auctionHistories, new Comparator<AuctionHistory>() {
-            @Override
-            public int compare(AuctionHistory o1, AuctionHistory o2) {
-                return (int) (o1.getMinBuyout().getMoney() - o2.getMinBuyout().getMoney());
-            }
-        });
+        Collections.sort(auctionHistories, goldComparator);
 
-        long oneDay = 3600 * 24 * 1000L;
-        long week = 7 * oneDay;
+        long week = 7 * 3600 * 24 * 1000L;
         long current = System.currentTimeMillis();
-        LinkedList<AuctionHistory> listOneDay = new LinkedList<>();
         LinkedList<AuctionHistory> listWeek = new LinkedList<>();
         LinkedList<AuctionHistory> listHistories = new LinkedList<>();
 
-        long avgOneDay = 0;
         long avgWeek = 0;
         long avgHistory = 0;
-        int avgCountOneDay = 0;
         int avgCountWeek = 0;
         int avgCountHistory = 0;
 
         for (AuctionHistory auctionHistory : auctionHistories) {
             long last = auctionHistory.getLastModifited();
-            if (current - last < oneDay) {
-                listOneDay.add(auctionHistory);
-                avgOneDay += auctionHistory.getMinBuyout().getMoney();
-                avgCountOneDay += auctionHistory.getCount();
-            }
             if (current - last < week) {
                 listWeek.add(auctionHistory);
                 avgWeek += auctionHistory.getMinBuyout().getMoney();
@@ -102,22 +104,39 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
             avgHistory += auctionHistory.getMinBuyout().getMoney();
             avgCountHistory += auctionHistory.getCount();
         }
-        result.setOneDay(getHistoryItem(listOneDay, avgOneDay, avgCountOneDay));
         result.setLastWeek(getHistoryItem(listWeek, avgWeek, avgCountWeek));
         result.setHistory(getHistoryItem(listHistories, avgHistory, avgCountHistory));
 
-        Comparator<AuctionHistory> timeComparator = new Comparator<AuctionHistory>() {
-            @Override
-            public int compare(AuctionHistory o1, AuctionHistory o2) {
-                return (int) (o1.getLastModifited() - o2.getLastModifited());
-            }
-        };
-
-        Collections.sort(listOneDay, timeComparator);
         Collections.sort(listHistories, timeComparator);
 
-        result.setDataOneDay(getCombinedData(listOneDay));
         result.setDataHistory(getCombinedData(listHistories));
+
+        return result;
+    }
+    private AuctionHistoryVO computePast(List<AuctionHistory> auctionPast, AuctionHistoryVO result) {
+
+        Collections.sort(auctionPast, goldComparator);
+
+        long oneDay = 3600 * 24 * 1000L;
+        long current = System.currentTimeMillis();
+        LinkedList<AuctionHistory> listOneDay = new LinkedList<>();
+
+        long avgOneDay = 0;
+        int avgCountOneDay = 0;
+
+        for (AuctionHistory auctionHistory : auctionPast) {
+            long last = auctionHistory.getLastModifited();
+            if (current - last < oneDay) {
+                listOneDay.add(auctionHistory);
+                avgOneDay += auctionHistory.getMinBuyout().getMoney();
+                avgCountOneDay += auctionHistory.getCount();
+            }
+        }
+        result.setOneDay(getHistoryItem(listOneDay, avgOneDay, avgCountOneDay));
+
+        Collections.sort(listOneDay, timeComparator);
+
+        result.setDataOneDay(getCombinedData(listOneDay));
 
         return result;
     }

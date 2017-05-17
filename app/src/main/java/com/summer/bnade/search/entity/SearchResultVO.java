@@ -35,6 +35,7 @@ public class SearchResultVO implements Parcelable {
      */
     private List<AuctionRealmItem> auctionRealmItems;
     private List<AuctionHistory> auctionHistories;
+    private List<AuctionHistory> auctionPast;
     private AuctionHistoryVO auctionHistoryVO;
     /**
      * 全服务器数据
@@ -46,10 +47,8 @@ public class SearchResultVO implements Parcelable {
      * 模糊搜索数据
      */
     private List<String> names;
-
     public SearchResultVO() {
     }
-
     public SearchResultVO(Item item) {
         this.item = item;
     }
@@ -105,6 +104,14 @@ public class SearchResultVO implements Parcelable {
 
     public void setAuctionItems(List<AuctionItem> auctionItems) {
         this.auctionItems = auctionItems;
+    }
+
+    public List<AuctionHistory> getAuctionPast() {
+        return auctionPast;
+    }
+
+    public void setAuctionPast(List<AuctionHistory> auctionPast) {
+        this.auctionPast = auctionPast;
     }
 
     public List<AuctionRealmItem> getAuctionRealmItems() {
