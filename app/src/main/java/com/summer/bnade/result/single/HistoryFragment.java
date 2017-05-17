@@ -8,18 +8,14 @@ import android.support.v7.widget.CardView;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.CombinedChart;
-import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.result.single.entity.AuctionHistoryVO;
-import com.summer.bnade.utils.DateUtil;
+import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.StringHelper;
-
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import butterknife.BindView;
 
@@ -30,7 +26,6 @@ import butterknife.BindView;
  */
 public class HistoryFragment extends BaseFragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
-    private static final NumberFormat format = new DecimalFormat("0.0");
     @BindView(R.id.tv_one_day)
     TextView mTvOneDay;
     @BindView(R.id.tv_week)
@@ -115,48 +110,31 @@ public class HistoryFragment extends BaseFragment {
     private void initChart(CombinedChart chart, final String pattern) {
         chart.setScaleYEnabled(false);
         chart.getDescription().setEnabled(false);
-        chart.getAxisLeft().setEnabled(false);
-        chart.getLegend().setEnabled(false);
-        chart.setViewPortOffsets(0, 0, 0, 0);
+        chart.setDrawOrder(new CombinedChart.DrawOrder[]{CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE});
 
-        YAxis y = chart.getAxisLeft();
-        y.setLabelCount(4);
-        y.setDrawGridLines(false);
-        y.setDrawAxisLine(false);
-        y.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return format.format(value / 10000) + "wG";
-            }
-
-            @Override
-            public int getDecimalDigits() {
-                return -1;
-            }
-        });
+        Legend l = chart.getLegend();
+        l.setWordWrapEnabled(true);
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(true);
+        l.setTextColor(Color.BLACK);
 
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setDrawGridLines(false);
-        rightAxis.setDrawZeroLine(false);
         rightAxis.setLabelCount(4);
+        rightAxis.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         rightAxis.setTextColor(Color.rgb(60, 220, 78));
         rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+
+        YAxis y = chart.getAxisLeft();
+        y.setLabelCount(4);
+        y.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
+        y.setValueFormatter(new ChartHelper.GoldAxisFormatter());
 
         XAxis x = chart.getXAxis();
         x.setPosition(XAxis.XAxisPosition.BOTTOM_INSIDE);
         x.setDrawGridLines(false);
-        x.setDrawAxisLine(false);
-        x.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return DateUtil.format((long) value, pattern);
-            }
-
-            @Override
-            public int getDecimalDigits() {
-                return -1;
-            }
-        });
-
+        x.setValueFormatter(new ChartHelper.TimeAxisFormatter(pattern));
     }
 }

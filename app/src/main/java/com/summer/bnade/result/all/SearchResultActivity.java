@@ -15,14 +15,13 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.CombinedChart.DrawOrder;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewActivity;
 import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.search.entity.SearchResultVO;
+import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Gold;
 import com.summer.lib.model.entity.Item;
@@ -116,21 +115,7 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
         leftAxis.setLabelCount(4);
         leftAxis.setTextColor(Color.rgb(240, 238, 70));
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
-        leftAxis.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                if (value > 10000 * 10000) {
-                    return (int) (value / 10000 / 10000) + "wG";
-                } else {
-                    return (int) (value / 10000) + "G";
-                }
-            }
-
-            @Override
-            public int getDecimalDigits() {
-                return -1;
-            }
-        });
+        leftAxis.setValueFormatter(new ChartHelper.GoldAxisFormatter());
     }
 
     @Override

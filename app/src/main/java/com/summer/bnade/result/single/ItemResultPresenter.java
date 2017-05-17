@@ -62,28 +62,6 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
                 }, mErrorHandler);
     }
 
-    @android.support.annotation.NonNull
-    private CombinedData getCombinedData(List<AuctionHistory> auctionHistories) {
-        CombinedData data = new CombinedData();
-        data.setData(ChartHelper.generateLineData(auctionHistories, new BiFunction<Integer, AuctionHistory, Entry>() {
-            @Override
-            public Entry apply(Integer index, @NonNull AuctionHistory auctionItem) throws
-                    Exception {
-                return new Entry(auctionItem.getLastModifited(), auctionItem.getMinBuyout()
-                        .getMoney(), auctionItem);
-            }
-        }));
-        data.setData(ChartHelper.generateBarData(auctionHistories, new BiFunction<Integer, AuctionHistory, BarEntry>() {
-            @Override
-            public BarEntry apply(@NonNull Integer integer, @NonNull AuctionHistory auctionItem)
-                    throws Exception {
-                return new BarEntry(auctionItem.getLastModifited(), auctionItem
-                        .getCount(), auctionItem);
-            }
-        }));
-        return data;
-    }
-
     private AuctionHistoryVO computeHistory(List<AuctionHistory> auctionHistories) {
         AuctionHistoryVO result = new AuctionHistoryVO();
 
@@ -142,6 +120,28 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
         result.setDataHistory(getCombinedData(listHistories));
 
         return result;
+    }
+
+    @android.support.annotation.NonNull
+    private CombinedData getCombinedData(List<AuctionHistory> auctionHistories) {
+        CombinedData data = new CombinedData();
+        data.setData(ChartHelper.generateLineData(auctionHistories, new BiFunction<Integer, AuctionHistory, Entry>() {
+            @Override
+            public Entry apply(Integer index, @NonNull AuctionHistory auctionItem) throws
+                    Exception {
+                return new Entry(auctionItem.getLastModifited(), auctionItem.getMinBuyout()
+                        .getMoney(), auctionItem);
+            }
+        }));
+        data.setData(ChartHelper.generateBarData(auctionHistories, new BiFunction<Integer, AuctionHistory, BarEntry>() {
+            @Override
+            public BarEntry apply(@NonNull Integer integer, @NonNull AuctionHistory auctionItem)
+                    throws Exception {
+                return new BarEntry(auctionItem.getLastModifited(), auctionItem
+                        .getCount(), auctionItem);
+            }
+        }));
+        return data;
     }
 
     @android.support.annotation.NonNull

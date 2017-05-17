@@ -45,4 +45,7 @@
     <string name="btn_clear">清除</string>
     <string name="fragment_title_current_price">当前价格</string>
     <string name="fragment_title_history_trand">历史趋势</string>
+    <string name="label_one_day">@string/wow_token_one_day</string>
+    <string name="label_week">一周内</string>
+    <string name="label_history">@string/wow_token_history</string>
 </resources>

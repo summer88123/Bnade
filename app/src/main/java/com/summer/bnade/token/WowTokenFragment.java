@@ -15,22 +15,19 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.token.entity.WowTokenVO;
+import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.bnade.utils.DefaultViewUtil;
 import com.summer.bnade.utils.ScreenUtil;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.List;
 
 import butterknife.BindColor;
@@ -41,7 +38,6 @@ import butterknife.ButterKnife;
 public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> implements WowTokenContract.View,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String TAG = WowTokenFragment.class.getSimpleName();
-    private static final NumberFormat format = new DecimalFormat("0.0");
     @BindView(R.id.tv_cur_price)
     TextView mTvCurPrice;
     @BindView(R.id.tv_modified_time)
@@ -195,33 +191,13 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
         y.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         y.setDrawGridLines(false);
         y.setDrawAxisLine(false);
-        y.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return format.format(value / 10000) + "wG";
-            }
-
-            @Override
-            public int getDecimalDigits() {
-                return -1;
-            }
-        });
+        y.setValueFormatter(new ChartHelper.GoldAxisFormatter(true));
 
         XAxis x = chart.getXAxis();
         x.setPosition(XAxis.XAxisPosition.BOTTOM_INSIDE);
         x.setDrawGridLines(false);
         x.setDrawAxisLine(false);
-        x.setValueFormatter(new IAxisValueFormatter() {
-            @Override
-            public String getFormattedValue(float value, AxisBase axis) {
-                return DateUtil.format((long) value, pattern);
-            }
-
-            @Override
-            public int getDecimalDigits() {
-                return -1;
-            }
-        });
+        x.setValueFormatter(new ChartHelper.TimeAxisFormatter(pattern));
 
     }
 
