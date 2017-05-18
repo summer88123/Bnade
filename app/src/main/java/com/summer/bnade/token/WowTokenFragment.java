@@ -4,9 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.os.Bundle;
+import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -21,7 +20,8 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseFragment;
+import com.summer.bnade.base.BaseViewFragment;
+import com.summer.bnade.home.MainComponentProvider;
 import com.summer.bnade.token.entity.WowTokenVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.DateUtil;
@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 
-public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> implements WowTokenContract.View,
+public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presenter> implements WowTokenContract.View,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String TAG = WowTokenFragment.class.getSimpleName();
     @BindView(R.id.tv_cur_price)
@@ -82,8 +82,16 @@ public class WowTokenFragment extends BaseFragment<WowTokenContract.Presenter> i
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainComponentProvider) {
+            ((MainComponentProvider) context).mainComponent().inject(this);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         hideCardView();
         mPresenter.load();
     }

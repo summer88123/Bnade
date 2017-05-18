@@ -4,7 +4,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
@@ -15,10 +14,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolder> {
-    private final PlayerItemFragment mFragment;
 
-    PlayerItemAdapter(PlayerItemFragment fragment) {
-        mFragment = fragment;
+    PlayerItemAdapter() {
     }
 
     @Override
@@ -56,7 +53,6 @@ class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolde
 
         @Override
         public void onBind(Auction auction) {
-            Glide.with(mFragment).load(auction.getItem().getUrl()).into(mIvIcon);
             mTvCount.setText(String.valueOf(auction.getCount()));
             mTvName.setText(auction.getName());
             mTvLastTime.setText(auction.getLastTime().getResult());

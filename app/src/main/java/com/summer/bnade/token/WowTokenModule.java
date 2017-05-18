@@ -15,6 +15,11 @@ public class WowTokenModule {
     }
 
     @Provides
+    WowTokenContract.Presenter providePresenter(WowTokenPresenter presenter) {
+        return presenter;
+    }
+
+    @Provides
     WowTokenContract.View provideWowTokenView(){
         return mView;
     }

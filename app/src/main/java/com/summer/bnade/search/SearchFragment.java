@@ -4,6 +4,7 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +22,8 @@ import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseFragment;
+import com.summer.bnade.base.BaseViewFragment;
+import com.summer.bnade.home.MainComponentProvider;
 import com.summer.bnade.result.all.SearchResultActivity;
 import com.summer.bnade.result.single.ItemResultActivity;
 import com.summer.bnade.search.entity.SearchVO;
@@ -41,7 +43,7 @@ import butterknife.OnClick;
 
 import static com.summer.bnade.R.id.searchView;
 
-public class SearchFragment extends BaseFragment<SearchContract.Presenter> implements SearchContract.View {
+public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> implements SearchContract.View {
     public static final String TAG = SearchFragment.class.getSimpleName();
     @BindView(searchView)
     SearchView mSearchView;
@@ -78,6 +80,14 @@ public class SearchFragment extends BaseFragment<SearchContract.Presenter> imple
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
             mSelectBtn.setRealm(data.<Realm>getParcelableExtra(Content.EXTRA_DATA));
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainComponentProvider) {
+            ((MainComponentProvider) context).mainComponent().inject(this);
         }
     }
 

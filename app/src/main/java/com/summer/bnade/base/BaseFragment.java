@@ -10,14 +10,12 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.summer.bnade.R;
-import com.summer.bnade.base.mvp.BaseView;
 
 /**
  * Created by kevin.bai on 2017/4/14.
  */
 
-public abstract class BaseFragment<P> extends Fragment implements IActivityCreated, BaseView<P> {
-    protected P mPresenter;
+public abstract class BaseFragment extends Fragment implements IActivityCreated {
 
     @Nullable
     @Override
@@ -28,11 +26,6 @@ public abstract class BaseFragment<P> extends Fragment implements IActivityCreat
     @StringRes
     public int title(){
         return R.string.app_name;
-    }
-
-    @Override
-    public void setPresenter(P p) {
-        this.mPresenter = p;
     }
 
     public void showToast(String message) {

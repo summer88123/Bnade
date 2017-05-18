@@ -15,6 +15,16 @@ public class PlayerItemModule {
     }
 
     @Provides
+    PlayerItemContract.Presenter providePresenter(PlayerItemPresenter presenter) {
+        return presenter;
+    }
+
+    @Provides
+    PlayerItemAdapter provideAdapter(){
+        return new PlayerItemAdapter();
+    }
+
+    @Provides
     PlayerItemContract.View provideView() {
         return mView;
     }

@@ -1,15 +1,15 @@
 package com.summer.bnade.player;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseFragment;
+import com.summer.bnade.base.BaseViewFragment;
+import com.summer.bnade.home.MainComponentProvider;
 import com.summer.bnade.select.RealmSelectActivity;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.widget.RealmSelectButton;
@@ -18,10 +18,13 @@ import com.summer.lib.model.entity.Realm;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presenter> implements PlayerItemContract.View {
+public class PlayerItemFragment extends BaseViewFragment<PlayerItemContract.Presenter> implements PlayerItemContract
+        .View {
     public static final String TAG = PlayerItemFragment.class.getSimpleName();
     @BindView(R.id.select_btn)
     RealmSelectButton mBtnRealmSelect;
@@ -30,7 +33,8 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
     @BindView(R.id.list)
     RecyclerView mList;
 
-    private PlayerItemAdapter mAdapter;
+    @Inject
+    PlayerItemAdapter mAdapter;
 
     @SuppressWarnings("unused")
     public static PlayerItemFragment getInstance(FragmentManager fm) {
@@ -51,9 +55,11 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemContract.Presente
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mAdapter = new PlayerItemAdapter(this);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainComponentProvider) {
+            ((MainComponentProvider) context).mainComponent().inject(this);
+        }
     }
 
     @Override

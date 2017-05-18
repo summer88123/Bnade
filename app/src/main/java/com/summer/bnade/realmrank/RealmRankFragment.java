@@ -1,9 +1,8 @@
 package com.summer.bnade.realmrank;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -14,7 +13,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseFragment;
+import com.summer.bnade.base.BaseViewFragment;
+import com.summer.bnade.home.MainComponentProvider;
 import com.summer.bnade.utils.DefaultViewUtil;
 import com.summer.lib.model.entity.AuctionRealm;
 
@@ -31,7 +31,7 @@ import butterknife.OnClick;
 /**
  * interface.
  */
-public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter> implements RealmRankContract.View,
+public class RealmRankFragment extends BaseViewFragment<RealmRankContract.Presenter> implements RealmRankContract.View,
         SwipeRefreshLayout.OnRefreshListener {
     public static final String TAG = RealmRankFragment.class.getSimpleName();
     @BindView(R.id.list)
@@ -75,8 +75,16 @@ public class RealmRankFragment extends BaseFragment<RealmRankContract.Presenter>
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainComponentProvider) {
+            ((MainComponentProvider) context).mainComponent().inject(this);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
         mPresenter.load(current);
     }
 

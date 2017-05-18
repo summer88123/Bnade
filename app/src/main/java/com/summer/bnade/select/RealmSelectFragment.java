@@ -10,7 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseFragment;
+import com.summer.bnade.base.BaseViewFragment;
 import com.summer.bnade.select.entity.TypedRealm;
 import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Realm;
@@ -21,7 +21,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnTextChanged;
 
-public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presenter> implements RealmSelectContract
+public class RealmSelectFragment extends BaseViewFragment<RealmSelectContract.Presenter> implements RealmSelectContract
         .View {
     public static final String TAG = RealmSelectFragment.class.getSimpleName();
     @BindView(R.id.list)
@@ -50,6 +50,12 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
         mList.addItemDecoration(new StickyRecyclerHeadersDecoration(mAdapter));
         ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
             @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                return makeMovementFlags(0, mAdapter.getItem(viewHolder.getAdapterPosition()).getType()
+                        .equals(TypedRealm.LABEL_USED) ? ItemTouchHelper.RIGHT : 0);
+            }
+
+            @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView
                     .ViewHolder target) {
                 return false;
@@ -62,20 +68,9 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
                 mPresenter.remove(mAdapter.getItem(position).getRealm());
             }
 
-            @Override
-            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                return makeMovementFlags(0, mAdapter.getItem(viewHolder.getAdapterPosition()).getType()
-                        .equals(TypedRealm.LABEL_USED) ? ItemTouchHelper.RIGHT : 0);
-            }
-
         };
         ItemTouchHelper helper = new ItemTouchHelper(callback);
         helper.attachToRecyclerView(mList);
-    }
-
-    @OnTextChanged(R.id.et_search)
-    public void onTextChange(CharSequence s) {
-        mPresenter.filter(s);
     }
 
     @Override
@@ -102,5 +97,10 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectContract.Presen
             mTextInputLayout.setError(null);
         }
         mAdapter.update(realms);
+    }
+
+    @OnTextChanged(R.id.et_search)
+    public void onTextChange(CharSequence s) {
+        mPresenter.filter(s);
     }
 }

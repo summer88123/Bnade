@@ -10,9 +10,13 @@ import dagger.Provides;
 public class RealmRankModule {
     private final RealmRankFragment mFragment;
 
-
     public RealmRankModule(RealmRankFragment fragment) {
         mFragment = fragment;
+    }
+
+    @Provides
+    RealmRankContract.Presenter providePresenter(RealmRankPresenter presenter) {
+        return presenter;
     }
 
     @Provides

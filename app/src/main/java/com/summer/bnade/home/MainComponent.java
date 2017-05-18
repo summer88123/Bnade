@@ -3,6 +3,7 @@ package com.summer.bnade.home;
 import com.summer.bnade.base.di.AppComponent;
 import com.summer.bnade.base.di.PreActivity;
 import com.summer.bnade.player.PlayerItemContract;
+import com.summer.bnade.player.PlayerItemFragment;
 import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.realmrank.RealmRankContract;
 import com.summer.bnade.realmrank.RealmRankFragment;
@@ -11,6 +12,7 @@ import com.summer.bnade.search.SearchContract;
 import com.summer.bnade.search.SearchFragment;
 import com.summer.bnade.search.SearchModule;
 import com.summer.bnade.token.WowTokenContract;
+import com.summer.bnade.token.WowTokenFragment;
 import com.summer.bnade.token.WowTokenModule;
 
 import dagger.Component;
@@ -27,12 +29,16 @@ import dagger.Component;
                 RealmRankModule.class,
                 PlayerItemModule.class,
         })
-interface MainComponent {
+public interface MainComponent {
     void inject(MainActivity activity);
 
     void inject(SearchFragment fragment);
 
     void inject(RealmRankFragment fragment);
+
+    void inject(WowTokenFragment fragment);
+
+    void inject(PlayerItemFragment fragment);
 
     WowTokenContract.View wowTokenView();
 

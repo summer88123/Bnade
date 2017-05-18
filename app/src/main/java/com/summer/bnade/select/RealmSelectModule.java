@@ -15,7 +15,12 @@ class RealmSelectModule {
     }
 
     @Provides
-    RealmSelectContract.View provideView(){
+    RealmSelectContract.Presenter providePresenter(RealmSelectPresenter presenter) {
+        return presenter;
+    }
+
+    @Provides
+    RealmSelectContract.View provideView() {
         return mView;
     }
 

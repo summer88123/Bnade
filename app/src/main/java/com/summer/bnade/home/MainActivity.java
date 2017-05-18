@@ -19,23 +19,17 @@ import com.summer.bnade.base.BaseActivity;
 import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.player.PlayerItemFragment;
 import com.summer.bnade.player.PlayerItemModule;
-import com.summer.bnade.player.PlayerItemPresenter;
 import com.summer.bnade.realmrank.RealmRankFragment;
 import com.summer.bnade.realmrank.RealmRankModule;
-import com.summer.bnade.realmrank.RealmRankPresenter;
 import com.summer.bnade.search.SearchFragment;
 import com.summer.bnade.search.SearchModule;
-import com.summer.bnade.search.SearchPresenter;
 import com.summer.bnade.token.WowTokenFragment;
 import com.summer.bnade.token.WowTokenModule;
-import com.summer.bnade.token.WowTokenPresenter;
-
-import javax.inject.Inject;
 
 import butterknife.BindView;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, MainComponentProvider {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -49,15 +43,6 @@ public class MainActivity extends BaseActivity
     FragmentManager fm;
 
     MainComponent mMainComponent;
-
-    @Inject
-    WowTokenPresenter wowTokenPresenter;
-    @Inject
-    SearchPresenter mSearchPresenter;
-    @Inject
-    RealmRankPresenter mRealmRankPresenter;
-    @Inject
-    PlayerItemPresenter mPlayerItemPresenter;
 
     @Override
     public int layout() {
@@ -88,6 +73,11 @@ public class MainActivity extends BaseActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         selectSearch();
+    }
+
+    @Override
+    public MainComponent mainComponent() {
+        return mMainComponent;
     }
 
     private void selectSearch() {
@@ -153,7 +143,6 @@ public class MainActivity extends BaseActivity
             fm.beginTransaction().replace(R.id.content_main, token, WowTokenFragment.TAG).commit();
         } else if (id == R.id.btn_realm_rank) {
             RealmRankFragment token = (RealmRankFragment) mMainComponent.realmRankView();
-            mMainComponent.inject(token);
             fm.beginTransaction().replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
         } else if (id == R.id.btn_player_item) {
             PlayerItemFragment player = (PlayerItemFragment) mMainComponent.playerItemView();
@@ -176,7 +165,7 @@ public class MainActivity extends BaseActivity
 
     private void showSearch() {
         SearchFragment search = (SearchFragment) mMainComponent.searchView();
-        mMainComponent.inject(search);
         fm.beginTransaction().replace(R.id.content_main, search, SearchFragment.TAG).commit();
     }
+
 }

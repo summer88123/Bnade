@@ -10,9 +10,13 @@ import dagger.Provides;
 public class SearchModule {
     private final SearchFragment mView;
 
-
     public SearchModule(SearchFragment view) {
         mView = view;
+    }
+
+    @Provides
+    SearchContract.Presenter providePresenter(SearchPresenter presenter) {
+        return presenter;
     }
 
     @Provides
