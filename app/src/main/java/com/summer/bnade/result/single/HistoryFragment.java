@@ -111,7 +111,8 @@ public class HistoryFragment extends BaseFragment {
         chart.setScaleYEnabled(false);
         chart.getDescription().setEnabled(false);
         chart.setDrawOrder(new CombinedChart.DrawOrder[]{CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE});
-
+        chart.setViewPortOffsets(0, 0, 0, 0);
+        
         Legend l = chart.getLegend();
         l.setWordWrapEnabled(true);
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
