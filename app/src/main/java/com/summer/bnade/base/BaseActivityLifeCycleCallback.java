@@ -10,6 +10,7 @@ import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.Icepick;
 
 /**
  * Created by kevin.bai on 2017/5/16.
@@ -34,6 +35,8 @@ class BaseActivityLifeCycleCallback implements Application.ActivityLifecycleCall
                     .registerFragmentLifecycleCallbacks(mBaseFragmentLifecycleCallbacks, true);
             activity.setContentView(created.layout());
             cache.put(activity, ButterKnife.bind(activity));
+            Icepick.restoreInstanceState(activity, savedInstanceState);
+            created.injectComponent();
             created.setUpView();
         }
     }
@@ -60,7 +63,7 @@ class BaseActivityLifeCycleCallback implements Application.ActivityLifecycleCall
 
     @Override
     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-
+        Icepick.saveInstanceState(activity, outState);
     }
 
     @Override

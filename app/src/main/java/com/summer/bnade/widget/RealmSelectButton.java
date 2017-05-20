@@ -1,6 +1,7 @@
 package com.summer.bnade.widget;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.constraint.ConstraintSet;
@@ -58,6 +59,16 @@ public class RealmSelectButton extends ConstraintLayout {
         noRealmSet.applyTo(this);
     }
 
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        return super.onSaveInstanceState();
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        super.onRestoreInstanceState(state);
+    }
+
     public RealmSelectButton(Context context) {
         super(context);
         init();
@@ -74,6 +85,10 @@ public class RealmSelectButton extends ConstraintLayout {
     }
 
     public void setRealm(Realm realm) {
+        if (realm == null) {
+            clearRealm();
+            return;
+        }
         this.realm = realm;
         mBtnRealmSelect.setText(realm.getConnected());
         TransitionManager.beginDelayedTransition(this);

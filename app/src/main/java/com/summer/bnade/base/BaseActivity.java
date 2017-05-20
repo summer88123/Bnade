@@ -1,7 +1,5 @@
 package com.summer.bnade.base;
 
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
@@ -11,10 +9,10 @@ import android.widget.Toast;
  */
 
 public abstract class BaseActivity extends AppCompatActivity implements IActivityCreated{
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        injectComponent();
-        super.onCreate(savedInstanceState);
+    public void injectComponent() {
+        // nothing
     }
 
     public void showToast(String message) {
@@ -25,5 +23,4 @@ public abstract class BaseActivity extends AppCompatActivity implements IActivit
         Toast.makeText(this, resId, Toast.LENGTH_SHORT).show();
     }
 
-    protected abstract void injectComponent();
 }

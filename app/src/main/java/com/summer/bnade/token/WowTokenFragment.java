@@ -21,7 +21,8 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewFragment;
-import com.summer.bnade.home.MainComponentProvider;
+import com.summer.bnade.home.MainComponent;
+import com.summer.bnade.home.Provider;
 import com.summer.bnade.token.entity.WowTokenVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.DateUtil;
@@ -84,8 +85,9 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MainComponentProvider) {
-            ((MainComponentProvider) context).mainComponent().inject(this);
+        if (context instanceof Provider) {
+            MainComponent component = (MainComponent) ((Provider) context).provide();
+            component.inject(this);
         }
     }
 

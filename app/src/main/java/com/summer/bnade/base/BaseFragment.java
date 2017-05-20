@@ -9,8 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.summer.bnade.R;
-
 /**
  * Created by kevin.bai on 2017/4/14.
  */
@@ -23,9 +21,10 @@ public abstract class BaseFragment extends Fragment implements IActivityCreated 
             savedInstanceState) {
         return inflater.inflate(layout(), container, false);
     }
-    @StringRes
-    public int title(){
-        return R.string.app_name;
+
+    @Override
+    public void injectComponent() {
+        // nothing
     }
 
     public void showToast(String message) {

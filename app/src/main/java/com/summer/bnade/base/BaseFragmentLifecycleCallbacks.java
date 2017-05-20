@@ -10,6 +10,7 @@ import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import icepick.Icepick;
 
 /**
  * Created by kevin.bai on 2017/5/16.
@@ -20,14 +21,27 @@ public class BaseFragmentLifecycleCallbacks extends FragmentManager.FragmentLife
     private Map<Fragment, Unbinder> cache = new HashMap<>();
 
     @Override
+    public void onFragmentCreated(FragmentManager fm, Fragment f, Bundle savedInstanceState) {
+        super.onFragmentCreated(fm, f, savedInstanceState);
+        Icepick.restoreInstanceState(f, savedInstanceState);
+    }
+
+    @Override
     public void onFragmentViewCreated(FragmentManager fm, Fragment f, View v, Bundle savedInstanceState) {
         super.onFragmentViewCreated(fm, f, v, savedInstanceState);
         if (f instanceof IActivityCreated) {
             IActivityCreated created = (IActivityCreated) f;
             cache.put(f, ButterKnife.bind(f, v));
+            created.injectComponent();
             created.setUpView();
         }
 
+    }
+
+    @Override
+    public void onFragmentSaveInstanceState(FragmentManager fm, Fragment f, Bundle outState) {
+        super.onFragmentSaveInstanceState(fm, f, outState);
+        Icepick.saveInstanceState(f, outState);
     }
 
     @Override

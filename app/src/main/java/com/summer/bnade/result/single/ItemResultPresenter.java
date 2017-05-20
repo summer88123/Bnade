@@ -1,12 +1,13 @@
 package com.summer.bnade.result.single;
 
+import android.support.v4.util.Pair;
+
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.result.single.entity.AuctionHistoryVO;
-import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.AuctionHistory;
 import com.summer.lib.model.entity.AuctionRealmItem;
@@ -22,12 +23,12 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.SingleTransformer;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Created by kevin.bai on 2017/4/28.
@@ -56,27 +57,59 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
     }
 
     @Override
-    public void load(Item item, Realm realm) {
-        mRepo.search(item, realm)
-                .map(new Function<SearchResultVO, SearchResultVO>() {
-                    @Override
-                    public SearchResultVO apply(@NonNull SearchResultVO resultVO) throws Exception {
-                        resultVO.setAuctionRealmItems(polySameRealmItem(resultVO.getAuctionRealmItems()));
-                        AuctionHistoryVO result = new AuctionHistoryVO();
-                        computeHistory(resultVO.getAuctionHistories(), result);
-                        computePast(resultVO.getAuctionPast(), result);
-                        resultVO.setAuctionHistoryVO(result);
-                        return resultVO;
-                    }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<SearchResultVO>() {
-                    @Override
-                    public void accept(@NonNull SearchResultVO searchResultVO) throws Exception {
-                        mView.show(searchResultVO);
-                    }
-                }, mErrorHandler);
+    public SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO> history() {
+        return new SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO>() {
+            @Override
+            public SingleSource<AuctionHistoryVO> apply(@NonNull Single<Pair<Item, Realm>> upstream) {
+                return upstream
+                        .flatMap(new Function<Pair<Item, Realm>, SingleSource<Pair<List<AuctionHistory>,
+                                List<AuctionHistory>>>>() {
+                            @Override
+                            public SingleSource<Pair<List<AuctionHistory>, List<AuctionHistory>>> apply(@NonNull
+                                                                                                                Pair<Item, Realm> itemRealmPair) throws Exception {
+                                return mRepo.getAuctionPastAndHistory(itemRealmPair.first, itemRealmPair.second);
+                            }
+                        })
+                        .map(new Function<Pair<List<AuctionHistory>, List<AuctionHistory>>, AuctionHistoryVO>() {
+                            @Override
+                            public AuctionHistoryVO apply(@NonNull Pair<List<AuctionHistory>, List<AuctionHistory>>
+                                                                  listListPair) throws Exception {
+                                AuctionHistoryVO result = new AuctionHistoryVO();
+                                computeHistory(listListPair.second, result);
+                                computePast(listListPair.first, result);
+                                return result;
+                            }
+                        });
+            }
+        };
+    }
+
+    @Override
+    public SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>> price() {
+        return new SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>>() {
+            @Override
+            public SingleSource<List<AuctionRealmItem>> apply(@NonNull Single<Pair<Item, Realm>>
+                                                                      upstream) {
+                return upstream
+                        .flatMap(new Function<Pair<Item, Realm>, SingleSource<? extends List<AuctionRealmItem>>>() {
+
+
+                            @Override
+                            public SingleSource<? extends List<AuctionRealmItem>> apply(@NonNull Pair<Item, Realm>
+                                                                                                itemRealmPair) throws
+                                    Exception {
+                                return mRepo.getAuctionRealmItem(itemRealmPair.first, itemRealmPair.second);
+                            }
+                        })
+                        .map(new Function<List<AuctionRealmItem>, List<AuctionRealmItem>>() {
+                            @Override
+                            public List<AuctionRealmItem> apply(@NonNull List<AuctionRealmItem> auctionRealmItems)
+                                    throws Exception {
+                                return polySameRealmItem(auctionRealmItems);
+                            }
+                        });
+            }
+        };
     }
 
     private AuctionHistoryVO computeHistory(List<AuctionHistory> auctionHistories, AuctionHistoryVO result) {
@@ -113,6 +146,7 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
 
         return result;
     }
+
     private AuctionHistoryVO computePast(List<AuctionHistory> auctionPast, AuctionHistoryVO result) {
 
         Collections.sort(auctionPast, goldComparator);

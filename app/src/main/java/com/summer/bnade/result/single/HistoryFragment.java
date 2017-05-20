@@ -1,9 +1,12 @@
 package com.summer.bnade.result.single;
 
 
+import android.content.Context;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
+import android.support.v4.util.Pair;
 import android.support.v7.widget.CardView;
 import android.widget.TextView;
 
@@ -13,11 +16,20 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
+import com.summer.bnade.home.Provider;
 import com.summer.bnade.result.single.entity.AuctionHistoryVO;
 import com.summer.bnade.utils.ChartHelper;
+import com.summer.bnade.utils.Content;
+import com.summer.bnade.utils.RxUtil;
 import com.summer.bnade.utils.StringHelper;
+import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import butterknife.BindView;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,7 +37,6 @@ import butterknife.BindView;
  * create an instance of this fragment.
  */
 public class HistoryFragment extends BaseFragment {
-    private static final String TAG = HistoryFragment.class.getSimpleName();
     @BindView(R.id.tv_one_day)
     TextView mTvOneDay;
     @BindView(R.id.tv_week)
@@ -62,18 +73,50 @@ public class HistoryFragment extends BaseFragment {
     CombinedChart mChartOneDay;
     @BindView(R.id.chart_history)
     CombinedChart mChartHistory;
+    Item item;
+    Realm realm;
 
-    public static HistoryFragment getInstance(FragmentManager fm) {
-        HistoryFragment fragment = (HistoryFragment) fm.findFragmentByTag(TAG);
-        if (fragment == null) {
-            fragment = new HistoryFragment();
-        }
+    ItemResultContract.Presenter mPresenter;
+
+    public static HistoryFragment getInstance(Item item, Realm realm) {
+        HistoryFragment fragment = new HistoryFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Content.EXTRA_DATA, item);
+        bundle.putParcelable(Content.EXTRA_SUB_DATA, realm);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
     @Override
-    public int title() {
-        return R.string.fragment_title_history_trand;
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof Provider) {
+            mPresenter = (ItemResultContract.Presenter) ((Provider) context).provide();
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            item = getArguments().getParcelable(Content.EXTRA_DATA);
+            realm = getArguments().getParcelable(Content.EXTRA_SUB_DATA);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Single.just(new Pair<>(item, realm))
+                .compose(mPresenter.history())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<AuctionHistoryVO>() {
+                    @Override
+                    public void accept(AuctionHistoryVO historyVO) throws Exception {
+                        update(historyVO);
+                    }
+                }, new RxUtil.ContextErrorHandler(getContext()));
     }
 
     @Override
@@ -112,7 +155,7 @@ public class HistoryFragment extends BaseFragment {
         chart.getDescription().setEnabled(false);
         chart.setDrawOrder(new CombinedChart.DrawOrder[]{CombinedChart.DrawOrder.BAR, CombinedChart.DrawOrder.LINE});
         chart.setViewPortOffsets(0, 0, 0, 0);
-        
+
         Legend l = chart.getLegend();
         l.setWordWrapEnabled(true);
         l.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);

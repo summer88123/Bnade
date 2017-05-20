@@ -9,7 +9,8 @@ import android.support.v7.widget.SearchView;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewFragment;
-import com.summer.bnade.home.MainComponentProvider;
+import com.summer.bnade.home.MainComponent;
+import com.summer.bnade.home.Provider;
 import com.summer.bnade.select.RealmSelectActivity;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.widget.RealmSelectButton;
@@ -57,8 +58,9 @@ public class PlayerItemFragment extends BaseViewFragment<PlayerItemContract.Pres
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MainComponentProvider) {
-            ((MainComponentProvider) context).mainComponent().inject(this);
+        if (context instanceof Provider) {
+            MainComponent component = (MainComponent) ((Provider) context).provide();
+            component.inject(this);
         }
     }
 

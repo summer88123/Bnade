@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.summer.bnade"
         minSdkVersion 19
@@ -23,6 +23,13 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':bnade')
+    //    compile 'com.android.support.constraint:constraint-layout:1.1.0-beat1'
+    //    compile "android.arch.lifecycle:runtime:1.0.0-alpha1"
+    //    compile "android.arch.lifecycle:extensions:1.0.0-alpha1"
+    //    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha1"
+    //
+    //    compile "android.arch.persistence.room:runtime:1.0.0-alpha1"
+    //    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha1"
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -39,7 +46,10 @@ dependencies {
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.android.support:support-annotations:26.0.0-alpha1'
     compile 'com.timehop.stickyheadersrecyclerview:library:0.4.3'
+    compile 'com.github.frankiesardo:icepick:2.3.6'
+    compile 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    annotationProcessor 'com.github.frankiesardo:icepick-processor:2.3.6'
 }

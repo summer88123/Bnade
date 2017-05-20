@@ -1,7 +1,8 @@
 package com.summer.bnade.result.single;
 
 
-import com.summer.bnade.base.di.PreActivity;
+import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,8 +13,12 @@ import dagger.Provides;
 @Module
 class ItemResultModule {
     private final ItemResultActivity mView;
+    private Item item;
+    private Realm realm;
 
-    ItemResultModule(ItemResultActivity view) {
+    ItemResultModule(ItemResultActivity view, Item item, Realm realm) {
+        this.item = item;
+        this.realm = realm;
         this.mView = view;
     }
 
@@ -27,26 +32,9 @@ class ItemResultModule {
         return presenter;
     }
 
-    @PreActivity
     @Provides
-    PriceFragment providePriceFragment() {
-        return PriceFragment.getInstance(mView.getSupportFragmentManager());
-    }
-
-    @PreActivity
-    @Provides
-    HistoryFragment provideHistoryFragment() {
-        return HistoryFragment.getInstance(mView.getSupportFragmentManager());
-    }
-
-    @Provides
-    ItemResultAdapter provideRealmItemAdapter() {
-        return new ItemResultAdapter();
-    }
-
-    @Provides
-    PageAdapter providePageAdapter(PriceFragment priceFragment, HistoryFragment historyFragment) {
-        return new PageAdapter(mView, mView.getSupportFragmentManager(), priceFragment, historyFragment);
+    ItemResultPageAdapter providePageAdapter() {
+        return new ItemResultPageAdapter(mView, mView.getSupportFragmentManager(), item, realm);
     }
 
 }

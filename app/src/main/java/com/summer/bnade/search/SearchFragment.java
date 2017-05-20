@@ -23,7 +23,8 @@ import android.widget.RadioGroup;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewFragment;
-import com.summer.bnade.home.MainComponentProvider;
+import com.summer.bnade.home.MainComponent;
+import com.summer.bnade.home.Provider;
 import com.summer.bnade.result.all.SearchResultActivity;
 import com.summer.bnade.result.single.ItemResultActivity;
 import com.summer.bnade.search.entity.SearchVO;
@@ -66,6 +67,8 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     ConstraintLayout mContent;
     @BindView(R.id.select_btn)
     RealmSelectButton mSelectBtn;
+    @IdRes
+    private int mCurrentId = R.id.rb_month;
 
     public static SearchFragment getInstance(FragmentManager fm) {
         SearchFragment fragment = (SearchFragment) fm.findFragmentByTag(TAG);
@@ -86,26 +89,24 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof MainComponentProvider) {
-            ((MainComponentProvider) context).mainComponent().inject(this);
+        if (context instanceof Provider) {
+            MainComponent component = (MainComponent) ((Provider) context).provide();
+            component.inject(this);
         }
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            Realm realm = savedInstanceState.getParcelable("REALM");
-            if (realm != null) {
-                mSelectBtn.setRealm(realm);
-            }
+            mCurrentId = savedInstanceState.getInt("CURRENT_ID");
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
     }
 
     @Override
@@ -117,7 +118,7 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("REALM", mSelectBtn.getRealm());
+        outState.putInt("CURRENT_ID", mCurrentId);
     }
 
     @Override
@@ -200,14 +201,14 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
                 mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
             }
         });
-
+        mRgHotType.check(mCurrentId);
         mRgHotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
+                mCurrentId = i;
                 mPresenter.updateHotSearchType(getHotType(i));
             }
         });
-
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {

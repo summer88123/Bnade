@@ -3,6 +3,7 @@ package com.summer.bnade.result.all;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -55,9 +56,13 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
         realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         mPresenter.load(item, realm);
     }
 
@@ -107,13 +112,13 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
         rightAxis.setDrawGridLines(false);
         rightAxis.setDrawZeroLine(false);
         rightAxis.setLabelCount(4);
-        rightAxis.setTextColor(Color.rgb(60, 220, 78));
+        rightAxis.setTextColor(ContextCompat.getColor(this, R.color.uncommon));
         rightAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
 
         YAxis leftAxis = mChart.getAxisLeft();
         leftAxis.setDrawZeroLine(false);
         leftAxis.setLabelCount(4);
-        leftAxis.setTextColor(Color.rgb(240, 238, 70));
+        leftAxis.setTextColor(ContextCompat.getColor(this, R.color.artifact));
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
         leftAxis.setValueFormatter(new ChartHelper.GoldAxisFormatter());
     }
@@ -153,7 +158,7 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     }
 
     @Override
-    protected void injectComponent() {
+    public void injectComponent() {
         DaggerSearchResultComponent.builder().appComponent(ComponentHolder.getComponent())
                 .searchResultModule(new SearchResultModule(this)).build().inject(this);
     }

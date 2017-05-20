@@ -29,7 +29,7 @@ import com.summer.bnade.token.WowTokenModule;
 import butterknife.BindView;
 
 public class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MainComponentProvider {
+        implements NavigationView.OnNavigationItemSelectedListener, Provider<MainComponent> {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -76,7 +76,7 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    public MainComponent mainComponent() {
+    public MainComponent provide() {
         return mMainComponent;
     }
 
@@ -87,7 +87,7 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    protected void injectComponent() {
+    public void injectComponent() {
         fm = getSupportFragmentManager();
         mMainComponent = DaggerMainComponent.builder()
                 .appComponent(ComponentHolder.getComponent())

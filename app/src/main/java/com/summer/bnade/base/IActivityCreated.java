@@ -17,4 +17,6 @@ public interface IActivityCreated {
      * 初始化view设置
      */
     void setUpView();
+
+    void injectComponent();
 }

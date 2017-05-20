@@ -1,5 +1,6 @@
 package com.summer.bnade.data;
 
+import android.support.v4.util.Pair;
 import android.util.SparseArray;
 
 import com.summer.bnade.data.error.EmptyDataException;
@@ -53,8 +54,28 @@ public class BnadeRepo {
         return mRealmHelper.getAllRealm(hasAllItem);
     }
 
+    public SingleSource<Pair<List<AuctionHistory>, List<AuctionHistory>>> getAuctionPastAndHistory(Item item, Realm
+            realm) {
+        return Single.zip(api.getAuctionPastRealmItem(realm.getId(), item.getId()), api
+                .getAuctionHistoryRealmItem(realm.getId(), item
+                        .getId()), new BiFunction<List<AuctionHistory>, List<AuctionHistory>,
+                Pair<List<AuctionHistory>, List<AuctionHistory>>>() {
+            @Override
+            public Pair<List<AuctionHistory>, List<AuctionHistory>> apply(@NonNull List<AuctionHistory>
+                                                                                  auctionPast, @NonNull
+                                                                                  List<AuctionHistory>
+                                                                                  auctionHistories) throws Exception {
+                return new Pair<>(auctionPast, auctionHistories);
+            }
+        });
+    }
+
     public Single<List<AuctionRealm>> getAuctionRealm(boolean useCache) {
         return Observable.concat(getAuctionRealmCache(useCache), getAuctionRealmRemote()).firstOrError();
+    }
+
+    public Single<List<AuctionRealmItem>> getAuctionRealmItem(Item item, Realm realm) {
+        return api.getAuctionRealmItem(realm.getId(), item.getId());
     }
 
     public Single<List<Auction>> getAuctionRealmOwner(long realmId, String name) {

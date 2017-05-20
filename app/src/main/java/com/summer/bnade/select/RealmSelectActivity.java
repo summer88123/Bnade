@@ -30,11 +30,6 @@ public class RealmSelectActivity extends BaseActivity {
     }
 
     @Override
-    protected void injectComponent() {
-
-    }
-
-    @Override
     public int layout() {
         return R.layout.activity_realm_select;
     }
