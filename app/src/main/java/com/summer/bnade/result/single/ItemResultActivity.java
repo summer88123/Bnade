@@ -21,7 +21,6 @@ import com.summer.lib.model.entity.Realm;
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import icepick.Icicle;
 
 public class ItemResultActivity extends BaseActivity implements Provider<ItemResultTransformer> {
 
@@ -37,17 +36,13 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
     @Inject
     ItemResultPageAdapter mItemResultPageAdapter;
 
-    @Icicle
     Item item;
-    @Icicle
     Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (savedInstanceState == null) {
-            item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
-            realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
-        }
+        item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
+        realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
         super.onCreate(savedInstanceState);
     }
 
@@ -80,11 +75,12 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
             }
 
             @Override
-            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
+                                           boolean isFromMemoryCache, boolean isFirstResource) {
                 mToolbar.setLogo(resource);
                 return true;
             }
-        }).into(ScreenUtil.dp2px(48),ScreenUtil.dp2px(48));
+        }).into(ScreenUtil.dp2px(48), ScreenUtil.dp2px(48));
     }
 
     @Override
