@@ -16,8 +16,7 @@ import butterknife.ButterKnife;
  * Created by kevin.bai on 2017/4/28.
  */
 
-class ItemResultAdapter extends BaseAdapter<AuctionRealmItem, ItemResultAdapter
-        .ViewHolder> {
+class ItemResultAdapter extends BaseAdapter<AuctionRealmItem, ItemResultAdapter.ViewHolder> {
 
     @Override
     protected int layoutId() {

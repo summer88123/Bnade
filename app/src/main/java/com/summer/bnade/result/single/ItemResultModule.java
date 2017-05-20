@@ -23,16 +23,6 @@ class ItemResultModule {
     }
 
     @Provides
-    ItemResultContract.View provideResultView() {
-        return mView;
-    }
-
-    @Provides
-    ItemResultContract.Presenter providePresenter(ItemResultPresenter presenter) {
-        return presenter;
-    }
-
-    @Provides
     ItemResultPageAdapter providePageAdapter() {
         return new ItemResultPageAdapter(mView, mView.getSupportFragmentManager(), item, realm);
     }

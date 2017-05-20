@@ -155,7 +155,6 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     public void showResult(Item item, Realm realm) {
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
         intent.putExtra(Content.EXTRA_DATA, item);
-        intent.putExtra(Content.EXTRA_SUB_DATA, realm);
         startActivity(intent);
     }
 

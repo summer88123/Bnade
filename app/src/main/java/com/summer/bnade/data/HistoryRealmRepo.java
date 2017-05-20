@@ -65,6 +65,15 @@ public class HistoryRealmRepo {
         }).subscribeOn(Schedulers.io());
     }
 
+    public Completable clearLast() {
+        return Completable.fromAction(new Action() {
+            @Override
+            public void run() throws Exception {
+                mEditor.remove(LAST_REALM_KEY).apply();
+            }
+        });
+    }
+
     public Completable clear() {
         return Completable.fromAction(new Action() {
             @Override

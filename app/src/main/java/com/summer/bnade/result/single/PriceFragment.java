@@ -28,7 +28,7 @@ public class PriceFragment extends BaseFragment {
     RecyclerView mListView;
     ItemResultAdapter mAdapter;
 
-    ItemResultContract.Presenter mPresenter;
+    ItemResultTransformer mPresenter;
 
     Item item;
     Realm realm;
@@ -46,7 +46,7 @@ public class PriceFragment extends BaseFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Provider) {
-            mPresenter = (ItemResultContract.Presenter) ((Provider) context).provide();
+            mPresenter = (ItemResultTransformer) ((Provider) context).provide();
         }
     }
 

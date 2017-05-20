@@ -4,6 +4,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
@@ -64,6 +65,7 @@ class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolde
             Gold buyout = auction.getBuyOut();
             mTvBuyout.setText(mResources
                     .getString(R.string.full_gold, buyout.getGold(), buyout.getSilver(), buyout.getCopper()));
+            Glide.with(itemView.getContext()).load(auction.getItem().getUrl()).into(mIvIcon);
         }
 
     }

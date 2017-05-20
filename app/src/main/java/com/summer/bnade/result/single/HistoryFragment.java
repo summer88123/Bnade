@@ -76,7 +76,7 @@ public class HistoryFragment extends BaseFragment {
     Item item;
     Realm realm;
 
-    ItemResultContract.Presenter mPresenter;
+    ItemResultTransformer mPresenter;
 
     public static HistoryFragment getInstance(Item item, Realm realm) {
         HistoryFragment fragment = new HistoryFragment();
@@ -91,7 +91,7 @@ public class HistoryFragment extends BaseFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Provider) {
-            mPresenter = (ItemResultContract.Presenter) ((Provider) context).provide();
+            mPresenter = (ItemResultTransformer) ((Provider) context).provide();
         }
     }
 

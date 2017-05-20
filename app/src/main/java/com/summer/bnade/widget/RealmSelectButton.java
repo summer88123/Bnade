@@ -57,6 +57,7 @@ public class RealmSelectButton extends ConstraintLayout {
         mBtnRealmSelect.setText(R.string.btn_realm_select);
         mBtnRealmSelect.postInvalidate();
         noRealmSet.applyTo(this);
+        mRealmRepo.clearLast().subscribe();
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.support.v4.util.Pair;
 import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
-import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.result.single.entity.AuctionHistoryVO;
 import com.summer.bnade.utils.ChartHelper;
@@ -34,8 +33,7 @@ import io.reactivex.functions.Function;
  * Created by kevin.bai on 2017/4/28.
  */
 
-class ItemResultPresenter extends BasePresenter<ItemResultContract.View> implements
-        ItemResultContract.Presenter {
+class ItemResultTransformer {
 
     private Comparator<AuctionHistory> goldComparator = new Comparator<AuctionHistory>() {
         @Override
@@ -51,13 +49,14 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
         }
     };
 
+    private BnadeRepo mRepo;
+
     @Inject
-    ItemResultPresenter(ItemResultContract.View view, BnadeRepo repo) {
-        super(view, repo);
+    ItemResultTransformer(BnadeRepo repo) {
+        this.mRepo = repo;
     }
 
-    @Override
-    public SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO> history() {
+    SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO> history() {
         return new SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO>() {
             @Override
             public SingleSource<AuctionHistoryVO> apply(@NonNull Single<Pair<Item, Realm>> upstream) {
@@ -84,8 +83,7 @@ class ItemResultPresenter extends BasePresenter<ItemResultContract.View> impleme
         };
     }
 
-    @Override
-    public SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>> price() {
+    SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>> price() {
         return new SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>>() {
             @Override
             public SingleSource<List<AuctionRealmItem>> apply(@NonNull Single<Pair<Item, Realm>>

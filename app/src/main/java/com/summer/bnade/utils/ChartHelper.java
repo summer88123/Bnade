@@ -1,6 +1,7 @@
 package com.summer.bnade.utils;
 
 import android.graphics.Color;
+import android.util.Log;
 
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.YAxis;
@@ -24,6 +25,7 @@ import io.reactivex.functions.BiFunction;
  */
 
 public class ChartHelper {
+    private static final String TAG = ChartHelper.class.getSimpleName();
     private static final NumberFormat format = new DecimalFormat("0.0");
 
     public static <T> LineData generateLineData(List<T> items, BiFunction<Integer, T, Entry> convert) {
@@ -51,6 +53,18 @@ public class ChartHelper {
         d.addDataSet(set);
 
         return d;
+    }
+
+    public static <T, D> List<D> generateData(List<T> items, BiFunction<Integer, T, D> convert) {
+        List<D> data = new ArrayList<>(items.size());
+        for (int i = 0, size = items.size(); i < size; i++) {
+            try {
+                data.add(convert.apply(i, items.get(i)));
+            } catch (Exception ignored) {
+                Log.e(TAG, ignored.getMessage(), ignored);
+            }
+        }
+        return data;
     }
 
     public static <T> BarData generateBarData(List<T> items, BiFunction<Integer, T, BarEntry> convert) {

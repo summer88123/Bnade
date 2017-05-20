@@ -12,6 +12,11 @@ public class BasePresenter<V extends BaseView> {
     protected BnadeRepo mRepo;
     protected RxUtil.BaseErrorHandler mErrorHandler;
 
+    public BasePresenter(BnadeRepo repo) {
+        this.mRepo = repo;
+        mErrorHandler = new RxUtil.BaseErrorHandler(mView);
+    }
+
     public BasePresenter(V view, BnadeRepo repo) {
         this.mView = view;
         this.mRepo = repo;

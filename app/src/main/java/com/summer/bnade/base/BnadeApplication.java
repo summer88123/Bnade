@@ -3,6 +3,7 @@ package com.summer.bnade.base;
 import android.app.Application;
 
 import com.summer.bnade.base.di.ComponentHolder;
+import com.summer.bnade.utils.Utils;
 
 import javax.inject.Inject;
 
@@ -18,6 +19,7 @@ public class BnadeApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Utils.init(this);
         ComponentHolder.initComponent(this);
         registerActivityLifecycleCallbacks(mLifeCycleCallback);
     }
