@@ -7,23 +7,16 @@ import com.summer.bnade.data.HistorySearchRepo;
 import com.summer.bnade.data.error.EmptyDataException;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
-import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 
 import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 /**
  * Created by kevin.bai on 2017/4/13.
@@ -43,68 +36,34 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
 
     @Override
     public void load(int hotType) {
-        Single.zip(mRepo.getHot(hotType), mHistorySearchRepo.getHistories().toList(),
-                new BiFunction<List<Hot>, List<String>, SearchVO>() {
-                    @Override
-                    public SearchVO apply(@NonNull List<Hot> hotlist, @NonNull List<String>
-                            strings) throws Exception {
-                        return new SearchVO(hotlist, strings);
-                    }
-                })
+        Single.zip(mRepo.getHot(hotType), mHistorySearchRepo.getHistories().toList(), SearchVO::new)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<SearchVO>() {
-                    @Override
-                    public void accept(@NonNull SearchVO searchVO) throws Exception {
-                        mView.show(searchVO);
-                    }
-                }, mErrorHandler);
+                .subscribe(searchVO -> mView.show(searchVO), mErrorHandler);
     }
 
     @Override
     public void search(final String name, final Realm realm) {
         mRepo.getItem(name)
-                .flatMap(new Function<Item, SingleSource<Item>>() {
-                    @Override
-                    public SingleSource<Item> apply(@NonNull Item item) throws Exception {
-                        return saveHistory(item, realm);
+                .flatMap(item -> saveHistory(item, realm))
+                .flatMap(item -> mRepo.search(item, realm))
+                .onErrorResumeNext(throwable -> {
+                    if (throwable instanceof EmptyDataException) {
+                        return mRepo.getItemNames(name).map(SearchResultVO::new);
                     }
-                })
-                .flatMap(new Function<Item, SingleSource<SearchResultVO>>() {
-                    @Override
-                    public SingleSource<SearchResultVO> apply(@NonNull Item item) throws Exception {
-                        return mRepo.search(item, realm);
-                    }
-                })
-                .onErrorResumeNext(new Function<Throwable, SingleSource<? extends SearchResultVO>>() {
-                    @Override
-                    public SingleSource<? extends SearchResultVO> apply(@NonNull Throwable throwable) throws Exception {
-                        if (throwable instanceof EmptyDataException) {
-                            return mRepo.getItemNames(name).map(new Function<List<String>, SearchResultVO>() {
-                                @Override
-                                public SearchResultVO apply(@NonNull List<String> strings) throws Exception {
-                                    return new SearchResultVO(strings);
-                                }
-                            });
-                        }
-                        return Single.error(throwable);
-                    }
+                    return Single.error(throwable);
                 })
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<SearchResultVO>() {
-
-                    @Override
-                    public void accept(@NonNull SearchResultVO searchResultVO) throws Exception {
-                        if (searchResultVO.getItem() == null) {
-                            mView.showFuzzySearch(searchResultVO.getNames());
-                        } else if (searchResultVO.getAuctionRealmItems() != null) {
-                            if (searchResultVO.getAuctionRealmItems().isEmpty()) {
-                                mView.showToast("无拍卖数据");
-                            } else {
-                                mView.showRealmItemResult(searchResultVO.getItem(), realm);
-                            }
+                .subscribe(searchResultVO -> {
+                    if (searchResultVO.getItem() == null) {
+                        mView.showFuzzySearch(searchResultVO.getNames());
+                    } else if (searchResultVO.getAuctionRealmItems() != null) {
+                        if (searchResultVO.getAuctionRealmItems().isEmpty()) {
+                            mView.showToast("无拍卖数据");
                         } else {
-                            mView.showResult(searchResultVO.getItem(), realm);
+                            mView.showRealmItemResult(searchResultVO.getItem(), realm);
                         }
+                    } else {
+                        mView.showResult(searchResultVO.getItem(), realm);
                     }
                 }, mErrorHandler);
     }
@@ -113,35 +72,20 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
     public void updateHistory() {
         mHistorySearchRepo.getHistories().toList()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<String>>() {
-                    @Override
-                    public void accept(@NonNull List<String> strings) throws Exception {
-                        mView.updateHistories(strings);
-                    }
-                });
+                .subscribe(strings -> mView.updateHistories(strings));
     }
 
     @Override
     public void updateHotSearchType(int type) {
         mRepo.getHot(type).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<Hot>>() {
-                    @Override
-                    public void accept(@NonNull List<Hot> hots) throws Exception {
-                        mView.updateHotSearch(hots);
-                    }
-                }, mErrorHandler);
+                .subscribe(hots -> mView.updateHotSearch(hots), mErrorHandler);
     }
 
     @Override
     public void clearHistories() {
         mHistorySearchRepo.clear()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        mView.updateHistories(Collections.<String>emptyList());
-                    }
-                });
+                .subscribe(() -> mView.updateHistories(Collections.emptyList()));
     }
 
     private Single<Item> saveHistory(@NonNull Item item, Realm realm) {

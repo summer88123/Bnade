@@ -1,5 +1,6 @@
 package com.summer.bnade.data;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 
 import com.summer.lib.model.entity.Realm;
@@ -7,17 +8,11 @@ import com.summer.lib.model.utils.RealmHelper;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
-import io.reactivex.MaybeSource;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Single;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Action;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -33,6 +28,7 @@ public class HistoryRealmRepo {
     private final SharedPreferences sp;
     private Set<String> cache;
 
+    @SuppressLint("CommitPrefEdits")
     public HistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
         this.mRealmHelper = realmHelper;
         this.sp = sp;
@@ -40,83 +36,52 @@ public class HistoryRealmRepo {
     }
 
     public Completable add(final Realm realm) {
-        return Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                initCache();
-                cache.add(realm.getConnected());
-                mEditor.putString(LAST_REALM_KEY, realm.getConnected()).apply();
-                save();
-            }
+        return Completable.fromAction(() -> {
+            initCache();
+            cache.add(realm.getConnected());
+            mEditor.putString(LAST_REALM_KEY, realm.getConnected()).apply();
+            save();
         }).subscribeOn(Schedulers.io());
     }
 
     public Maybe<Realm> last() {
-        return Single.fromCallable(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                return sp.getString(LAST_REALM_KEY, NONE);
-            }
-        }).flatMapMaybe(new Function<String, MaybeSource<Realm>>() {
-            @Override
-            public MaybeSource<Realm> apply(@NonNull String s) throws Exception {
-                return mRealmHelper.getRealmsByName(s).firstElement();
-            }
-        }).subscribeOn(Schedulers.io());
+        return Single.fromCallable(() -> sp.getString(LAST_REALM_KEY, NONE))
+                .flatMapMaybe(s -> mRealmHelper.getRealmsByName(s).firstElement()).subscribeOn(Schedulers.io());
     }
 
     public Completable clearLast() {
-        return Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                mEditor.remove(LAST_REALM_KEY).apply();
-            }
-        });
+        return Completable.fromAction(() -> mEditor.remove(LAST_REALM_KEY).apply());
     }
 
     public Completable clear() {
-        return Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                initCache();
-                cache.clear();
-                save();
-            }
+        return Completable.fromAction(() -> {
+            initCache();
+            cache.clear();
+            save();
         }).subscribeOn(Schedulers.io());
     }
 
     public Observable<Realm> getAll() {
         return Observable
-                .defer(new Callable<ObservableSource<String>>() {
-                    @Override
-                    public ObservableSource<String> call() throws Exception {
-                        initCache();
-                        return Observable.fromIterable(cache);
-                    }
+                .defer(() -> {
+                    initCache();
+                    return Observable.fromIterable(cache);
                 })
-                .flatMap(new Function<String, ObservableSource<Realm>>() {
-                    @Override
-                    public ObservableSource<Realm> apply(@NonNull String s) throws Exception {
-                        return mRealmHelper.getRealmsByName(s);
-                    }
-                })
+                .flatMap(mRealmHelper::getRealmsByName)
                 .subscribeOn(Schedulers.io());
     }
 
     public Completable remove(final Realm item) {
-        return Completable.fromAction(new Action() {
-            @Override
-            public void run() throws Exception {
-                initCache();
-                cache.remove(item.getConnected());
-                save();
-            }
+        return Completable.fromAction(() -> {
+            initCache();
+            cache.remove(item.getConnected());
+            save();
         }).subscribeOn(Schedulers.io());
     }
 
     private void initCache() {
         if (cache == null) {
-            cache = sp.getStringSet(HISTORY_REALM_KEY, new LinkedHashSet<String>());
+            cache = sp.getStringSet(HISTORY_REALM_KEY, new LinkedHashSet<>());
         }
     }
 

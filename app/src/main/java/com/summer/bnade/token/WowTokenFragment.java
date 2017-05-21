@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -66,12 +65,9 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
     @BindViews({R.id.cardView1, R.id.cardView2, R.id.cardView3})
     List<CardView> mCardViewList;
 
-    ButterKnife.Setter<CardView, Float> endState = new ButterKnife.Setter<CardView, Float>() {
-        @Override
-        public void set(@NonNull CardView view, Float value, int index) {
-            view.setAlpha(1f);
-            view.setTranslationY(value);
-        }
+    ButterKnife.Setter<CardView, Float> endState = (view, value, index) -> {
+        view.setAlpha(1f);
+        view.setTranslationY(value);
     };
 
     public static WowTokenFragment getInstance(FragmentManager fm) {
@@ -128,12 +124,7 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
 
     @Override
     public void refreshStart() {
-        mRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                mRefreshLayout.setRefreshing(true);
-            }
-        });
+        mRefreshLayout.post(() -> mRefreshLayout.setRefreshing(true));
     }
 
     @Override

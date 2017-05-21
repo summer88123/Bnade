@@ -8,14 +8,10 @@ import com.summer.bnade.data.HistoryRealmRepo;
 import com.summer.bnade.select.entity.TypedRealm;
 import com.summer.lib.model.entity.Realm;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
 /**
@@ -27,19 +23,9 @@ class RealmSelectPresenter extends BasePresenter<RealmSelectContract.View> imple
 
     private final HistoryRealmRepo mRealmRepo;
 
-    private Function<Realm, TypedRealm> mapUsed = new Function<Realm, TypedRealm>() {
-        @Override
-        public TypedRealm apply(@NonNull Realm realm) throws Exception {
-            return TypedRealm.USED(realm);
-        }
-    };
+    private Function<Realm, TypedRealm> mapUsed = TypedRealm::USED;
 
-    private Function<Realm, TypedRealm> mapNormal = new Function<Realm, TypedRealm>() {
-        @Override
-        public TypedRealm apply(@NonNull Realm realm) throws Exception {
-            return TypedRealm.NORMAL(realm);
-        }
-    };
+    private Function<Realm, TypedRealm> mapNormal = TypedRealm::NORMAL;
 
     @Inject
     RealmSelectPresenter(RealmSelectContract.View view, BnadeRepo repo, HistoryRealmRepo realmRepo) {
@@ -56,12 +42,7 @@ class RealmSelectPresenter extends BasePresenter<RealmSelectContract.View> imple
                     .map(mapNormal)
                     .toList()
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Consumer<List<TypedRealm>>() {
-                        @Override
-                        public void accept(@NonNull List<TypedRealm> realms) throws Exception {
-                            mView.show(realms);
-                        }
-                    });
+                    .subscribe(mView::show);
         }
     }
 
@@ -70,12 +51,7 @@ class RealmSelectPresenter extends BasePresenter<RealmSelectContract.View> imple
         Observable.concat(mRealmRepo.getAll().map(mapUsed), mRepo.getAllRealm(false).map(mapNormal))
                 .toList()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<TypedRealm>>() {
-                    @Override
-                    public void accept(@NonNull List<TypedRealm> list) throws Exception {
-                        mView.show(list);
-                    }
-                });
+                .subscribe(mView::show);
     }
 
     @Override

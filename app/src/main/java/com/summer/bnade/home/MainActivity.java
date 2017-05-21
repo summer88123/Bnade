@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.summer.bnade.R;
@@ -53,15 +52,12 @@ public class MainActivity extends BaseActivity
     public void setUpView() {
         setSupportActionBar(toolbar);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SearchFragment searchFragment = (SearchFragment) fm.findFragmentByTag(SearchFragment.TAG);
-                if (searchFragment != null) {
-                    searchFragment.search();
-                } else {
-                    selectSearch();
-                }
+        fab.setOnClickListener(view -> {
+            SearchFragment searchFragment = (SearchFragment) fm.findFragmentByTag(SearchFragment.TAG);
+            if (searchFragment != null) {
+                searchFragment.search();
+            } else {
+                selectSearch();
             }
         });
 

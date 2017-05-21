@@ -10,7 +10,7 @@ import com.summer.bnade.base.Adapter;
  * Created by kevin.bai on 2017/4/17.
  */
 
-class FuzzyItemAdapter extends Adapter<String, FuzzyItemAdapter.ViewHolder> {
+class FuzzyItemAdapter extends Adapter<String, FuzzyItemAdapter.FuzzyViewHolder> {
 
     @Override
     protected int layoutId() {
@@ -18,14 +18,14 @@ class FuzzyItemAdapter extends Adapter<String, FuzzyItemAdapter.ViewHolder> {
     }
 
     @Override
-    protected ViewHolder createViewHolder(View v, int viewType) {
-        return new ViewHolder(v);
+    protected FuzzyViewHolder createViewHolder(View v, int viewType) {
+        return new FuzzyViewHolder(v);
     }
 
-    class ViewHolder extends com.summer.bnade.base.ViewHolder<String> {
+    class FuzzyViewHolder extends com.summer.bnade.base.ViewHolder<String> {
         TextView mTextView;
 
-        public ViewHolder(View itemView) {
+        public FuzzyViewHolder(View itemView) {
             super(itemView);
             mTextView = (TextView) itemView;
         }

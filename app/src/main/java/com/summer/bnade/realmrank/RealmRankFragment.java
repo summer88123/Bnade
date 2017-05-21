@@ -2,7 +2,6 @@ package com.summer.bnade.realmrank;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -59,12 +58,7 @@ public class RealmRankFragment extends BaseViewFragment<RealmRankContract.Presen
     @Inject
     RealmRankAdapter mAdapter;
     private AuctionRealm.SortType current = AuctionRealm.SortType.TotalDown;
-    private ButterKnife.Action<TextView> DisableRightDrawable = new ButterKnife.Action<TextView>() {
-        @Override
-        public void apply(@NonNull TextView view, int index) {
-            view.setCompoundDrawables(null, null, null, null);
-        }
-    };
+    private ButterKnife.Action<TextView> DisableRightDrawable = (view, index) -> view.setCompoundDrawables(null, null, null, null);
 
     @SuppressWarnings("unused")
     public static RealmRankFragment getInstance(FragmentManager fm) {
