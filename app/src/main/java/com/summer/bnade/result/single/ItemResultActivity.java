@@ -1,5 +1,7 @@
 package com.summer.bnade.result.single;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -14,6 +16,7 @@ import com.summer.bnade.base.BaseActivity;
 import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.Content;
+import com.summer.bnade.utils.RxUtil;
 import com.summer.bnade.utils.ScreenUtil;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
@@ -38,6 +41,18 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
 
     Item item;
     Realm realm;
+
+    public static RxUtil.DataConsumer<Context, Realm> starter(Item item) {
+        return new RxUtil.DataConsumer<Context, Realm>() {
+            @Override
+            public void accept(Context context) throws Exception {
+                Intent intent = new Intent(context, ItemResultActivity.class);
+                intent.putExtra(Content.EXTRA_DATA, item);
+                intent.putExtra(Content.EXTRA_SUB_DATA, data);
+                context.startActivity(intent);
+            }
+        };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

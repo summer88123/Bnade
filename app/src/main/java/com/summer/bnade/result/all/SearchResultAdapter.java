@@ -1,14 +1,21 @@
 package com.summer.bnade.result.all;
 
+import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.view.RxView;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
+import com.summer.bnade.result.single.ItemResultActivity;
 import com.summer.bnade.utils.DateUtil;
+import com.summer.bnade.utils.RxUtil;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.Gold;
+import com.summer.lib.model.entity.Item;
+import com.summer.lib.model.entity.Realm;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -16,6 +23,11 @@ import butterknife.ButterKnife;
 /**
  */
 class SearchResultAdapter extends BaseAdapter<AuctionItem, SearchResultAdapter.ViewHolder> {
+    private final Item item;
+
+    SearchResultAdapter(Item item) {
+        this.item = item;
+    }
 
     @Override
     protected int layoutId() {
@@ -40,14 +52,23 @@ class SearchResultAdapter extends BaseAdapter<AuctionItem, SearchResultAdapter.V
         TextView mTvUpdateTime;
         @BindView(R.id.tv_last_time)
         TextView mTvLastTime;
+        @BindView(R.id.card_view)
+        CardView mCardView;
+
+        RxUtil.DataConsumer<Context, Realm> consumer;
 
         ViewHolder(View view) {
             super(view);
             ButterKnife.bind(this, view);
+            consumer = ItemResultActivity.starter(SearchResultAdapter.this.item);
+            RxView.clicks(mCardView)
+                    .map(o -> itemView.getContext())
+                    .subscribe(consumer);
         }
 
         @Override
         public void onBind(AuctionItem auctionItem) {
+            consumer.setData(auctionItem.getRealm());
             mTvRealm.setText(auctionItem.getRealm().getConnected());
             mTvSeller.setText(auctionItem.getName());
             mTvLastTime.setText(auctionItem.getLastTime().getResult());

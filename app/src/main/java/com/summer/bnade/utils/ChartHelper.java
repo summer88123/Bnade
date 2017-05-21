@@ -1,6 +1,8 @@
 package com.summer.bnade.utils;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.github.mikephil.charting.components.AxisBase;
@@ -8,10 +10,12 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
+import com.summer.bnade.R;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -64,6 +68,32 @@ public class ChartHelper {
                 Log.e(TAG, ignored.getMessage(), ignored);
             }
         }
+        return data;
+    }
+
+    public static CombinedData generateCombinedData(Context context, List<Entry> lines, List<BarEntry> bars) {
+        CombinedData data = new CombinedData();
+
+        BarDataSet barSet = new BarDataSet(bars, "数量");
+        barSet.setColor(ContextCompat.getColor(context, R.color.uncommon));
+        barSet.setDrawValues(false);
+        barSet.setAxisDependency(YAxis.AxisDependency.RIGHT);
+        BarData barData = new BarData(barSet);
+
+        LineDataSet lineSet = new LineDataSet(lines, "价格");
+        int color = ContextCompat.getColor(context, R.color.artifact);
+        lineSet.setColor(color);
+        lineSet.setLineWidth(1.5f);
+        lineSet.setCircleColor(color);
+        lineSet.setCircleRadius(2f);
+        lineSet.setFillColor(color);
+        lineSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        lineSet.setDrawValues(false);
+        lineSet.setAxisDependency(YAxis.AxisDependency.LEFT);
+        LineData lineData = new LineData(lineSet);
+
+        data.setData(lineData);
+        data.setData(barData);
         return data;
     }
 

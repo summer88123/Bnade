@@ -21,14 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.BiFunction;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
-import io.reactivex.functions.Function4;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -54,20 +49,23 @@ public class BnadeRepo {
         return mRealmHelper.getAllRealm(hasAllItem);
     }
 
+    public Single<List<AuctionItem>> getAuction(Item item) {
+        return api.getAuctionItem(item.getId())
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapSingle(auctionItem -> mRealmHelper.getRealmById(auctionItem.getRealmId())
+                        .map(realm -> {
+                            auctionItem.setRealm(realm);
+                            return auctionItem;
+                        }))
+                .toSortedList();
+    }
+
     public SingleSource<Pair<List<AuctionHistory>, List<AuctionHistory>>> getAuctionPastAndHistory(Item item, Realm
             realm) {
-        return Single.zip(api.getAuctionPastRealmItem(realm.getId(), item.getId()), api
-                .getAuctionHistoryRealmItem(realm.getId(), item
-                        .getId()), new BiFunction<List<AuctionHistory>, List<AuctionHistory>,
-                Pair<List<AuctionHistory>, List<AuctionHistory>>>() {
-            @Override
-            public Pair<List<AuctionHistory>, List<AuctionHistory>> apply(@NonNull List<AuctionHistory>
-                                                                                  auctionPast, @NonNull
-                                                                                  List<AuctionHistory>
-                                                                                  auctionHistories) throws Exception {
-                return new Pair<>(auctionPast, auctionHistories);
-            }
-        });
+        return Single.zip(
+                api.getAuctionPastRealmItem(realm.getId(), item.getId()),
+                api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
+                Pair::new);
     }
 
     public Single<List<AuctionRealm>> getAuctionRealm(boolean useCache) {
@@ -80,26 +78,12 @@ public class BnadeRepo {
 
     public Single<List<Auction>> getAuctionRealmOwner(long realmId, String name) {
         return api.getAuctionRealmOwner(realmId, name)
-                .flatMapObservable(new Function<List<Auction>, ObservableSource<Auction>>() {
-                    @Override
-                    public ObservableSource<Auction> apply(@NonNull List<Auction> auctions) throws Exception {
-                        return Observable.fromIterable(auctions);
-                    }
-                })
-                .flatMapSingle(new Function<Auction, SingleSource<Auction>>() {
-                    @Override
-                    public SingleSource<Auction> apply(@NonNull Auction auction) throws Exception {
-                        return Single.just(auction).zipWith(getItem(auction.getName()),
-                                new BiFunction<Auction, Item, Auction>() {
-                                    @Override
-                                    public Auction apply(@NonNull Auction auction, @NonNull Item item) throws
-                                            Exception {
-                                        auction.setItem(item);
-                                        return auction;
-                                    }
-                                });
-                    }
-                })
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapSingle(auction -> getItem(auction.getName())
+                        .map(item -> {
+                            auction.setItem(item);
+                            return auction;
+                        }))
                 .toList();
     }
 
@@ -108,14 +92,11 @@ public class BnadeRepo {
     }
 
     public Single<Item> getItem(String name) {
-        return api.getItem(name).map(new Function<List<Item>, Item>() {
-            @Override
-            public Item apply(@NonNull List<Item> items) throws Exception {
-                if (!items.isEmpty()) {
-                    return items.get(0);
-                }
-                throw new EmptyDataException();
+        return api.getItem(name).map(items -> {
+            if (!items.isEmpty()) {
+                return items.get(0);
             }
+            throw new EmptyDataException();
         });
     }
 
@@ -135,33 +116,6 @@ public class BnadeRepo {
         return Observable.concat(searchCache(item), searchRemote(item, realm).toObservable()).firstOrError();
     }
 
-    private Single<List<AuctionItem>> getAuction(long itemId) {
-        return api.getAuctionItem(itemId)
-                .flatMapObservable(new Function<List<AuctionItem>, ObservableSource<AuctionItem>>() {
-                    @Override
-                    public ObservableSource<AuctionItem> apply(@NonNull List<AuctionItem> auctionItems) throws
-                            Exception {
-                        return Observable.fromIterable(auctionItems);
-                    }
-                })
-                .flatMapSingle(new Function<AuctionItem, SingleSource<AuctionItem>>() {
-                    @Override
-                    public SingleSource<AuctionItem> apply(@NonNull AuctionItem auctionItem) throws Exception {
-                        return Single.just(auctionItem)
-                                .zipWith(mRealmHelper.getRealmById(auctionItem.getRealmId()),
-                                        new BiFunction<AuctionItem, Realm, AuctionItem>() {
-                                            @Override
-                                            public AuctionItem apply(@NonNull AuctionItem auctionItem, @NonNull Realm
-                                                    realm) throws Exception {
-                                                auctionItem.setRealm(realm);
-                                                return auctionItem;
-                                            }
-                                        });
-                    }
-                })
-                .toSortedList();
-    }
-
     private Observable<List<AuctionRealm>> getAuctionRealmCache(boolean useCache) {
         return (useCache && !mAuctionRealmsCache.isEmpty() ? Observable
                 .just(mAuctionRealmsCache) : Observable.<List<AuctionRealm>>empty())
@@ -170,35 +124,16 @@ public class BnadeRepo {
 
     private Observable<List<AuctionRealm>> getAuctionRealmRemote() {
         return api.getAuctionRealmsSummary()
-                .doOnSuccess(new Consumer<List<AuctionRealm>>() {
-                    @Override
-                    public void accept(@NonNull List<AuctionRealm> auctionRealms) throws Exception {
-                        mAuctionRealmsCache.clear();
-                        mAuctionRealmsCache.addAll(auctionRealms);
-                    }
+                .doOnSuccess(auctionRealms -> {
+                    mAuctionRealmsCache.clear();
+                    mAuctionRealmsCache.addAll(auctionRealms);
                 })
-                .flatMapObservable(new Function<List<AuctionRealm>, ObservableSource<AuctionRealm>>() {
-                    @Override
-                    public ObservableSource<AuctionRealm> apply(@NonNull List<AuctionRealm> auctionRealms) throws
-                            Exception {
-                        return Observable.fromIterable(auctionRealms);
-                    }
-                })
-                .flatMapSingle(new Function<AuctionRealm, SingleSource<AuctionRealm>>() {
-                    @Override
-                    public SingleSource<AuctionRealm> apply(@NonNull AuctionRealm auctionRealm) throws Exception {
-                        return Single.just(auctionRealm)
-                                .zipWith(mRealmHelper.getRealmById(auctionRealm.getId()),
-                                        new BiFunction<AuctionRealm, Realm, AuctionRealm>() {
-                                            @Override
-                                            public AuctionRealm apply(@NonNull AuctionRealm auctionRealm, @NonNull
-                                                    Realm realm) throws Exception {
-                                                auctionRealm.setRealm(realm);
-                                                return auctionRealm;
-                                            }
-                                        });
-                    }
-                })
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapSingle(auctionRealm -> Single.just(auctionRealm)
+                        .zipWith(mRealmHelper.getRealmById(auctionRealm.getId()), (auctionRealm1, realm) -> {
+                            auctionRealm1.setRealm(realm);
+                            return auctionRealm1;
+                        }))
                 .toList()
                 .toObservable();
     }
@@ -210,28 +145,20 @@ public class BnadeRepo {
 
     private Observable<List<Hot>> getHotRemote(final int type) {
         return api.getHot().toObservable()
-                .map(new Function<List<Hot>, SparseArray<List<Hot>>>() {
-                    @Override
-                    public SparseArray<List<Hot>> apply(@NonNull List<Hot> hots) throws Exception {
-                        SparseArray<List<Hot>> map = hotCache;
-                        map.clear();
-                        for (Hot hot : hots) {
-                            List<Hot> typeList = map.get(hot.getType());
-                            if (typeList == null) {
-                                typeList = new ArrayList<>();
-                                map.put(hot.getType(), typeList);
-                            }
-                            typeList.add(hot);
+                .map(hots -> {
+                    SparseArray<List<Hot>> map = hotCache;
+                    map.clear();
+                    for (Hot hot : hots) {
+                        List<Hot> typeList = map.get(hot.getType());
+                        if (typeList == null) {
+                            typeList = new ArrayList<>();
+                            map.put(hot.getType(), typeList);
                         }
-                        return map;
+                        typeList.add(hot);
                     }
+                    return map;
                 })
-                .map(new Function<SparseArray<List<Hot>>, List<Hot>>() {
-                    @Override
-                    public List<Hot> apply(@NonNull SparseArray<List<Hot>> listSparseArray) throws Exception {
-                        return listSparseArray.get(type);
-                    }
-                });
+                .map(listSparseArray -> listSparseArray.get(type));
     }
 
     private Observable<SearchResultVO> searchCache(@NonNull Item item) {
@@ -241,38 +168,24 @@ public class BnadeRepo {
 
     private Single<SearchResultVO> searchRemote(@NonNull Item item, Realm realm) {
         if (realm == null) {
-            return Single.zip(getAuction(item.getId()), Single
-                    .just(item), new BiFunction<List<AuctionItem>, Item, SearchResultVO>() {
-                @Override
-                public SearchResultVO apply(@NonNull List<AuctionItem> auctionItems, @NonNull
-                        Item item)
-                        throws Exception {
-                    mSearchResultVO.reset();
-                    mSearchResultVO.setItem(item);
-                    mSearchResultVO.setAuctionItems(auctionItems);
-                    return mSearchResultVO;
-                }
+            return Single.zip(getAuction(item), Single
+                    .just(item), (auctionItems, item1) -> {
+                mSearchResultVO.reset();
+                mSearchResultVO.setItem(item1);
+                mSearchResultVO.setAuctionItems(auctionItems);
+                return mSearchResultVO;
             });
         }
         return Single.zip(api.getAuctionRealmItem(realm.getId(), item.getId()), Single.just(item),
                 api.getAuctionPastRealmItem(realm.getId(), item.getId()),
                 api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
-                new Function4<List<AuctionRealmItem>, Item, List<AuctionHistory>, List<AuctionHistory>,
-                        SearchResultVO>() {
-
-
-                    @Override
-                    public SearchResultVO apply(@NonNull List<AuctionRealmItem> auctionRealmItems, @NonNull Item
-                            item, @NonNull List<AuctionHistory> auctionHistories, @NonNull List<AuctionHistory>
-                                                        auctionHistories2) throws Exception {
-                        mSearchResultVO.reset();
-                        mSearchResultVO.setItem(item);
-                        mSearchResultVO.setAuctionRealmItems(auctionRealmItems);
-                        mSearchResultVO.setAuctionHistories(auctionHistories2);
-                        mSearchResultVO.setAuctionPast(auctionHistories);
-                        return mSearchResultVO;
-                    }
-
+                (auctionRealmItems, item12, auctionHistories, auctionHistories2) -> {
+                    mSearchResultVO.reset();
+                    mSearchResultVO.setItem(item12);
+                    mSearchResultVO.setAuctionRealmItems(auctionRealmItems);
+                    mSearchResultVO.setAuctionHistories(auctionHistories2);
+                    mSearchResultVO.setAuctionPast(auctionHistories);
+                    return mSearchResultVO;
                 });
     }
 

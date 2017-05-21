@@ -1,5 +1,7 @@
 package com.summer.bnade.result.all;
 
+import com.summer.lib.model.entity.Item;
+
 import dagger.Module;
 import dagger.Provides;
 
@@ -8,25 +10,22 @@ import dagger.Provides;
  */
 @Module
 class SearchResultModule {
-    private final SearchResultContract.View mView;
+    private final SearchResultActivity mView;
+    private final Item item;
 
-    SearchResultModule(SearchResultContract.View view) {
+    SearchResultModule(SearchResultActivity view, Item item) {
+        this.item = item;
         this.mView = view;
     }
 
     @Provides
-    SearchResultContract.View provideResultView() {
+    SearchResultActivity provideResultView() {
         return mView;
     }
 
     @Provides
-    SearchResultContract.Presenter providePresenter(SearchResultPresenter presenter) {
-        return presenter;
-    }
-
-    @Provides
     SearchResultAdapter provideAdapter() {
-        return new SearchResultAdapter();
+        return new SearchResultAdapter(item);
     }
 
 }

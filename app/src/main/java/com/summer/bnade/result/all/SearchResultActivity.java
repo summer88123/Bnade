@@ -9,7 +9,6 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,27 +17,25 @@ import com.github.mikephil.charting.charts.CombinedChart;
 import com.github.mikephil.charting.charts.CombinedChart.DrawOrder;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.YAxis;
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseViewActivity;
+import com.summer.bnade.base.BaseActivity;
 import com.summer.bnade.base.di.ComponentHolder;
-import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Gold;
 import com.summer.lib.model.entity.Item;
-import com.summer.lib.model.entity.Realm;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
-public class SearchResultActivity extends BaseViewActivity<SearchResultContract.Presenter> implements
-        SearchResultContract.View, SearchView.OnQueryTextListener {
+public class SearchResultActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-    @Inject
-    SearchResultAdapter mResultAdapter;
     @BindView(R.id.list)
     RecyclerView mList;
     @BindView(R.id.collapsing_toolbar_layout)
@@ -50,32 +47,35 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     @BindView(R.id.chart)
     CombinedChart mChart;
 
+    @Inject
+    SearchResultAdapter mResultAdapter;
+    @Inject
+    SearchResultTransformer mPresenter;
+
     Item item;
-    Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
-        realm = getIntent().getParcelableExtra(Content.EXTRA_SUB_DATA);
+        super.onCreate(savedInstanceState);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mPresenter.load(item, realm);
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        mPresenter.filter(query, item, realm);
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        mPresenter.filter(newText, item, realm);
-        return true;
+        Single.just(item)
+                .compose(mPresenter.list())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(result -> {
+                    mResultAdapter.update(result.getAuctionItems());
+                    Gold avgBuyout = result.getAvg();
+                    mTvAvgBuyout.setText(getString(R.string.result_avg_buyout,
+                            getString(R.string.full_gold, avgBuyout.getGold(), avgBuyout.getSilver(), avgBuyout
+                                    .getCopper())));
+                    mChart.setData(ChartHelper
+                            .generateCombinedData(SearchResultActivity.this, result.getLines(), result.getBars()));
+                    mChart.animateXY(1000, 1000);
+                });
     }
 
     @Override
@@ -88,6 +88,8 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
         initToolbar();
         mList.setAdapter(mResultAdapter);
         initChart();
+        Glide.with(SearchResultActivity.this).load(item.getUrl()).into(mIvItemIcon);
+        mCollapsingToolbarLayout.setTitle(item.getName());
     }
 
     private void initChart() {
@@ -126,11 +128,16 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_search_result, menu);
-
         MenuItem search = menu.findItem(R.id.action_filter);
         SearchView searchView = (SearchView) search.getActionView();
-        searchView.setOnQueryTextListener(this);
         searchView.setQueryHint(getString(R.string.search_result_filter_hint));
+        RxSearchView.queryTextChangeEvents(searchView)
+                .publish()
+                .autoConnect()
+                .compose(mPresenter.filter(item))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mResultAdapter::update);
+
         return true;
     }
 
@@ -146,31 +153,13 @@ public class SearchResultActivity extends BaseViewActivity<SearchResultContract.
     }
 
     @Override
-    public void show(SearchResultVO result) {
-        mResultAdapter.update(result.getAuctionItems());
-        Glide.with(this).load(result.getItem().getUrl()).into(mIvItemIcon);
-        Gold avgBuyout = result.getAvgBuyout();
-        mTvAvgBuyout.setText(getString(R.string.result_avg_buyout,
-                getString(R.string.full_gold, avgBuyout.getGold(), avgBuyout.getSilver(), avgBuyout.getCopper())));
-        mChart.setData(result.getCombinedData());
-        mChart.invalidate();
-        mCollapsingToolbarLayout.setTitle(result.getItem().getName());
-    }
-
-    @Override
     public void injectComponent() {
         DaggerSearchResultComponent.builder().appComponent(ComponentHolder.getComponent())
-                .searchResultModule(new SearchResultModule(this)).build().inject(this);
+                .searchResultModule(new SearchResultModule(this, item)).build().inject(this);
     }
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
         setTitle("");
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
     }
 }

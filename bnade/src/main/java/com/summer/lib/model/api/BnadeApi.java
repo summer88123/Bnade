@@ -25,7 +25,7 @@ public interface BnadeApi {
 
     String BASE_URL = "https://www.bnade.com/wow/";
     String BASE_ICON_URL = "http://content.battlenet.com.cn/wow/icons/56/";
-
+    String BASE_WEB_ITEM_URL = "https://www.bnade.com/wow/item/%1$s?tooltip=true";
     /**
      * 通过物品名查询物品，不支持模糊
      * @param name 物品名称

@@ -16,6 +16,14 @@ import io.reactivex.functions.Consumer;
 public class RxUtil {
     private static final String TAG = RxUtil.class.getSimpleName();
 
+    public static abstract class DataConsumer<T, D> implements Consumer<T> {
+        protected D data;
+
+        public void setData(D data) {
+            this.data = data;
+        }
+    }
+
     public static class BaseErrorHandler implements Consumer<Throwable> {
         BaseView mBaseView;
 
