@@ -3,6 +3,7 @@ package com.summer.bnade.select;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.summer.bnade.R;
@@ -11,6 +12,8 @@ import com.summer.bnade.base.BaseViewHolder;
 import com.summer.bnade.select.entity.TypedRealm;
 import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -18,9 +21,11 @@ import butterknife.OnClick;
 class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> implements
         StickyRecyclerHeadersAdapter<RealmAdapter.HeaderViewHolder> {
     private RealmSelectContract.View view;
+    private RealmSelectContract.Presenter mPresenter;
 
-    RealmAdapter(RealmSelectContract.View view) {
+    RealmAdapter(RealmSelectContract.View view, RealmSelectContract.Presenter presenter) {
         this.view = view;
+        this.mPresenter = presenter;
     }
 
     @Override
@@ -48,6 +53,12 @@ class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> impl
         holder.label.setText(getItem(position).getType());
     }
 
+    @Override
+    public void remove(int position) {
+        TypedRealm item = getItem(position);
+        mPresenter.remove(item.getRealm());
+        super.remove(position);
+    }
 
     class HeaderViewHolder extends RecyclerView.ViewHolder {
         TextView label;
@@ -61,6 +72,8 @@ class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> impl
     public class ViewHolder extends BaseViewHolder<TypedRealm> {
         @BindView(R.id.content)
         TextView mContent;
+        @BindView(R.id.imageButton)
+        ImageButton mImageButton;
 
         public ViewHolder(View view) {
             super(view);
@@ -70,6 +83,16 @@ class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> impl
         @Override
         public void onBind(TypedRealm realm) {
             mContent.setText(realm.getConnected());
+            if (Objects.equals(realm.getType(), TypedRealm.LABEL_USED)) {
+                mImageButton.setVisibility(View.VISIBLE);
+            } else {
+                mImageButton.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        @OnClick(R.id.imageButton)
+        public void onImageButtonClick() {
+            remove(getAdapterPosition());
         }
 
         @OnClick(R.id.layout)

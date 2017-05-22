@@ -2,8 +2,6 @@ package com.summer.bnade.select;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
@@ -45,14 +43,14 @@ public class RealmSelectFragment extends BaseViewFragment<RealmSelectContract.Pr
 
     @Override
     public void setUpView() {
-        mAdapter = new RealmAdapter(this);
+        mAdapter = new RealmAdapter(this, mPresenter);
         mList.setAdapter(mAdapter);
         mList.addItemDecoration(new StickyRecyclerHeadersDecoration(mAdapter));
         ItemTouchHelper.Callback callback = new ItemTouchHelper.Callback() {
             @Override
             public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
                 return makeMovementFlags(0, mAdapter.getItem(viewHolder.getAdapterPosition()).getType()
-                        .equals(TypedRealm.LABEL_USED) ? ItemTouchHelper.RIGHT : 0);
+                        .equals(TypedRealm.LABEL_USED) ? ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT : 0);
             }
 
             @Override
@@ -65,7 +63,6 @@ public class RealmSelectFragment extends BaseViewFragment<RealmSelectContract.Pr
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
                 mAdapter.remove(position);
-                mPresenter.remove(mAdapter.getItem(position).getRealm());
             }
 
         };
@@ -74,8 +71,8 @@ public class RealmSelectFragment extends BaseViewFragment<RealmSelectContract.Pr
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onStart() {
+        super.onStart();
         mPresenter.load();
     }
 

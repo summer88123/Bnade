@@ -46,4 +46,6 @@
     <string name="label_one_day">@string/wow_token_one_day</string>
     <string name="label_week">一周内</string>
     <string name="label_history">@string/wow_token_history</string>
+    <string name="delete_used_realm">删除%1$s</string>
+    <string name="revoked">撤销</string>
 </resources>

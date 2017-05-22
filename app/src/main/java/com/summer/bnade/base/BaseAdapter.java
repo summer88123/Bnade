@@ -14,8 +14,8 @@ import java.util.List;
  */
 
 public abstract class BaseAdapter<I, H extends BaseViewHolder<I>> extends RecyclerView.Adapter<H> {
-    private List<I> data;
     protected LayoutInflater mInflater;
+    private List<I> data;
     private BaseDiffCallback mCallback;
 
     public BaseAdapter() {
@@ -41,6 +41,11 @@ public abstract class BaseAdapter<I, H extends BaseViewHolder<I>> extends Recycl
         return data.size();
     }
 
+    public void add(int position, I item) {
+        data.add(position, item);
+        notifyItemInserted(position);
+    }
+
     public I getItem(int position) {
         return data.get(position);
     }
@@ -48,21 +53,6 @@ public abstract class BaseAdapter<I, H extends BaseViewHolder<I>> extends Recycl
     public void remove(int position) {
         data.remove(position);
         notifyItemRemoved(position);
-    }
-
-    protected abstract int layoutId();
-
-    protected abstract H createViewHolder(View v, int viewType);
-
-    private BaseDiffCallback createDiffCallBack() {
-        return new BaseDiffCallback();
-    }
-
-    private BaseDiffCallback getCallback() {
-        if (mCallback == null) {
-            mCallback = createDiffCallBack();
-        }
-        return mCallback;
     }
 
     public void update(List<I> newData) {
@@ -78,6 +68,21 @@ public abstract class BaseAdapter<I, H extends BaseViewHolder<I>> extends Recycl
             data.addAll(newData);
             result.dispatchUpdatesTo(this);
         }
+    }
+
+    protected abstract H createViewHolder(View v, int viewType);
+
+    protected abstract int layoutId();
+
+    private BaseDiffCallback createDiffCallBack() {
+        return new BaseDiffCallback();
+    }
+
+    private BaseDiffCallback getCallback() {
+        if (mCallback == null) {
+            mCallback = createDiffCallBack();
+        }
+        return mCallback;
     }
 
     private class BaseDiffCallback extends DiffUtil.Callback {
