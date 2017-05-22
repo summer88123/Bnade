@@ -135,7 +135,7 @@ public class MainActivity extends BaseActivity
         if (id == R.id.btn_item_search) {
             showSearch();
         } else if (id == R.id.btn_token) {
-            WowTokenFragment token = (WowTokenFragment) mMainComponent.wowTokenView();
+            WowTokenFragment token = mMainComponent.wowTokenView();
             fm.beginTransaction().replace(R.id.content_main, token, WowTokenFragment.TAG).commit();
         } else if (id == R.id.btn_realm_rank) {
             RealmRankFragment token = (RealmRankFragment) mMainComponent.realmRankView();

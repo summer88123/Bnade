@@ -18,8 +18,9 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout;
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseViewFragment;
+import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.home.MainComponent;
 import com.summer.bnade.home.Provider;
 import com.summer.bnade.token.entity.WowTokenVO;
@@ -30,13 +31,15 @@ import com.summer.bnade.utils.ScreenUtil;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
+import io.reactivex.Observable;
 
-public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presenter> implements WowTokenContract.View,
-        SwipeRefreshLayout.OnRefreshListener {
+public class WowTokenFragment extends BaseFragment {
     public static final String TAG = WowTokenFragment.class.getSimpleName();
     @BindView(R.id.tv_cur_price)
     TextView mTvCurPrice;
@@ -59,8 +62,10 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
     CardView mCardView2;
     @BindView(R.id.cardView3)
     CardView mCardView3;
-    @BindColor(R.color.pve_label)
+    @BindColor(R.color.wow_token)
     int blue;
+    @BindColor(R.color.gold)
+    int gold;
 
     @BindViews({R.id.cardView1, R.id.cardView2, R.id.cardView3})
     List<CardView> mCardViewList;
@@ -69,6 +74,9 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
         view.setAlpha(1f);
         view.setTranslationY(value);
     };
+
+    @Inject
+    WowTokenTransformer mPresenter;
 
     public static WowTokenFragment getInstance(FragmentManager fm) {
         WowTokenFragment fragment = (WowTokenFragment) fm.findFragmentByTag(TAG);
@@ -91,54 +99,37 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
     public void onStart() {
         super.onStart();
         hideCardView();
-        mPresenter.load();
+        Observable.just(new Object())
+                .compose(mPresenter.load())
+                .subscribe(this::show);
     }
 
-    @Override
-    public void showCurrentToken(WowTokenVO current) {
-        mTvCurPrice.setText(getString(R.string.gold, current.getCurrentGold()));
-        mTvModifiedTime.setText(DateUtil.format(current.getLastModified(), "M月d日 H:mm"));
-        mTvMinPrice.setText(getString(R.string.gold, current.getMinGold()));
-        mTvMaxPrice.setText(getString(R.string.gold, current.getMaxGold()));
-        animateIn(mCardView1, 0);
+    public void show(WowTokenVO current) {
+        mRefreshLayout.setRefreshing(current.isInProgress());
+        if (!current.isInProgress())
+            if (current.isSuccess()) {
+                mTvCurPrice.setText(getString(R.string.gold, current.getCurrentGold()));
+                mTvModifiedTime.setText(DateUtil.format(current.getLastModified(), "M月d日 H:mm"));
+                mTvMinPrice.setText(getString(R.string.gold, current.getMinGold()));
+                mTvMaxPrice.setText(getString(R.string.gold, current.getMaxGold()));
+                animateIn(mCardView1, 0);
+                showOneDayChart(current.getOneDayTokens());
+                showHistoryChart(current.getAllTokens());
+            } else {
+                showToast(current.getErrorMsg());
+            }
     }
 
-    @Override
     public void showHistoryChart(List<Entry> allTokens) {
         setupChartData(allTokens, mChartHistory);
         mChartHistory.animateXY(1500, 1500);
         animateIn(mCardView3, 300);
     }
 
-    @Override
     public void showOneDayChart(List<Entry> data) {
         setupChartData(data, mChart);
         mChart.animateXY(1000, 1000);
         animateIn(mCardView2, 150);
-    }
-
-    @Override
-    public void refreshOver() {
-        mRefreshLayout.setRefreshing(false);
-    }
-
-    @Override
-    public void refreshStart() {
-        mRefreshLayout.post(() -> mRefreshLayout.setRefreshing(true));
-    }
-
-    @Override
-    public void onRefresh() {
-        animateOut(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                hideCardView();
-                mChartHistory.setScaleX(1);
-                mChart.setScaleX(1);
-                mPresenter.load();
-            }
-        });
     }
 
     @Override
@@ -149,8 +140,18 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
     @Override
     public void setUpView() {
         DefaultViewUtil.defaultRefresh(mRefreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
-
+        RxSwipeRefreshLayout.refreshes(mRefreshLayout)
+                .doOnNext(o -> animateOut(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        hideCardView();
+                        mChartHistory.setScaleX(1);
+                        mChart.setScaleX(1);
+                    }
+                }))
+                .compose(mPresenter.load())
+                .subscribe(this::show);
         setupChart(mChart, "HH:mm");
         setupChart(mChartHistory, "MM-dd");
     }
@@ -192,6 +193,7 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
         y.setPosition(YAxis.YAxisLabelPosition.INSIDE_CHART);
         y.setDrawGridLines(false);
         y.setDrawAxisLine(false);
+        y.setTextColor(gold);
         y.setValueFormatter(new ChartHelper.GoldAxisFormatter(true));
 
         XAxis x = chart.getXAxis();
@@ -231,5 +233,4 @@ public class WowTokenFragment extends BaseViewFragment<WowTokenContract.Presente
             chart.setData(data1);
         }
     }
-
 }

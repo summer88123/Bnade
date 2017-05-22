@@ -1,8 +1,14 @@
 package com.summer.lib.model.entity;
 
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
+
+import com.summer.lib.R;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -98,5 +104,12 @@ public class Gold implements Parcelable, Comparable<Gold> {
             silver = (int) (money % 10000 / 100);
         }
         return format.format(silver);
+    }
+
+    public static Spannable showSpan(Context context,  int gold) {
+        ImageSpan goldSpan = new ImageSpan(context, R.mipmap.gold);
+        Spannable result = new SpannableString(context.getString(R.string.gold, gold));
+        result.setSpan(goldSpan, result.length() -1, result.length(),Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return result;
     }
 }

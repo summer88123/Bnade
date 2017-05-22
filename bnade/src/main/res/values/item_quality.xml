@@ -9,4 +9,29 @@
     <color name="artifact">#e6cc80</color>
     <color name="heirloom">#00ccff</color>
     <color name="wow_token">#00ccff</color>
+
+    <color name="warrior">#C79C6E</color>
+    <color name="warlock">#9482C9</color>
+    <color name="shaman">#0070DE</color>
+    <color name="rogue">#FFF569</color>
+    <color name="priest">#FFFFFF</color>
+    <color name="paladin">#F58CBA</color>
+    <color name="monk">#00FF96</color>
+    <color name="mage">#69CCF0</color>
+    <color name="hunter">#ABD473</color>
+    <color name="druid">#FF7D0A</color>
+    <color name="demon_hunter">#A330C9</color>
+    <color name="death_knight">#C41F3B</color>
+
+    <color name="alliance">#0078ff</color>
+    <color name="horde">#b30000</color>
+
+    <color name="classic">#fff468</color>
+    <color name="the_burning_crusade">#aad372</color>
+    <color name="wrath_of_the_lich_king">#68ccef</color>
+    <color name="cataclysm">#ff7c0a</color>
+
+    <color name="gold">#FFD700</color>
+    <color name="silver">#C0C0C0</color>
+    <color name="copper">#C47222</color>
 </resources>

@@ -17,7 +17,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="8dp"
             >
 
             <android.support.v7.widget.CardView
@@ -35,6 +34,7 @@
                     <TextView
                         android:id="@+id/tv_cur_price"
                         style="@style/AppTheme.Wowtoken.Text.Gold"
+                        android:textColor="@color/gold"
                         tools:text="25000G"
                         />
 
@@ -68,6 +68,7 @@
                     <TextView
                         android:id="@+id/tv_min_price"
                         style="@style/AppTheme.Wowtoken.Text.Gold"
+                        android:textColor="@color/gold"
                         app:layout_constraintHorizontal_chainStyle="spread"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toLeftOf="@+id/textView2"
@@ -78,6 +79,7 @@
                     <TextView
                         android:id="@+id/tv_max_price"
                         style="@style/AppTheme.Wowtoken.Text.Gold"
+                        android:textColor="@color/gold"
                         app:layout_constraintBottom_toBottomOf="@+id/tv_min_price"
                         app:layout_constraintLeft_toRightOf="@+id/textView2"
                         app:layout_constraintRight_toRightOf="parent"
@@ -89,6 +91,7 @@
                         android:id="@+id/textView2"
                         style="@style/AppTheme.Wowtoken.Text.Gold"
                         android:text="@string/scope"
+                        android:textColor="@color/gold"
                         app:layout_constraintBottom_toBottomOf="@+id/tv_min_price"
                         app:layout_constraintLeft_toRightOf="@+id/tv_min_price"
                         app:layout_constraintRight_toLeftOf="@+id/tv_max_price"
@@ -110,6 +113,7 @@
             <android.support.v7.widget.CardView
                 android:id="@+id/cardView3"
                 style="@style/AppTheme.Wowtoken.CardView"
+                android:layout_marginBottom="8dp"
                 >
 
                 <android.support.constraint.ConstraintLayout

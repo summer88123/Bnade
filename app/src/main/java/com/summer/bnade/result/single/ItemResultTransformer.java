@@ -22,11 +22,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.SingleTransformer;
-import io.reactivex.annotations.NonNull;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 
 /**
@@ -35,19 +31,11 @@ import io.reactivex.functions.Function;
 
 class ItemResultTransformer {
 
-    private Comparator<AuctionHistory> goldComparator = new Comparator<AuctionHistory>() {
-        @Override
-        public int compare(AuctionHistory o1, AuctionHistory o2) {
-            return (int) (o1.getMinBuyout().getMoney() - o2.getMinBuyout().getMoney());
-        }
-    };
+    private Comparator<AuctionHistory> goldComparator = (o1, o2) -> (int) (o1.getMinBuyout().getMoney() - o2
+            .getMinBuyout().getMoney());
 
-    private Comparator<AuctionHistory> timeComparator = new Comparator<AuctionHistory>() {
-        @Override
-        public int compare(AuctionHistory o1, AuctionHistory o2) {
-            return (int) (o1.getLastModifited() - o2.getLastModifited());
-        }
-    };
+    private Comparator<AuctionHistory> timeComparator = (o1, o2) -> (int) (o1.getLastModifited() - o2
+            .getLastModifited());
 
     private BnadeRepo mRepo;
 
@@ -57,60 +45,23 @@ class ItemResultTransformer {
     }
 
     SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO> history() {
-        return new SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO>() {
-            @Override
-            public SingleSource<AuctionHistoryVO> apply(@NonNull Single<Pair<Item, Realm>> upstream) {
-                return upstream
-                        .flatMap(new Function<Pair<Item, Realm>, SingleSource<Pair<List<AuctionHistory>,
-                                List<AuctionHistory>>>>() {
-                            @Override
-                            public SingleSource<Pair<List<AuctionHistory>, List<AuctionHistory>>> apply(@NonNull
-                                                                                                                Pair<Item, Realm> itemRealmPair) throws Exception {
-                                return mRepo.getAuctionPastAndHistory(itemRealmPair.first, itemRealmPair.second);
-                            }
-                        })
-                        .map(new Function<Pair<List<AuctionHistory>, List<AuctionHistory>>, AuctionHistoryVO>() {
-                            @Override
-                            public AuctionHistoryVO apply(@NonNull Pair<List<AuctionHistory>, List<AuctionHistory>>
-                                                                  listListPair) throws Exception {
-                                AuctionHistoryVO result = new AuctionHistoryVO();
-                                computeHistory(listListPair.second, result);
-                                computePast(listListPair.first, result);
-                                return result;
-                            }
-                        });
-            }
-        };
+        return upstream -> upstream
+                .flatMap(itemRealmPair -> mRepo.getAuctionPastAndHistory(itemRealmPair.first, itemRealmPair.second))
+                .map((Function<Pair<List<AuctionHistory>, List<AuctionHistory>>, AuctionHistoryVO>) listListPair -> {
+                    AuctionHistoryVO result = new AuctionHistoryVO();
+                    computeHistory(listListPair.second, result);
+                    computePast(listListPair.first, result);
+                    return result;
+                });
     }
 
     SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>> price() {
-        return new SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>>() {
-            @Override
-            public SingleSource<List<AuctionRealmItem>> apply(@NonNull Single<Pair<Item, Realm>>
-                                                                      upstream) {
-                return upstream
-                        .flatMap(new Function<Pair<Item, Realm>, SingleSource<? extends List<AuctionRealmItem>>>() {
-
-
-                            @Override
-                            public SingleSource<? extends List<AuctionRealmItem>> apply(@NonNull Pair<Item, Realm>
-                                                                                                itemRealmPair) throws
-                                    Exception {
-                                return mRepo.getAuctionRealmItem(itemRealmPair.first, itemRealmPair.second);
-                            }
-                        })
-                        .map(new Function<List<AuctionRealmItem>, List<AuctionRealmItem>>() {
-                            @Override
-                            public List<AuctionRealmItem> apply(@NonNull List<AuctionRealmItem> auctionRealmItems)
-                                    throws Exception {
-                                return polySameRealmItem(auctionRealmItems);
-                            }
-                        });
-            }
-        };
+        return upstream -> upstream
+                .flatMap(itemRealmPair -> mRepo.getAuctionRealmItem(itemRealmPair.first, itemRealmPair.second))
+                .map(this::polySameRealmItem);
     }
 
-    private AuctionHistoryVO computeHistory(List<AuctionHistory> auctionHistories, AuctionHistoryVO result) {
+    private void computeHistory(List<AuctionHistory> auctionHistories, AuctionHistoryVO result) {
 
         Collections.sort(auctionHistories, goldComparator);
 
@@ -142,10 +93,9 @@ class ItemResultTransformer {
 
         result.setDataHistory(getCombinedData(listHistories));
 
-        return result;
     }
 
-    private AuctionHistoryVO computePast(List<AuctionHistory> auctionPast, AuctionHistoryVO result) {
+    private void computePast(List<AuctionHistory> auctionPast, AuctionHistoryVO result) {
 
         Collections.sort(auctionPast, goldComparator);
 
@@ -170,28 +120,17 @@ class ItemResultTransformer {
 
         result.setDataOneDay(getCombinedData(listOneDay));
 
-        return result;
     }
 
     @android.support.annotation.NonNull
     private CombinedData getCombinedData(List<AuctionHistory> auctionHistories) {
         CombinedData data = new CombinedData();
-        data.setData(ChartHelper.generateLineData(auctionHistories, new BiFunction<Integer, AuctionHistory, Entry>() {
-            @Override
-            public Entry apply(Integer index, @NonNull AuctionHistory auctionItem) throws
-                    Exception {
-                return new Entry(auctionItem.getLastModifited(), auctionItem.getMinBuyout()
-                        .getMoney(), auctionItem);
-            }
-        }));
-        data.setData(ChartHelper.generateBarData(auctionHistories, new BiFunction<Integer, AuctionHistory, BarEntry>() {
-            @Override
-            public BarEntry apply(@NonNull Integer integer, @NonNull AuctionHistory auctionItem)
-                    throws Exception {
-                return new BarEntry(auctionItem.getLastModifited(), auctionItem
-                        .getCount(), auctionItem);
-            }
-        }));
+        data.setData(ChartHelper.generateLineData(auctionHistories, (index, auctionItem) -> new Entry(auctionItem
+                .getLastModifited(), auctionItem.getMinBuyout()
+                .getMoney(), auctionItem)));
+        data.setData(ChartHelper.generateBarData(auctionHistories, (integer, auctionItem) -> new BarEntry(auctionItem
+                .getLastModifited(), auctionItem
+                .getCount(), auctionItem)));
         return data;
     }
 
@@ -213,16 +152,13 @@ class ItemResultTransformer {
             }
         }
 
-        Collections.sort(result, new Comparator<AuctionRealmItem>() {
-            @Override
-            public int compare(AuctionRealmItem o1, AuctionRealmItem o2) {
-                long result = o1.getUnitBuyout().getMoney() - o2.getUnitBuyout().getMoney();
-                if (result == 0) {
-                    result = o1.getUnitBidPrice().getMoney() - o2.getUnitBidPrice().getMoney();
-                }
-                if (result > 0) return 1;
-                else return result == 0 ? 0 : -1;
+        Collections.sort(result, (o1, o2) -> {
+            long result1 = o1.getUnitBuyout().getMoney() - o2.getUnitBuyout().getMoney();
+            if (result1 == 0) {
+                result1 = o1.getUnitBidPrice().getMoney() - o2.getUnitBidPrice().getMoney();
             }
+            if (result1 > 0) return 1;
+            else return result1 == 0 ? 0 : -1;
         });
         return result;
     }

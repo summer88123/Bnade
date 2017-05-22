@@ -8,19 +8,14 @@ import dagger.Provides;
  */
 @Module
 public class WowTokenModule {
-    private final WowTokenContract.View mView;
+    private final WowTokenFragment mView;
 
-    public WowTokenModule(WowTokenContract.View view) {
+    public WowTokenModule(WowTokenFragment view) {
         mView = view;
     }
 
     @Provides
-    WowTokenContract.Presenter providePresenter(WowTokenPresenter presenter) {
-        return presenter;
-    }
-
-    @Provides
-    WowTokenContract.View provideWowTokenView(){
+    WowTokenFragment provideWowTokenView(){
         return mView;
     }
 }

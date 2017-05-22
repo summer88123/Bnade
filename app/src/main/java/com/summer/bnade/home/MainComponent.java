@@ -11,7 +11,6 @@ import com.summer.bnade.realmrank.RealmRankModule;
 import com.summer.bnade.search.SearchContract;
 import com.summer.bnade.search.SearchFragment;
 import com.summer.bnade.search.SearchModule;
-import com.summer.bnade.token.WowTokenContract;
 import com.summer.bnade.token.WowTokenFragment;
 import com.summer.bnade.token.WowTokenModule;
 
@@ -40,7 +39,7 @@ public interface MainComponent {
 
     void inject(PlayerItemFragment fragment);
 
-    WowTokenContract.View wowTokenView();
+    WowTokenFragment wowTokenView();
 
     SearchContract.View searchView();
 

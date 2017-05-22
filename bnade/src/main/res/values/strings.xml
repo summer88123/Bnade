@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">bnade</string>
+    <string name="gold">%1$d金</string>
+    <string name="full_gold">%1$s金%2$s银%3$s铜</string>
 </resources>
