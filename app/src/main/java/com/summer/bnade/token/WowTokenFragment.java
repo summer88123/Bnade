@@ -18,12 +18,13 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.jakewharton.rxbinding2.internal.Notification;
 import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.home.MainComponent;
 import com.summer.bnade.home.Provider;
-import com.summer.bnade.token.entity.WowTokenVO;
+import com.summer.bnade.token.entity.WowTokenUIModel;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.bnade.utils.DefaultViewUtil;
@@ -99,12 +100,12 @@ public class WowTokenFragment extends BaseFragment {
     public void onStart() {
         super.onStart();
         hideCardView();
-        Observable.just(new Object())
+        Observable.just(Notification.INSTANCE)
                 .compose(mPresenter.load())
                 .subscribe(this::show);
     }
 
-    public void show(WowTokenVO current) {
+    private void show(WowTokenUIModel current) {
         mRefreshLayout.setRefreshing(current.isInProgress());
         if (!current.isInProgress())
             if (current.isSuccess()) {
@@ -139,6 +140,8 @@ public class WowTokenFragment extends BaseFragment {
 
     @Override
     public void setUpView() {
+        setupChart(mChart, "HH:mm");
+        setupChart(mChartHistory, "MM-dd");
         DefaultViewUtil.defaultRefresh(mRefreshLayout);
         RxSwipeRefreshLayout.refreshes(mRefreshLayout)
                 .doOnNext(o -> animateOut(new AnimatorListenerAdapter() {
@@ -152,8 +155,6 @@ public class WowTokenFragment extends BaseFragment {
                 }))
                 .compose(mPresenter.load())
                 .subscribe(this::show);
-        setupChart(mChart, "HH:mm");
-        setupChart(mChartHistory, "MM-dd");
     }
 
     private void animateIn(CardView cardView, int startDelay) {

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -76,12 +77,6 @@ public class MainActivity extends BaseActivity
         return mMainComponent;
     }
 
-    private void selectSearch() {
-        showSearch();
-        navigationView.setCheckedItem(R.id.btn_item_search);
-        setTitle(R.string.item_search);
-    }
-
     @Override
     public void injectComponent() {
         fm = getSupportFragmentManager();
@@ -133,21 +128,31 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.btn_item_search) {
-            showSearch();
+            SearchFragment search = (SearchFragment) mMainComponent.searchView();
+            fm.beginTransaction().setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
+                    .replace(R.id.content_main, search, SearchFragment.TAG).commit();
         } else if (id == R.id.btn_token) {
             WowTokenFragment token = mMainComponent.wowTokenView();
-            fm.beginTransaction().replace(R.id.content_main, token, WowTokenFragment.TAG).commit();
+            fm.beginTransaction()
+                    .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
+                    .replace(R.id.content_main, token, WowTokenFragment.TAG)
+                    .commit();
         } else if (id == R.id.btn_realm_rank) {
             RealmRankFragment token = (RealmRankFragment) mMainComponent.realmRankView();
-            fm.beginTransaction().replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
+            fm.beginTransaction()
+                    .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
+                    .replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
         } else if (id == R.id.btn_player_item) {
             PlayerItemFragment player = (PlayerItemFragment) mMainComponent.playerItemView();
-            fm.beginTransaction().replace(R.id.content_main, player, PlayerItemFragment.TAG).commit();
+            fm.beginTransaction()
+                    .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
+                    .replace(R.id.content_main, player, PlayerItemFragment.TAG).commit();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
         }
+
         setTitle(item.getTitle());
         drawer.closeDrawer(GravityCompat.START);
         closeSoftInput();
@@ -159,9 +164,12 @@ public class MainActivity extends BaseActivity
         imm.hideSoftInputFromWindow(drawer.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
-    private void showSearch() {
+    private void selectSearch() {
         SearchFragment search = (SearchFragment) mMainComponent.searchView();
-        fm.beginTransaction().replace(R.id.content_main, search, SearchFragment.TAG).commit();
+        fm.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .replace(R.id.content_main, search, SearchFragment.TAG).commit();
+        navigationView.setCheckedItem(R.id.btn_item_search);
+        setTitle(R.string.item_search);
     }
 
 }

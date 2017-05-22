@@ -7,9 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Bundle;
 import android.support.annotation.IdRes;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.ListPopupWindow;
@@ -17,7 +15,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
@@ -41,6 +38,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import icepick.Icicle;
 
 import static com.summer.bnade.R.id.searchView;
 
@@ -67,8 +65,9 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     ConstraintLayout mContent;
     @BindView(R.id.select_btn)
     RealmSelectButton mSelectBtn;
+    @Icicle
     @IdRes
-    private int mCurrentId = R.id.rb_month;
+    int mCurrentId = R.id.rb_month;
 
     public static SearchFragment getInstance(FragmentManager fm) {
         SearchFragment fragment = (SearchFragment) fm.findFragmentByTag(TAG);
@@ -82,7 +81,7 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Content.REQUEST_SELECT_REALM && resultCode == Activity.RESULT_OK && data != null) {
-            mSelectBtn.setRealm(data.<Realm>getParcelableExtra(Content.EXTRA_DATA));
+            mSelectBtn.setRealm(data.getParcelableExtra(Content.EXTRA_DATA));
         }
     }
 
@@ -96,14 +95,6 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            mCurrentId = savedInstanceState.getInt("CURRENT_ID");
-        }
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
@@ -113,12 +104,6 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     public void onResume() {
         super.onResume();
         mPresenter.updateHistory();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("CURRENT_ID", mCurrentId);
     }
 
     @Override
@@ -193,20 +178,14 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
         mFuzzyList.setAdapter(mFuzzyAdapter);
         mFuzzyList.setAnchorView(mSearchView);
         mFuzzyList.setModal(true);
-        mFuzzyList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView parent, View view, int position, long id) {
-                mFuzzyList.dismiss();
-                mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
-            }
+        mFuzzyList.setOnItemClickListener((parent, view, position, id) -> {
+            mFuzzyList.dismiss();
+            mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
         });
         mRgHotType.check(mCurrentId);
-        mRgHotType.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, @IdRes int i) {
-                mCurrentId = i;
-                mPresenter.updateHotSearchType(getHotType(i));
-            }
+        mRgHotType.setOnCheckedChangeListener((radioGroup, i) -> {
+            mCurrentId = i;
+            mPresenter.updateHotSearchType(getHotType(i));
         });
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

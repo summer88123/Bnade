@@ -8,7 +8,7 @@ import java.util.List;
  * Created by kevin.bai on 2017/4/9.
  */
 
-public class WowTokenVO {
+public class WowTokenUIModel {
 
     private final String errorMsg;
     private final boolean inProgress;
@@ -20,28 +20,28 @@ public class WowTokenVO {
     private List<Entry> oneDayTokens;
     private List<Entry> allTokens;
 
-    private WowTokenVO(boolean inProgress, boolean success, String errorMsg) {
+    private WowTokenUIModel(boolean inProgress, boolean success, String errorMsg) {
         this.inProgress = inProgress;
         this.success = success;
         this.errorMsg = errorMsg;
     }
 
-    private WowTokenVO(boolean inProgress, boolean success) {
+    private WowTokenUIModel(boolean inProgress, boolean success) {
         this.inProgress = inProgress;
         this.success = success;
         this.errorMsg = null;
     }
 
-    public static WowTokenVO inProgress() {
-        return new WowTokenVO(true, false);
+    public static WowTokenUIModel inProgress() {
+        return new WowTokenUIModel(true, false);
     }
 
-    public static WowTokenVO success() {
-        return new WowTokenVO(false, true);
+    public static WowTokenUIModel success() {
+        return new WowTokenUIModel(false, true);
     }
 
-    public static WowTokenVO failure(String errorMsg) {
-        return new WowTokenVO(false, false, errorMsg);
+    public static WowTokenUIModel failure(String errorMsg) {
+        return new WowTokenUIModel(false, false, errorMsg);
     }
 
     public List<Entry> getAllTokens() {

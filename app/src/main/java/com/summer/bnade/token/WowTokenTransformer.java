@@ -2,7 +2,7 @@ package com.summer.bnade.token;
 
 import com.github.mikephil.charting.data.Entry;
 import com.summer.bnade.data.BnadeRepo;
-import com.summer.bnade.token.entity.WowTokenVO;
+import com.summer.bnade.token.entity.WowTokenUIModel;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.WowTokens;
 
@@ -36,11 +36,11 @@ public class WowTokenTransformer {
                 .getGold() - t1.getGold();
     }
 
-    public ObservableTransformer<Object, WowTokenVO> load() {
+    public ObservableTransformer<Object, WowTokenUIModel> load() {
         return observable -> observable
                 .flatMap(o -> mRepo.getWowTokens()
                         .map(list -> {
-                            WowTokenVO token = WowTokenVO.success();
+                            WowTokenUIModel token = WowTokenUIModel.success();
                             List<WowTokens> oneDay = new ArrayList<>();
                             List<WowTokens> all = new ArrayList<>();
                             long temp = 0;
@@ -75,8 +75,8 @@ public class WowTokenTransformer {
                             return token;
                         })
                         .toObservable()
-                        .onErrorReturn(e -> WowTokenVO.failure(e.getMessage()))
+                        .onErrorReturn(e -> WowTokenUIModel.failure(e.getMessage()))
                         .observeOn(AndroidSchedulers.mainThread())
-                        .startWith(WowTokenVO.inProgress()));
+                        .startWith(WowTokenUIModel.inProgress()));
     }
 }
