@@ -44,7 +44,6 @@
             android:layout_marginRight="0dp"
             android:layout_marginTop="0dp"
             app:layoutManager="LinearLayoutManager"
-
             tools:context="com.summer.bnade.realmrank.RealmRankFragment"
             tools:listitem="@layout/fragment_item"
             />

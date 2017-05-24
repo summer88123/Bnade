@@ -18,6 +18,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
+import com.jakewharton.rxbinding2.support.v7.widget.SearchViewQueryTextEvent;
+import com.jakewharton.rxbinding2.widget.RxRadioGroup;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseViewFragment;
 import com.summer.bnade.home.MainComponent;
@@ -183,22 +186,15 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
             mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
         });
         mRgHotType.check(mCurrentId);
-        mRgHotType.setOnCheckedChangeListener((radioGroup, i) -> {
-            mCurrentId = i;
-            mPresenter.updateHotSearchType(getHotType(i));
-        });
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                search(s);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
+        RxRadioGroup.checkedChanges(mRgHotType)
+                .subscribe(i -> {
+                    mCurrentId = i;
+                    mPresenter.updateHotSearchType(getHotType(i));
+                });
+        RxSearchView.queryTextChangeEvents(mSearchView)
+                .filter(SearchViewQueryTextEvent::isSubmitted)
+                .map(event -> event.queryText().toString())
+                .subscribe(this::search);
     }
 
     @OnClick(R.id.ib_clear_histories)
@@ -223,7 +219,6 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
         }
     }
 
-
     private int getHotType(@IdRes int resId) {
         switch (resId) {
             case R.id.rb_week:
@@ -235,6 +230,4 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
                 return Hot.MONTH;
         }
     }
-
-
 }

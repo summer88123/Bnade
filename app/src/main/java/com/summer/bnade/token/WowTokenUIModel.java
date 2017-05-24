@@ -1,4 +1,4 @@
-package com.summer.bnade.token.entity;
+package com.summer.bnade.token;
 
 import com.github.mikephil.charting.data.Entry;
 

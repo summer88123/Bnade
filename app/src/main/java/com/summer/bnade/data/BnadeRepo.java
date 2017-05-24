@@ -68,8 +68,8 @@ public class BnadeRepo {
                 Pair::new);
     }
 
-    public Single<List<AuctionRealm>> getAuctionRealm(boolean useCache) {
-        return Observable.concat(getAuctionRealmCache(useCache), getAuctionRealmRemote()).firstOrError();
+    public Observable<List<AuctionRealm>> getAuctionRealm(boolean useCache) {
+        return Observable.concat(getAuctionRealmCache(useCache), getAuctionRealmRemote());
     }
 
     public Single<List<AuctionRealmItem>> getAuctionRealmItem(Item item, Realm realm) {

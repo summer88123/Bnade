@@ -24,7 +24,6 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.home.MainComponent;
 import com.summer.bnade.home.Provider;
-import com.summer.bnade.token.entity.WowTokenUIModel;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.bnade.utils.DefaultViewUtil;

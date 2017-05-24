@@ -52,7 +52,6 @@ public class MainActivity extends BaseActivity
     @Override
     public void setUpView() {
         setSupportActionBar(toolbar);
-
         fab.setOnClickListener(view -> {
             SearchFragment searchFragment = (SearchFragment) fm.findFragmentByTag(SearchFragment.TAG);
             if (searchFragment != null) {
@@ -121,7 +120,6 @@ public class MainActivity extends BaseActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
@@ -138,7 +136,7 @@ public class MainActivity extends BaseActivity
                     .replace(R.id.content_main, token, WowTokenFragment.TAG)
                     .commit();
         } else if (id == R.id.btn_realm_rank) {
-            RealmRankFragment token = (RealmRankFragment) mMainComponent.realmRankView();
+            RealmRankFragment token = mMainComponent.realmRankView();
             fm.beginTransaction()
                     .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
                     .replace(R.id.content_main, token, RealmRankFragment.TAG).commit();

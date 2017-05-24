@@ -23,7 +23,6 @@ import java.util.List;
 import javax.inject.Inject;
 
 import io.reactivex.SingleTransformer;
-import io.reactivex.functions.Function;
 
 /**
  * Created by kevin.bai on 2017/4/28.
@@ -47,7 +46,7 @@ class ItemResultTransformer {
     SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO> history() {
         return upstream -> upstream
                 .flatMap(itemRealmPair -> mRepo.getAuctionPastAndHistory(itemRealmPair.first, itemRealmPair.second))
-                .map((Function<Pair<List<AuctionHistory>, List<AuctionHistory>>, AuctionHistoryVO>) listListPair -> {
+                .map(listListPair -> {
                     AuctionHistoryVO result = new AuctionHistoryVO();
                     computeHistory(listListPair.second, result);
                     computePast(listListPair.first, result);
@@ -64,7 +63,7 @@ class ItemResultTransformer {
     private void computeHistory(List<AuctionHistory> auctionHistories, AuctionHistoryVO result) {
 
         Collections.sort(auctionHistories, goldComparator);
-
+        long oneDay = 3600 * 24 * 1000L;
         long week = 7 * 3600 * 24 * 1000L;
         long current = System.currentTimeMillis();
         LinkedList<AuctionHistory> listWeek = new LinkedList<>();
@@ -90,8 +89,15 @@ class ItemResultTransformer {
         result.setHistory(getHistoryItem(listHistories, avgHistory, avgCountHistory));
 
         Collections.sort(listHistories, timeComparator);
-
-        result.setDataHistory(getCombinedData(listHistories));
+        long temp = 0;
+        List<AuctionHistory> list = new ArrayList<>(listHistories.size());
+        for (AuctionHistory listHistory : listHistories) {
+            if (temp == 0 || listHistory.getLastModifited() - temp > oneDay) {
+                list.add(listHistory);
+                temp = listHistory.getLastModifited();
+            }
+        }
+        result.setDataHistory(getCombinedData(list));
 
     }
 

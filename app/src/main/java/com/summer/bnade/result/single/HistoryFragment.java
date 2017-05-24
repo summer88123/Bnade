@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.util.Pair;
 import android.support.v7.widget.CardView;
 import android.widget.TextView;
@@ -28,14 +27,8 @@ import com.summer.lib.model.entity.Realm;
 import butterknife.BindView;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HistoryFragment#getInstance} factory method to
- * create an instance of this fragment.
- */
 public class HistoryFragment extends BaseFragment {
     @BindView(R.id.tv_one_day)
     TextView mTvOneDay;
@@ -111,12 +104,7 @@ public class HistoryFragment extends BaseFragment {
                 .compose(mPresenter.history())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<AuctionHistoryVO>() {
-                    @Override
-                    public void accept(AuctionHistoryVO historyVO) throws Exception {
-                        update(historyVO);
-                    }
-                }, new RxUtil.ContextErrorHandler(getContext()));
+                .subscribe(this::update, new RxUtil.ContextErrorHandler(getContext()));
     }
 
     @Override

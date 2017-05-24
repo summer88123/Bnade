@@ -3,16 +3,15 @@ package com.summer.bnade.realmrank;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.internal.Notification;
+import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseViewFragment;
+import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.home.MainComponent;
 import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.DefaultViewUtil;
@@ -26,13 +25,13 @@ import butterknife.BindDrawable;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+import icepick.Icicle;
+import io.reactivex.Observable;
 
 /**
  * interface.
  */
-public class RealmRankFragment extends BaseViewFragment<RealmRankContract.Presenter> implements RealmRankContract.View,
-        SwipeRefreshLayout.OnRefreshListener {
+public class RealmRankFragment extends BaseFragment {
     public static final String TAG = RealmRankFragment.class.getSimpleName();
     @BindView(R.id.list)
     RecyclerView mList;
@@ -48,17 +47,20 @@ public class RealmRankFragment extends BaseViewFragment<RealmRankContract.Presen
     SwipeRefreshLayout mRefreshLayout;
     @BindViews({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})
     List<TextView> labels;
-    @BindDrawable(R.drawable.ic_arrow_drop_up_black_24dp)
-    Drawable up;
-    @BindDrawable(R.drawable.ic_arrow_drop_down_black_24dp)
-    Drawable down;
-
+    @BindDrawable(value = R.drawable.ic_arrow_drop_up_black_24dp, tint = R.attr.colorAccent)
     Drawable tintUp;
+    @BindDrawable(value = R.drawable.ic_arrow_drop_down_black_24dp, tint = R.attr.colorAccent)
     Drawable tintDown;
+
     @Inject
     RealmRankAdapter mAdapter;
-    private AuctionRealm.SortType current = AuctionRealm.SortType.TotalDown;
-    private ButterKnife.Action<TextView> DisableRightDrawable = (view, index) -> view.setCompoundDrawables(null, null, null, null);
+    @Inject
+    RealmRankTransformer mPresenter;
+
+    @Icicle
+    AuctionRealm.SortType current = AuctionRealm.SortType.TotalDown;
+    private ButterKnife.Action<TextView> DisableRightDrawable = (view, index) -> view
+            .setCompoundDrawables(null, null, null, null);
 
     @SuppressWarnings("unused")
     public static RealmRankFragment getInstance(FragmentManager fm) {
@@ -81,23 +83,22 @@ public class RealmRankFragment extends BaseViewFragment<RealmRankContract.Presen
     @Override
     public void onStart() {
         super.onStart();
-        mPresenter.load(current);
+        Observable.just(Notification.INSTANCE)
+                .map(o -> current)
+                .compose(mPresenter.load())
+                .doOnNext(ignore -> updateSortType(current))
+                .subscribe(this::show);
     }
 
-    @Override
-    public void show(List<AuctionRealm> list, AuctionRealm.SortType sortType) {
-        updateSortType(sortType);
-        this.mAdapter.update(list);
-    }
-
-    @Override
-    public void setRefreshing(boolean refreshing) {
-        mRefreshLayout.setRefreshing(refreshing);
-    }
-
-    @Override
-    public void onRefresh() {
-        mPresenter.load(current);
+    public void show(RealmRankUIModel model) {
+        mRefreshLayout.setRefreshing(model.isInProgress());
+        if (!model.isInProgress()) {
+            if (model.isSuccess()) {
+                mAdapter.update(model.getList());
+            } else {
+                showToast(model.getErrorMsg());
+            }
+        }
     }
 
     @Override
@@ -107,44 +108,33 @@ public class RealmRankFragment extends BaseViewFragment<RealmRankContract.Presen
 
     @Override
     public void setUpView() {
-        mList.setLayoutManager(new LinearLayoutManager(getContext()));
         mList.setAdapter(mAdapter);
         DefaultViewUtil.defaultRefresh(mRefreshLayout);
-        mRefreshLayout.setOnRefreshListener(this);
-        tintUp = DrawableCompat.wrap(up);
-        DrawableCompat.setTint(tintUp, ContextCompat.getColor(getContext(), R.color.colorAccent));
-        tintDown = DrawableCompat.wrap(down);
-        DrawableCompat.setTint(tintDown, ContextCompat.getColor(getContext(), R.color.colorAccent));
-    }
-
-    @OnClick({R.id.tv_total_count, R.id.tv_user_count, R.id.tv_item_kind, R.id.tv_update_time})
-    public void onViewClicked(View view) {
-        AuctionRealm.SortType last = current;
-        AuctionRealm.SortType current;
-        switch (view.getId()) {
-            case R.id.tv_user_count:
-                current = last == AuctionRealm.SortType.PlayerDown
-                        ? AuctionRealm.SortType.PlayerUp
-                        : AuctionRealm.SortType.PlayerDown;
-                break;
-            case R.id.tv_item_kind:
-                current = last == AuctionRealm.SortType.ItemDown
-                        ? AuctionRealm.SortType.ItemUp
-                        : AuctionRealm.SortType.ItemDown;
-                break;
-            case R.id.tv_update_time:
-                current = last == AuctionRealm.SortType.TimeDown
-                        ? AuctionRealm.SortType.TimeUp
-                        : AuctionRealm.SortType.TimeDown;
-                break;
-            case R.id.tv_total_count:
-            default:
-                current = last == AuctionRealm.SortType.TotalDown
-                        ? AuctionRealm.SortType.TotalUp
-                        : AuctionRealm.SortType.TotalDown;
-                break;
-        }
-        mPresenter.sort(current);
+        RxSwipeRefreshLayout.refreshes(mRefreshLayout)
+                .map(o -> current)
+                .compose(mPresenter.load())
+                .doOnNext(ignore -> updateSortType(current))
+                .subscribe(this::show);
+        Observable.merge(
+                RxView.clicks(mTvUserCount)
+                        .map(o -> current == AuctionRealm.SortType.PlayerDown
+                                ? AuctionRealm.SortType.PlayerUp
+                                : AuctionRealm.SortType.PlayerDown),
+                RxView.clicks(mTvItemKind)
+                        .map(o -> current == AuctionRealm.SortType.ItemDown
+                                ? AuctionRealm.SortType.ItemUp
+                                : AuctionRealm.SortType.ItemDown),
+                RxView.clicks(mTvUpdateTime)
+                        .map(o -> current == AuctionRealm.SortType.TimeDown
+                                ? AuctionRealm.SortType.TimeUp
+                                : AuctionRealm.SortType.TimeDown),
+                RxView.clicks(mTvTotalCount)
+                        .map(o -> current == AuctionRealm.SortType.TotalDown
+                                ? AuctionRealm.SortType.TotalUp
+                                : AuctionRealm.SortType.TotalDown))
+                .doOnNext(this::updateSortType)
+                .compose(mPresenter.sort())
+                .subscribe(this::show);
     }
 
     private void updateSortType(AuctionRealm.SortType sortType) {

@@ -11,16 +11,12 @@ import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.utils.RxUtil;
-import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
-
-import java.util.List;
 
 import butterknife.BindView;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class PriceFragment extends BaseFragment {
@@ -67,12 +63,7 @@ public class PriceFragment extends BaseFragment {
                 .compose(mPresenter.price())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<List<AuctionRealmItem>>() {
-                    @Override
-                    public void accept(List<AuctionRealmItem> list) throws Exception {
-                        mAdapter.update(list);
-                    }
-                }, new RxUtil.ContextErrorHandler(getContext()));
+                .subscribe(list -> mAdapter.update(list), new RxUtil.ContextErrorHandler(getContext()));
     }
 
     @Override

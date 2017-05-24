@@ -5,13 +5,8 @@ package com.summer.lib.model.entity;
  */
 
 public class AuctionRealm {
-    public enum SortType {
-        TotalUp, TotalDown, PlayerUp, PlayerDown, ItemUp, ItemDown, TimeUp, TimeDown
-    }
-
     public static final String PVP = "pvp";
     public static final String PVE = "pve";
-
     private long id;
     private String type;
     private Realm realm;
@@ -20,28 +15,30 @@ public class AuctionRealm {
     private int itemQuantity;
     private long lastModified;
 
-    public Realm getRealm() {
-        return realm;
+    @Override
+    public int hashCode() {
+        int result = (int) (getId() ^ (getId() >>> 32));
+        result = 31 * result + getRealm().hashCode();
+        result = 31 * result + getAuctionQuantity();
+        result = 31 * result + getPlayerQuantity();
+        result = 31 * result + getItemQuantity();
+        result = 31 * result + (int) (getLastModified() ^ (getLastModified() >>> 32));
+        return result;
     }
 
-    public void setRealm(Realm realm) {
-        this.realm = realm;
-    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuctionRealm)) return false;
 
-    public long getId() {
-        return id;
-    }
+        AuctionRealm that = (AuctionRealm) o;
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+        if (getId() != that.getId()) return false;
+        if (getAuctionQuantity() != that.getAuctionQuantity()) return false;
+        if (getPlayerQuantity() != that.getPlayerQuantity()) return false;
+        if (getItemQuantity() != that.getItemQuantity()) return false;
+        if (getLastModified() != that.getLastModified()) return false;
+        return getRealm().equals(that.getRealm());
     }
 
     public int getAuctionQuantity() {
@@ -52,12 +49,12 @@ public class AuctionRealm {
         this.auctionQuantity = auctionQuantity;
     }
 
-    public int getPlayerQuantity() {
-        return playerQuantity;
+    public long getId() {
+        return id;
     }
 
-    public void setPlayerQuantity(int playerQuantity) {
-        this.playerQuantity = playerQuantity;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public int getItemQuantity() {
@@ -74,5 +71,33 @@ public class AuctionRealm {
 
     public void setLastModified(long lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public int getPlayerQuantity() {
+        return playerQuantity;
+    }
+
+    public void setPlayerQuantity(int playerQuantity) {
+        this.playerQuantity = playerQuantity;
+    }
+
+    public Realm getRealm() {
+        return realm;
+    }
+
+    public void setRealm(Realm realm) {
+        this.realm = realm;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public enum SortType {
+        TotalUp, TotalDown, PlayerUp, PlayerDown, ItemUp, ItemDown, TimeUp, TimeDown
     }
 }

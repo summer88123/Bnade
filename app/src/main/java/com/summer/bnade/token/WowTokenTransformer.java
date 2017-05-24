@@ -2,7 +2,6 @@ package com.summer.bnade.token;
 
 import com.github.mikephil.charting.data.Entry;
 import com.summer.bnade.data.BnadeRepo;
-import com.summer.bnade.token.entity.WowTokenUIModel;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.WowTokens;
 

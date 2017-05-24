@@ -5,7 +5,6 @@ import com.summer.bnade.base.di.PreActivity;
 import com.summer.bnade.player.PlayerItemContract;
 import com.summer.bnade.player.PlayerItemFragment;
 import com.summer.bnade.player.PlayerItemModule;
-import com.summer.bnade.realmrank.RealmRankContract;
 import com.summer.bnade.realmrank.RealmRankFragment;
 import com.summer.bnade.realmrank.RealmRankModule;
 import com.summer.bnade.search.SearchContract;
@@ -43,7 +42,7 @@ public interface MainComponent {
 
     SearchContract.View searchView();
 
-    RealmRankContract.View realmRankView();
+    RealmRankFragment realmRankView();
 
     PlayerItemContract.View playerItemView();
 

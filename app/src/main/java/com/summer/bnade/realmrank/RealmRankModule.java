@@ -15,12 +15,7 @@ public class RealmRankModule {
     }
 
     @Provides
-    RealmRankContract.Presenter providePresenter(RealmRankPresenter presenter) {
-        return presenter;
-    }
-
-    @Provides
-    RealmRankContract.View provideView() {
+    RealmRankFragment provideFragment(){
         return mFragment;
     }
 

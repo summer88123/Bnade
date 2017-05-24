@@ -92,7 +92,7 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
             @Override
             public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
                                            boolean isFromMemoryCache, boolean isFirstResource) {
-                mToolbar.setLogo(resource);
+                mToolbar.setNavigationIcon(resource);
                 return true;
             }
         }).into(ScreenUtil.dp2px(48), ScreenUtil.dp2px(48));
