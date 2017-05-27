@@ -38,6 +38,7 @@ class BaseActivityLifeCycleCallback implements Application.ActivityLifecycleCall
             Icepick.restoreInstanceState(activity, savedInstanceState);
             created.injectComponent();
             created.setUpView();
+            created.setUpObservable();
         }
     }
 

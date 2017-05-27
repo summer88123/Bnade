@@ -6,4 +6,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowBackground">@color/colorBackground</item>
     </style>
+    <style name="AppTheme.NoActionBar.Drawer">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
 </resources>

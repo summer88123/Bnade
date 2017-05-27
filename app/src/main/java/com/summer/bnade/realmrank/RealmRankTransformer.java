@@ -8,11 +8,22 @@ import java.util.Comparator;
 
 import javax.inject.Inject;
 
+import io.reactivex.Observable;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.Subject;
 
 class RealmRankTransformer {
     private BnadeRepo mRepo;
+    private Subject<AuctionRealm.SortType> subject = BehaviorSubject.create();
+    private Observable<RealmRankUIModel> publisher =
+            subject.flatMap(ignore -> mRepo.getAuctionRealm()
+                    .map(RealmRankUIModel::success)
+                    .onErrorReturn(e -> RealmRankUIModel.failure(e.getMessage()))
+                    .startWith(RealmRankUIModel.progress()))
+                    .publish()
+                    .autoConnect(2);
 
     @Inject
     RealmRankTransformer(BnadeRepo repo) {
@@ -20,25 +31,20 @@ class RealmRankTransformer {
     }
 
     ObservableTransformer<AuctionRealm.SortType, RealmRankUIModel> load() {
-        return upstream -> upstream.flatMap(sortType -> mRepo.getAuctionRealm(false)
-                .map(list -> {
-                    Collections.sort(list, getComparator(sortType));
-                    return list;
-                })
-                .map(RealmRankUIModel::success)
-                .observeOn(AndroidSchedulers.mainThread())
-                .startWith(RealmRankUIModel.progress())
-                .onErrorReturn(e -> RealmRankUIModel.failure(e.getMessage())));
+        return upstream -> {
+            upstream.subscribe(subject);
+            return publisher.observeOn(AndroidSchedulers.mainThread());
+        };
     }
 
     ObservableTransformer<AuctionRealm.SortType, RealmRankUIModel> sort() {
-        return upstream -> upstream.flatMap(sortType -> mRepo.getAuctionRealm(true)
-                .map(list -> {
-                    Collections.sort(list, getComparator(sortType));
-                    return list;
-                })
-                .map(RealmRankUIModel::success)
-                .observeOn(AndroidSchedulers.mainThread()));
+        return upstream ->
+                Observable.combineLatest(upstream, publisher.filter(RealmRankUIModel::isSuccess),
+                        (sortType, model) -> {
+                            Collections.sort(model.getList(), getComparator(sortType));
+                            return model;
+                        })
+                        .observeOn(AndroidSchedulers.mainThread());
     }
 
     private Comparator<? super AuctionRealm> getComparator(final AuctionRealm.SortType sortType) {

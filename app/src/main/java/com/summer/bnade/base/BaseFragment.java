@@ -27,6 +27,16 @@ public abstract class BaseFragment extends Fragment implements IActivityCreated 
         // nothing
     }
 
+    @Override
+    public void setUpView() {
+        // nothing
+    }
+
+    @Override
+    public void setUpObservable() {
+        // nothing
+    }
+
     public void showToast(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }

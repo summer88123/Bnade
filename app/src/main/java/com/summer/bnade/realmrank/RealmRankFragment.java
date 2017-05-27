@@ -7,7 +7,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding2.internal.Notification;
 import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.summer.bnade.R;
@@ -80,16 +79,6 @@ public class RealmRankFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Observable.just(Notification.INSTANCE)
-                .map(o -> current)
-                .compose(mPresenter.load())
-                .doOnNext(ignore -> updateSortType(current))
-                .subscribe(this::show);
-    }
-
     public void show(RealmRankUIModel model) {
         mRefreshLayout.setRefreshing(model.isInProgress());
         if (!model.isInProgress()) {
@@ -110,30 +99,35 @@ public class RealmRankFragment extends BaseFragment {
     public void setUpView() {
         mList.setAdapter(mAdapter);
         DefaultViewUtil.defaultRefresh(mRefreshLayout);
-        RxSwipeRefreshLayout.refreshes(mRefreshLayout)
-                .map(o -> current)
-                .compose(mPresenter.load())
-                .doOnNext(ignore -> updateSortType(current))
-                .subscribe(this::show);
-        Observable.merge(
-                RxView.clicks(mTvUserCount)
-                        .map(o -> current == AuctionRealm.SortType.PlayerDown
-                                ? AuctionRealm.SortType.PlayerUp
-                                : AuctionRealm.SortType.PlayerDown),
-                RxView.clicks(mTvItemKind)
-                        .map(o -> current == AuctionRealm.SortType.ItemDown
-                                ? AuctionRealm.SortType.ItemUp
-                                : AuctionRealm.SortType.ItemDown),
-                RxView.clicks(mTvUpdateTime)
-                        .map(o -> current == AuctionRealm.SortType.TimeDown
-                                ? AuctionRealm.SortType.TimeUp
-                                : AuctionRealm.SortType.TimeDown),
-                RxView.clicks(mTvTotalCount)
-                        .map(o -> current == AuctionRealm.SortType.TotalDown
-                                ? AuctionRealm.SortType.TotalUp
-                                : AuctionRealm.SortType.TotalDown))
+    }
+
+    @Override
+    public void setUpObservable() {
+        Observable<AuctionRealm.SortType> userCountObservable = RxView.clicks(mTvUserCount)
+                .map(o -> current == AuctionRealm.SortType.PlayerDown
+                        ? AuctionRealm.SortType.PlayerUp
+                        : AuctionRealm.SortType.PlayerDown);
+        Observable<AuctionRealm.SortType> itemKindObservable = RxView.clicks(mTvItemKind)
+                .map(o -> current == AuctionRealm.SortType.ItemDown
+                        ? AuctionRealm.SortType.ItemUp
+                        : AuctionRealm.SortType.ItemDown);
+        Observable<AuctionRealm.SortType> updateTimeObservable = RxView.clicks(mTvUpdateTime)
+                .map(o -> current == AuctionRealm.SortType.TimeDown
+                        ? AuctionRealm.SortType.TimeUp
+                        : AuctionRealm.SortType.TimeDown);
+        Observable<AuctionRealm.SortType> totalCountObservable = RxView.clicks(mTvTotalCount)
+                .map(o -> current == AuctionRealm.SortType.TotalDown
+                        ? AuctionRealm.SortType.TotalUp
+                        : AuctionRealm.SortType.TotalDown);
+        Observable.merge(userCountObservable, itemKindObservable, updateTimeObservable, totalCountObservable)
+                .startWith(current)
                 .doOnNext(this::updateSortType)
                 .compose(mPresenter.sort())
+                .subscribe(this::show);
+        RxSwipeRefreshLayout.refreshes(mRefreshLayout)
+                .map(o -> current)
+                .startWith(current)
+                .compose(mPresenter.load())
                 .subscribe(this::show);
     }
 

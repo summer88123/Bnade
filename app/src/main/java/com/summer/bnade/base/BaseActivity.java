@@ -8,10 +8,15 @@ import android.widget.Toast;
  * Created by kevin.bai on 2017/4/4.
  */
 
-public abstract class BaseActivity extends AppCompatActivity implements IActivityCreated{
+public abstract class BaseActivity extends AppCompatActivity implements IActivityCreated {
 
     @Override
     public void injectComponent() {
+        // nothing
+    }
+
+    @Override
+    public void setUpObservable() {
         // nothing
     }
 

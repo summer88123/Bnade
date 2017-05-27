@@ -33,7 +33,6 @@ public class BnadeRepo {
     private final BnadeApi api;
     // TODO 缓存需要设置失效
     private final SparseArray<List<Hot>> hotCache;
-    private final List<AuctionRealm> mAuctionRealmsCache;
     private final RealmHelper mRealmHelper;
     private final SearchResultVO mSearchResultVO;
 
@@ -41,7 +40,6 @@ public class BnadeRepo {
         this.api = api;
         this.mRealmHelper = realmHelper;
         hotCache = new SparseArray<>(3);
-        mAuctionRealmsCache = new ArrayList<>();
         mSearchResultVO = new SearchResultVO();
     }
 
@@ -68,8 +66,16 @@ public class BnadeRepo {
                 Pair::new);
     }
 
-    public Observable<List<AuctionRealm>> getAuctionRealm(boolean useCache) {
-        return Observable.concat(getAuctionRealmCache(useCache), getAuctionRealmRemote());
+    public Observable<List<AuctionRealm>> getAuctionRealm() {
+        return api.getAuctionRealmsSummary()
+                .flatMapObservable(Observable::fromIterable)
+                .flatMapSingle(auctionRealm -> Single.just(auctionRealm)
+                        .zipWith(mRealmHelper.getRealmById(auctionRealm.getId()), (auctionRealm1, realm) -> {
+                            auctionRealm1.setRealm(realm);
+                            return auctionRealm1;
+                        }))
+                .toList()
+                .toObservable();
     }
 
     public Single<List<AuctionRealmItem>> getAuctionRealmItem(Item item, Realm realm) {
@@ -114,28 +120,6 @@ public class BnadeRepo {
 
     public Single<SearchResultVO> search(Item item, Realm realm) {
         return Observable.concat(searchCache(item), searchRemote(item, realm).toObservable()).firstOrError();
-    }
-
-    private Observable<List<AuctionRealm>> getAuctionRealmCache(boolean useCache) {
-        return (useCache && !mAuctionRealmsCache.isEmpty() ? Observable
-                .just(mAuctionRealmsCache) : Observable.<List<AuctionRealm>>empty())
-                .subscribeOn(Schedulers.computation());
-    }
-
-    private Observable<List<AuctionRealm>> getAuctionRealmRemote() {
-        return api.getAuctionRealmsSummary()
-                .doOnSuccess(auctionRealms -> {
-                    mAuctionRealmsCache.clear();
-                    mAuctionRealmsCache.addAll(auctionRealms);
-                })
-                .flatMapObservable(Observable::fromIterable)
-                .flatMapSingle(auctionRealm -> Single.just(auctionRealm)
-                        .zipWith(mRealmHelper.getRealmById(auctionRealm.getId()), (auctionRealm1, realm) -> {
-                            auctionRealm1.setRealm(realm);
-                            return auctionRealm1;
-                        }))
-                .toList()
-                .toObservable();
     }
 
     private Observable<List<Hot>> getHotCache(int type) {

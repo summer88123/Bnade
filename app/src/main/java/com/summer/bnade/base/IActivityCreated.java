@@ -20,4 +20,5 @@ public interface IActivityCreated {
 
     void injectComponent();
 
+    void setUpObservable();
 }
