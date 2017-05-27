@@ -1,5 +1,7 @@
 package com.summer.bnade.token;
 
+import android.support.annotation.NonNull;
+
 import com.github.mikephil.charting.data.Entry;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.utils.ChartHelper;
@@ -38,44 +40,47 @@ public class WowTokenTransformer {
     public ObservableTransformer<Object, WowTokenUIModel> load() {
         return observable -> observable
                 .flatMap(o -> mRepo.getWowTokens()
-                        .map(list -> {
-                            WowTokenUIModel token = WowTokenUIModel.success();
-                            List<WowTokens> oneDay = new ArrayList<>();
-                            List<WowTokens> all = new ArrayList<>();
-                            long temp = 0;
-                            long current = System.currentTimeMillis();
-                            for (WowTokens wowTokens : list) {
-                                if (temp == 0 || wowTokens.getLastModified() > temp + ONE_DAY) {
-                                    temp = wowTokens.getLastModified();
-                                    all.add(wowTokens);
-                                }
-                                if ((current - wowTokens.getLastModified()) < ONE_DAY) {
-                                    oneDay.add(wowTokens);
-                                }
-                            }
-                            Collections.sort(oneDay, goldComparator);
-                            int last = oneDay.size() - 1;
-                            token.setMinGold(oneDay.get(0).getGold());
-                            token.setMaxGold(oneDay.get(last).getGold());
-
-                            Collections.sort(oneDay, timeComparator);
-                            token.setCurrentGold(oneDay.get(last).getGold());
-                            token.setLastModified(oneDay.get(last).getLastModified());
-
-                            token.setOneDayTokens(ChartHelper
-                                    .generateData(oneDay, (index, tokens) -> new Entry(tokens.getLastModified(), tokens
-                                            .getGold())));
-
-                            Collections.sort(list, timeComparator);
-
-                            token.setAllTokens(ChartHelper
-                                    .generateData(all, (index, tokens) -> new Entry(tokens.getLastModified(), tokens
-                                            .getGold())));
-                            return token;
-                        })
+                        .map(this::getWowTokenUIModel)
                         .toObservable()
                         .onErrorReturn(e -> WowTokenUIModel.failure(e.getMessage()))
                         .observeOn(AndroidSchedulers.mainThread())
                         .startWith(WowTokenUIModel.inProgress()));
+    }
+
+    @NonNull
+    private WowTokenUIModel getWowTokenUIModel(List<WowTokens> list) {
+        WowTokenUIModel token = WowTokenUIModel.success();
+        List<WowTokens> oneDay = new ArrayList<>();
+        List<WowTokens> all = new ArrayList<>();
+        long temp = 0;
+        long current = System.currentTimeMillis();
+        for (WowTokens wowTokens : list) {
+            if (temp == 0 || wowTokens.getLastModified() > temp + ONE_DAY) {
+                temp = wowTokens.getLastModified();
+                all.add(wowTokens);
+            }
+            if ((current - wowTokens.getLastModified()) < ONE_DAY) {
+                oneDay.add(wowTokens);
+            }
+        }
+        Collections.sort(oneDay, goldComparator);
+        int last = oneDay.size() - 1;
+        token.setMinGold(oneDay.get(0).getGold());
+        token.setMaxGold(oneDay.get(last).getGold());
+
+        Collections.sort(oneDay, timeComparator);
+        token.setCurrentGold(oneDay.get(last).getGold());
+        token.setLastModified(oneDay.get(last).getLastModified());
+
+        token.setOneDayTokens(ChartHelper
+                .generateData(oneDay, (index, tokens) -> new Entry(tokens.getLastModified(), tokens
+                        .getGold())));
+
+        Collections.sort(list, timeComparator);
+
+        token.setAllTokens(ChartHelper
+                .generateData(all, (index, tokens) -> new Entry(tokens.getLastModified(), tokens
+                        .getGold())));
+        return token;
     }
 }

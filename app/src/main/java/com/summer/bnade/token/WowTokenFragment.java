@@ -18,7 +18,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
-import com.jakewharton.rxbinding2.internal.Notification;
 import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
@@ -28,8 +27,10 @@ import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.bnade.utils.DefaultViewUtil;
 import com.summer.bnade.utils.ScreenUtil;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -37,7 +38,6 @@ import butterknife.BindColor;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
-import io.reactivex.Observable;
 
 public class WowTokenFragment extends BaseFragment {
     public static final String TAG = WowTokenFragment.class.getSimpleName();
@@ -95,15 +95,6 @@ public class WowTokenFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        hideCardView();
-        Observable.just(Notification.INSTANCE)
-                .compose(mPresenter.load())
-                .subscribe(this::show);
-    }
-
     private void show(WowTokenUIModel current) {
         mRefreshLayout.setRefreshing(current.isInProgress());
         if (!current.isInProgress())
@@ -142,6 +133,12 @@ public class WowTokenFragment extends BaseFragment {
         setupChart(mChart, "HH:mm");
         setupChart(mChartHistory, "MM-dd");
         DefaultViewUtil.defaultRefresh(mRefreshLayout);
+        hideCardView();
+    }
+
+    @Override
+    public void setUpObservable() {
+        super.setUpObservable();
         RxSwipeRefreshLayout.refreshes(mRefreshLayout)
                 .doOnNext(o -> animateOut(new AnimatorListenerAdapter() {
                     @Override
@@ -152,7 +149,10 @@ public class WowTokenFragment extends BaseFragment {
                         mChart.setScaleX(1);
                     }
                 }))
+                .delay(400, TimeUnit.MILLISECONDS)
+                .startWith(untilEmit(FragmentEvent.START))
                 .compose(mPresenter.load())
+                .compose(bindToLifecycle())
                 .subscribe(this::show);
     }
 
@@ -173,7 +173,7 @@ public class WowTokenFragment extends BaseFragment {
         for (int i = 0; i < views.length; i++) {
             animators[i] = ObjectAnimator.ofFloat(views[i], "alpha", 0f);
         }
-        as.setDuration(500).playTogether((Animator[]) animators);
+        as.setDuration(400).playTogether((Animator[]) animators);
         as.start();
     }
 

@@ -15,6 +15,7 @@ import com.summer.bnade.home.MainComponent;
 import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.DefaultViewUtil;
 import com.summer.lib.model.entity.AuctionRealm;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import java.util.List;
 
@@ -119,15 +120,18 @@ public class RealmRankFragment extends BaseFragment {
                 .map(o -> current == AuctionRealm.SortType.TotalDown
                         ? AuctionRealm.SortType.TotalUp
                         : AuctionRealm.SortType.TotalDown);
+
         Observable.merge(userCountObservable, itemKindObservable, updateTimeObservable, totalCountObservable)
                 .startWith(current)
                 .doOnNext(this::updateSortType)
                 .compose(mPresenter.sort())
+                .compose(bindToLifecycle())
                 .subscribe(this::show);
         RxSwipeRefreshLayout.refreshes(mRefreshLayout)
                 .map(o -> current)
-                .startWith(current)
+                .startWith(untilEmit(FragmentEvent.START).map(ignore -> current))
                 .compose(mPresenter.load())
+                .compose(bindToLifecycle())
                 .subscribe(this::show);
     }
 
