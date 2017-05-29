@@ -10,16 +10,13 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.Content;
-import com.summer.bnade.utils.RxUtil;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import butterknife.BindView;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
-public class PriceFragment extends BaseFragment {
+public class PriceFragment extends BaseFragment<ItemResultUIModel> {
     @BindView(R.id.list_view)
     RecyclerView mListView;
     ItemResultAdapter mAdapter;
@@ -39,6 +36,30 @@ public class PriceFragment extends BaseFragment {
     }
 
     @Override
+    public int layout() {
+        return R.layout.fragment_price;
+    }
+
+    @Override
+    public void setUpView() {
+        mListView.setAdapter(mAdapter);
+    }
+
+    @Override
+    public void setUpObservable() {
+        untilEmit(FragmentEvent.START)
+                .map(ignore -> new Pair<>(item, realm))
+                .compose(mPresenter.price())
+                .compose(bindToLifecycle())
+                .subscribe(showAs());
+    }
+
+    @Override
+    protected void onSuccess(ItemResultUIModel model) {
+        mAdapter.update(model.getList());
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Provider) {
@@ -54,25 +75,5 @@ public class PriceFragment extends BaseFragment {
             realm = getArguments().getParcelable(Content.EXTRA_SUB_DATA);
         }
         mAdapter = new ItemResultAdapter();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Single.just(new Pair<>(item, realm))
-                .compose(mPresenter.price())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(list -> mAdapter.update(list), new RxUtil.ContextErrorHandler(getContext()));
-    }
-
-    @Override
-    public int layout() {
-        return R.layout.fragment_price;
-    }
-
-    @Override
-    public void setUpView() {
-        mListView.setAdapter(mAdapter);
     }
 }

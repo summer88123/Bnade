@@ -70,14 +70,14 @@ public interface BnadeApi {
      * 结果数组说明: arr[0] - 最低一口价(单位:铜) arr[1] - 总数量 arr[2] - 数据更新时间(单位:arr[0]
      */
     @GET("auction/past/realm/{realmId}/item/{itemId}")
-    Single<List<AuctionHistory>> getAuctionPastRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
+    Observable<List<AuctionHistory>> getAuctionPastRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
 
     /**
      * 物品在指定服务器1年内的所有最低一口价的历史数据,
      * 结果数组说明: arr[0] - 最低一口价(单位:铜) arr[1] - 总数量 arr[2] - 数据更新时间(单位:arr[0]
      */
     @GET("auction/history/realm/{realmId}/item/{itemId}")
-    Single<List<AuctionHistory>> getAuctionHistoryRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
+    Observable<List<AuctionHistory>> getAuctionHistoryRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
 
     /**
      * 所有服务器拍卖总数据
@@ -92,7 +92,7 @@ public interface BnadeApi {
      * 查询某个服务器某个物品的拍卖行的所有数据
      */
     @GET("auction/realm/{realmId}/item/{itemId}")
-    Single<List<AuctionRealmItem>> getAuctionRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
+    Observable<List<AuctionRealmItem>> getAuctionRealmItem(@Path("realmId") long realmId, @Path("itemId") long itemId);
 
     @GET("ah/wowtokens")
     Single<List<WowTokens>> getAhWowtokens();

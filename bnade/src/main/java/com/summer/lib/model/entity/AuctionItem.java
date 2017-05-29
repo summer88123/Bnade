@@ -63,6 +63,32 @@ public class AuctionItem implements Parcelable, Comparable<AuctionItem> {
         dest.writeInt(this.lastTime == null ? -1 : this.lastTime.ordinal());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuctionItem)) return false;
+
+        AuctionItem that = (AuctionItem) o;
+
+        if (getRealmId() != that.getRealmId()) return false;
+        if (getTotal() != that.getTotal()) return false;
+        if (getLastUpdateTime() != that.getLastUpdateTime()) return false;
+        if (!getMinBuyOut().equals(that.getMinBuyOut())) return false;
+        if (!getName().equals(that.getName())) return false;
+        return getLastTime() == that.getLastTime();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (getRealmId() ^ (getRealmId() >>> 32));
+        result = 31 * result + getMinBuyOut().hashCode();
+        result = 31 * result + getName().hashCode();
+        result = 31 * result + getTotal();
+        result = 31 * result + (int) (getLastUpdateTime() ^ (getLastUpdateTime() >>> 32));
+        result = 31 * result + getLastTime().hashCode();
+        return result;
+    }
+
     public LastTime getLastTime() {
         return lastTime;
     }

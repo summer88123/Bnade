@@ -20,10 +20,10 @@ import butterknife.OnClick;
 
 class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> implements
         StickyRecyclerHeadersAdapter<RealmAdapter.HeaderViewHolder> {
-    private RealmSelectContract.View view;
-    private RealmSelectContract.Presenter mPresenter;
+    private RealmSelectFragment view;
+    private RealmSelectTransformer mPresenter;
 
-    RealmAdapter(RealmSelectContract.View view, RealmSelectContract.Presenter presenter) {
+    RealmAdapter(RealmSelectFragment view, RealmSelectTransformer presenter) {
         this.view = view;
         this.mPresenter = presenter;
     }

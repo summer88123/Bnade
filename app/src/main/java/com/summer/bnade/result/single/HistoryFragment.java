@@ -16,20 +16,18 @@ import com.github.mikephil.charting.components.YAxis;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.home.Provider;
-import com.summer.bnade.result.single.entity.AuctionHistoryVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.Content;
-import com.summer.bnade.utils.RxUtil;
 import com.summer.bnade.utils.StringHelper;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
+import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import butterknife.BindView;
-import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class HistoryFragment extends BaseFragment {
+public class HistoryFragment extends BaseFragment<ItemResultUIModel> {
     @BindView(R.id.tv_one_day)
     TextView mTvOneDay;
     @BindView(R.id.tv_week)
@@ -81,6 +79,48 @@ public class HistoryFragment extends BaseFragment {
     }
 
     @Override
+    public int layout() {
+        return R.layout.fragment_history;
+    }
+
+    @Override
+    public void setUpView() {
+        initChart(mChartHistory, "MM-dd");
+        initChart(mChartOneDay, "HH:mm");
+    }
+
+    @Override
+    public void setUpObservable() {
+        untilEmit(FragmentEvent.START)
+                .map(ignore -> new Pair<>(item, realm))
+                .compose(mPresenter.history())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(showAs());
+    }
+
+    @Override
+    protected void onSuccess(ItemResultUIModel model) {
+        mTvDayMin.setText(StringHelper.fullGold(getContext(), model.getOneDay().getMin()));
+        mTvDayMax.setText(StringHelper.fullGold(getContext(), model.getOneDay().getMax()));
+        mTvDayAvg.setText(StringHelper.fullGold(getContext(), model.getOneDay().getAvg()));
+        mTvDayCountAvg.setText(String.valueOf(model.getOneDay().getAvgCount()));
+        mTvWeekMin.setText(StringHelper.fullGold(getContext(), model.getLastWeek().getMin()));
+        mTvWeekMax.setText(StringHelper.fullGold(getContext(), model.getLastWeek().getMax()));
+        mTvWeekAvg.setText(StringHelper.fullGold(getContext(), model.getLastWeek().getAvg()));
+        mTvWeekCountAvg.setText(String.valueOf(model.getLastWeek().getAvgCount()));
+        mTvHistoryMin.setText(StringHelper.fullGold(getContext(), model.getHistory().getMin()));
+        mTvHistoryMax.setText(StringHelper.fullGold(getContext(), model.getHistory().getMax()));
+        mTvHistoryAvg.setText(StringHelper.fullGold(getContext(), model.getHistory().getAvg()));
+        mTvHistoryCountAvg.setText(String.valueOf(model.getHistory().getAvgCount()));
+
+        mChartHistory.setData(model.getDataHistory());
+        mChartHistory.invalidate();
+        mChartOneDay.setData(model.getDataOneDay());
+        mChartOneDay.invalidate();
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof Provider) {
@@ -95,47 +135,6 @@ public class HistoryFragment extends BaseFragment {
             item = getArguments().getParcelable(Content.EXTRA_DATA);
             realm = getArguments().getParcelable(Content.EXTRA_SUB_DATA);
         }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Single.just(new Pair<>(item, realm))
-                .compose(mPresenter.history())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(this::update, new RxUtil.ContextErrorHandler(getContext()));
-    }
-
-    @Override
-    public int layout() {
-        return R.layout.fragment_history;
-    }
-
-    @Override
-    public void setUpView() {
-        initChart(mChartHistory, "MM-dd");
-        initChart(mChartOneDay, "HH:mm");
-    }
-
-    public void update(AuctionHistoryVO historyVO) {
-        mTvDayMin.setText(StringHelper.fullGold(getContext(), historyVO.getOneDay().getMin()));
-        mTvDayMax.setText(StringHelper.fullGold(getContext(), historyVO.getOneDay().getMax()));
-        mTvDayAvg.setText(StringHelper.fullGold(getContext(), historyVO.getOneDay().getAvg()));
-        mTvDayCountAvg.setText(String.valueOf(historyVO.getOneDay().getAvgCount()));
-        mTvWeekMin.setText(StringHelper.fullGold(getContext(), historyVO.getLastWeek().getMin()));
-        mTvWeekMax.setText(StringHelper.fullGold(getContext(), historyVO.getLastWeek().getMax()));
-        mTvWeekAvg.setText(StringHelper.fullGold(getContext(), historyVO.getLastWeek().getAvg()));
-        mTvWeekCountAvg.setText(String.valueOf(historyVO.getLastWeek().getAvgCount()));
-        mTvHistoryMin.setText(StringHelper.fullGold(getContext(), historyVO.getHistory().getMin()));
-        mTvHistoryMax.setText(StringHelper.fullGold(getContext(), historyVO.getHistory().getMax()));
-        mTvHistoryAvg.setText(StringHelper.fullGold(getContext(), historyVO.getHistory().getAvg()));
-        mTvHistoryCountAvg.setText(String.valueOf(historyVO.getHistory().getAvgCount()));
-
-        mChartHistory.setData(historyVO.getDataHistory());
-        mChartHistory.invalidate();
-        mChartOneDay.setData(historyVO.getDataOneDay());
-        mChartOneDay.invalidate();
     }
 
     private void initChart(CombinedChart chart, final String pattern) {

@@ -1,18 +1,54 @@
-package com.summer.bnade.result.single.entity;
+package com.summer.bnade.result.single;
 
 import com.github.mikephil.charting.data.CombinedData;
+import com.summer.bnade.base.BaseUIModel;
+import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Gold;
+
+import java.util.List;
 
 /**
  * Created by kevin.bai on 2017/5/15.
  */
 
-public class AuctionHistoryVO {
+public class ItemResultUIModel extends BaseUIModel {
     private HistoryItem oneDay;
     private HistoryItem lastWeek;
     private HistoryItem history;
     private CombinedData dataOneDay;
     private CombinedData dataHistory;
+
+    private List<AuctionRealmItem> list;
+
+    private ItemResultUIModel(boolean inProgress, boolean success, String errorMsg) {
+        super(inProgress, success, errorMsg);
+    }
+
+    private ItemResultUIModel(List<AuctionRealmItem> list) {
+        this(false, true, null);
+        this.list = list;
+    }
+
+    static ItemResultUIModel success() {
+        return new ItemResultUIModel(false, true, null);
+    }
+
+    static ItemResultUIModel success(List<AuctionRealmItem> list) {
+        return new ItemResultUIModel(list);
+    }
+
+    static ItemResultUIModel progress(){
+        return new ItemResultUIModel(true, false, null);
+    }
+
+    static ItemResultUIModel failure(String errorMsg){
+        return new ItemResultUIModel(false, false, errorMsg);
+    }
+
+
+    public List<AuctionRealmItem> getList() {
+        return list;
+    }
 
     public HistoryItem getOneDay() {
         return oneDay;

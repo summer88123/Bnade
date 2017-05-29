@@ -25,14 +25,13 @@ import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Gold;
 import com.summer.lib.model.entity.Item;
+import com.trello.rxlifecycle2.android.ActivityEvent;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
-import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
-public class SearchResultActivity extends BaseActivity {
+public class SearchResultActivity extends BaseActivity<ResultUIModel> {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -47,36 +46,14 @@ public class SearchResultActivity extends BaseActivity {
     @BindView(R.id.chart)
     CombinedChart mChart;
 
+    SearchView mSearchView;
+
     @Inject
     SearchResultAdapter mResultAdapter;
     @Inject
     SearchResultTransformer mPresenter;
 
     Item item;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Single.just(item)
-                .compose(mPresenter.list())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(result -> {
-                    mResultAdapter.update(result.getAuctionItems());
-                    Gold avgBuyout = result.getAvg();
-                    mTvAvgBuyout.setText(getString(R.string.result_avg_buyout,
-                            getString(R.string.full_gold, avgBuyout.getGold(), avgBuyout.getSilver(), avgBuyout
-                                    .getCopper())));
-                    mChart.setData(ChartHelper
-                            .generateCombinedData(SearchResultActivity.this, result.getLines(), result.getBars()));
-                    mChart.animateXY(1000, 1000);
-                });
-    }
 
     @Override
     public int layout() {
@@ -90,6 +67,63 @@ public class SearchResultActivity extends BaseActivity {
         initChart();
         Glide.with(SearchResultActivity.this).load(item.getUrl()).into(mIvItemIcon);
         mCollapsingToolbarLayout.setTitle(item.getName());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_search_result, menu);
+        MenuItem search = menu.findItem(R.id.action_filter);
+        mSearchView = (SearchView) search.getActionView();
+        mSearchView.setQueryHint(getString(R.string.search_result_filter_hint));
+        RxSearchView.queryTextChangeEvents(mSearchView)
+                .compose(mPresenter.filter())
+                .compose(bindToLifecycle())
+                .subscribe(mResultAdapter::update);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_filter) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void injectComponent() {
+        DaggerSearchResultComponent.builder().appComponent(ComponentHolder.getComponent())
+                .searchResultModule(new SearchResultModule(this)).build().inject(this);
+    }
+
+    @Override
+    public void setUpObservable() {
+        untilEmit(ActivityEvent.START)
+                .map(ignore -> item)
+                .compose(mPresenter.list())
+                .compose(bindToLifecycle())
+                .subscribe(showAs());
+    }
+
+    @Override
+    protected void onSuccess(ResultUIModel model) {
+        mResultAdapter.update(model.getAuctionItems());
+        Gold avgBuyout = model.getAvg();
+        mTvAvgBuyout.setText(getString(R.string.result_avg_buyout,
+                getString(R.string.full_gold, avgBuyout.getGold(), avgBuyout.getSilver(), avgBuyout
+                        .getCopper())));
+        mChart.setData(ChartHelper
+                .generateCombinedData(SearchResultActivity.this, model.getLines(), model.getBars()));
+        mChart.animateXY(1000, 1000);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        item = getIntent().getParcelableExtra(Content.EXTRA_DATA);
+        super.onCreate(savedInstanceState);
     }
 
     private void initChart() {
@@ -123,39 +157,6 @@ public class SearchResultActivity extends BaseActivity {
         leftAxis.setTextColor(ContextCompat.getColor(this, R.color.artifact));
         leftAxis.setAxisMinimum(0f); // this replaces setStartAtZero(true)
         leftAxis.setValueFormatter(new ChartHelper.GoldAxisFormatter());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_search_result, menu);
-        MenuItem search = menu.findItem(R.id.action_filter);
-        SearchView searchView = (SearchView) search.getActionView();
-        searchView.setQueryHint(getString(R.string.search_result_filter_hint));
-        RxSearchView.queryTextChangeEvents(searchView)
-                .publish()
-                .autoConnect()
-                .compose(mPresenter.filter(item))
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mResultAdapter::update);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_filter) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void injectComponent() {
-        DaggerSearchResultComponent.builder().appComponent(ComponentHolder.getComponent())
-                .searchResultModule(new SearchResultModule(this, item)).build().inject(this);
     }
 
     private void initToolbar() {

@@ -39,7 +39,7 @@ import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 
-public class WowTokenFragment extends BaseFragment {
+public class WowTokenFragment extends BaseFragment<WowTokenUIModel> {
     public static final String TAG = WowTokenFragment.class.getSimpleName();
     @BindView(R.id.tv_cur_price)
     TextView mTvCurPrice;
@@ -95,20 +95,20 @@ public class WowTokenFragment extends BaseFragment {
         }
     }
 
-    private void show(WowTokenUIModel current) {
-        mRefreshLayout.setRefreshing(current.isInProgress());
-        if (!current.isInProgress())
-            if (current.isSuccess()) {
-                mTvCurPrice.setText(getString(R.string.gold, current.getCurrentGold()));
-                mTvModifiedTime.setText(DateUtil.format(current.getLastModified(), "M月d日 H:mm"));
-                mTvMinPrice.setText(getString(R.string.gold, current.getMinGold()));
-                mTvMaxPrice.setText(getString(R.string.gold, current.getMaxGold()));
-                animateIn(mCardView1, 0);
-                showOneDayChart(current.getOneDayTokens());
-                showHistoryChart(current.getAllTokens());
-            } else {
-                showToast(current.getErrorMsg());
-            }
+    @Override
+    protected void onProgress(boolean inProgress) {
+        mRefreshLayout.setRefreshing(inProgress);
+    }
+
+    @Override
+    protected void onSuccess(WowTokenUIModel model) {
+        mTvCurPrice.setText(getString(R.string.gold, model.getCurrentGold()));
+        mTvModifiedTime.setText(DateUtil.format(model.getLastModified(), "M月d日 H:mm"));
+        mTvMinPrice.setText(getString(R.string.gold, model.getMinGold()));
+        mTvMaxPrice.setText(getString(R.string.gold, model.getMaxGold()));
+        animateIn(mCardView1, 0);
+        showOneDayChart(model.getOneDayTokens());
+        showHistoryChart(model.getAllTokens());
     }
 
     public void showHistoryChart(List<Entry> allTokens) {
@@ -140,6 +140,7 @@ public class WowTokenFragment extends BaseFragment {
     public void setUpObservable() {
         super.setUpObservable();
         RxSwipeRefreshLayout.refreshes(mRefreshLayout)
+                .mergeWith(untilEmit(FragmentEvent.START))
                 .doOnNext(o -> animateOut(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
@@ -150,10 +151,9 @@ public class WowTokenFragment extends BaseFragment {
                     }
                 }))
                 .delay(400, TimeUnit.MILLISECONDS)
-                .startWith(untilEmit(FragmentEvent.START))
                 .compose(mPresenter.load())
                 .compose(bindToLifecycle())
-                .subscribe(this::show);
+                .subscribe(showAs());
     }
 
     private void animateIn(CardView cardView, int startDelay) {

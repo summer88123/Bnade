@@ -22,7 +22,6 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.SingleSource;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.schedulers.Schedulers;
 
@@ -58,9 +57,9 @@ public class BnadeRepo {
                 .toSortedList();
     }
 
-    public SingleSource<Pair<List<AuctionHistory>, List<AuctionHistory>>> getAuctionPastAndHistory(Item item, Realm
+    public Observable<Pair<List<AuctionHistory>, List<AuctionHistory>>> getAuctionPastAndHistory(Item item, Realm
             realm) {
-        return Single.zip(
+        return Observable.zip(
                 api.getAuctionPastRealmItem(realm.getId(), item.getId()),
                 api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
                 Pair::new);
@@ -78,7 +77,7 @@ public class BnadeRepo {
                 .toObservable();
     }
 
-    public Single<List<AuctionRealmItem>> getAuctionRealmItem(Item item, Realm realm) {
+    public Observable<List<AuctionRealmItem>> getAuctionRealmItem(Item item, Realm realm) {
         return api.getAuctionRealmItem(realm.getId(), item.getId());
     }
 
@@ -160,9 +159,9 @@ public class BnadeRepo {
                 return mSearchResultVO;
             });
         }
-        return Single.zip(api.getAuctionRealmItem(realm.getId(), item.getId()), Single.just(item),
-                api.getAuctionPastRealmItem(realm.getId(), item.getId()),
-                api.getAuctionHistoryRealmItem(realm.getId(), item.getId()),
+        return Single.zip(api.getAuctionRealmItem(realm.getId(), item.getId()).firstOrError(), Single.just(item),
+                api.getAuctionPastRealmItem(realm.getId(), item.getId()).firstOrError(),
+                api.getAuctionHistoryRealmItem(realm.getId(), item.getId()).firstOrError(),
                 (auctionRealmItems, item12, auctionHistories, auctionHistories2) -> {
                     mSearchResultVO.reset();
                     mSearchResultVO.setItem(item12);

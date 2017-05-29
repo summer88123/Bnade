@@ -6,7 +6,6 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.CombinedData;
 import com.github.mikephil.charting.data.Entry;
 import com.summer.bnade.data.BnadeRepo;
-import com.summer.bnade.result.single.entity.AuctionHistoryVO;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.lib.model.entity.AuctionHistory;
 import com.summer.lib.model.entity.AuctionRealmItem;
@@ -22,7 +21,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import io.reactivex.SingleTransformer;
+import io.reactivex.ObservableTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by kevin.bai on 2017/4/28.
@@ -43,24 +43,30 @@ class ItemResultTransformer {
         this.mRepo = repo;
     }
 
-    SingleTransformer<Pair<Item, Realm>, AuctionHistoryVO> history() {
+    ObservableTransformer<Pair<Item, Realm>, ItemResultUIModel> history() {
         return upstream -> upstream
-                .flatMap(itemRealmPair -> mRepo.getAuctionPastAndHistory(itemRealmPair.first, itemRealmPair.second))
-                .map(listListPair -> {
-                    AuctionHistoryVO result = new AuctionHistoryVO();
-                    computeHistory(listListPair.second, result);
-                    computePast(listListPair.first, result);
-                    return result;
-                });
+                .flatMap(itemRealmPair -> mRepo.getAuctionPastAndHistory(itemRealmPair.first, itemRealmPair.second)
+                        .map(listListPair -> {
+                            ItemResultUIModel result = ItemResultUIModel.success();
+                            computeHistory(listListPair.second, result);
+                            computePast(listListPair.first, result);
+                            return result;
+                        })
+                        .onErrorReturn(error -> ItemResultUIModel.failure(error.getMessage()))
+                        .startWith(ItemResultUIModel.progress())
+                        .observeOn(AndroidSchedulers.mainThread()));
     }
 
-    SingleTransformer<Pair<Item, Realm>, List<AuctionRealmItem>> price() {
-        return upstream -> upstream
-                .flatMap(itemRealmPair -> mRepo.getAuctionRealmItem(itemRealmPair.first, itemRealmPair.second))
-                .map(this::polySameRealmItem);
+    ObservableTransformer<Pair<Item, Realm>, ItemResultUIModel> price() {
+        return upstream -> upstream.flatMap(
+                itemRealmPair -> mRepo.getAuctionRealmItem(itemRealmPair.first, itemRealmPair.second)
+                        .map(this::polySameRealmItem)
+                        .onErrorReturn(error -> ItemResultUIModel.failure(error.getMessage()))
+                        .startWith(ItemResultUIModel.progress())
+                        .observeOn(AndroidSchedulers.mainThread()));
     }
 
-    private void computeHistory(List<AuctionHistory> auctionHistories, AuctionHistoryVO result) {
+    private void computeHistory(List<AuctionHistory> auctionHistories, ItemResultUIModel result) {
 
         Collections.sort(auctionHistories, goldComparator);
         long oneDay = 3600 * 24 * 1000L;
@@ -101,7 +107,7 @@ class ItemResultTransformer {
 
     }
 
-    private void computePast(List<AuctionHistory> auctionPast, AuctionHistoryVO result) {
+    private void computePast(List<AuctionHistory> auctionPast, ItemResultUIModel result) {
 
         Collections.sort(auctionPast, goldComparator);
 
@@ -141,13 +147,13 @@ class ItemResultTransformer {
     }
 
     @android.support.annotation.NonNull
-    private AuctionHistoryVO.HistoryItem getHistoryItem(LinkedList<AuctionHistory> list, long sumGold, int sumCount) {
-        return new AuctionHistoryVO.HistoryItem(new Gold(sumGold / list.size()), list.getLast()
+    private ItemResultUIModel.HistoryItem getHistoryItem(LinkedList<AuctionHistory> list, long sumGold, int sumCount) {
+        return new ItemResultUIModel.HistoryItem(new Gold(sumGold / list.size()), list.getLast()
                 .getMinBuyout(), list.getFirst().getMinBuyout(), sumCount / list.size());
     }
 
     @android.support.annotation.NonNull
-    private List<AuctionRealmItem> polySameRealmItem(List<AuctionRealmItem> realmItems) {
+    private ItemResultUIModel polySameRealmItem(List<AuctionRealmItem> realmItems) {
         List<AuctionRealmItem> result = new ArrayList<>();
         for (AuctionRealmItem realmItem : realmItems) {
             int index = result.indexOf(realmItem);
@@ -166,6 +172,6 @@ class ItemResultTransformer {
             if (result1 > 0) return 1;
             else return result1 == 0 ? 0 : -1;
         });
-        return result;
+        return ItemResultUIModel.success(result);
     }
 }

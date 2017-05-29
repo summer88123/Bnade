@@ -1,6 +1,7 @@
 package com.summer.bnade.token;
 
 import com.github.mikephil.charting.data.Entry;
+import com.summer.bnade.base.BaseUIModel;
 
 import java.util.List;
 
@@ -8,11 +9,8 @@ import java.util.List;
  * Created by kevin.bai on 2017/4/9.
  */
 
-public class WowTokenUIModel {
+public class WowTokenUIModel extends BaseUIModel {
 
-    private final String errorMsg;
-    private final boolean inProgress;
-    private final boolean success;
     private int currentGold;
     private long lastModified;
     private int minGold;
@@ -21,86 +19,71 @@ public class WowTokenUIModel {
     private List<Entry> allTokens;
 
     private WowTokenUIModel(boolean inProgress, boolean success, String errorMsg) {
-        this.inProgress = inProgress;
-        this.success = success;
-        this.errorMsg = errorMsg;
+        super(inProgress, success, errorMsg);
     }
 
     private WowTokenUIModel(boolean inProgress, boolean success) {
-        this.inProgress = inProgress;
-        this.success = success;
-        this.errorMsg = null;
+        this(inProgress, success, null);
     }
 
-    public static WowTokenUIModel inProgress() {
+    static WowTokenUIModel inProgress() {
         return new WowTokenUIModel(true, false);
     }
 
-    public static WowTokenUIModel success() {
+    static WowTokenUIModel success() {
         return new WowTokenUIModel(false, true);
     }
 
-    public static WowTokenUIModel failure(String errorMsg) {
+    static WowTokenUIModel failure(String errorMsg) {
         return new WowTokenUIModel(false, false, errorMsg);
     }
 
-    public List<Entry> getAllTokens() {
+    List<Entry> getAllTokens() {
         return allTokens;
     }
 
-    public void setAllTokens(List<Entry> allTokens) {
+    void setAllTokens(List<Entry> allTokens) {
         this.allTokens = allTokens;
     }
 
-    public int getCurrentGold() {
+    int getCurrentGold() {
         return currentGold;
     }
 
-    public void setCurrentGold(int currentGold) {
+    void setCurrentGold(int currentGold) {
         this.currentGold = currentGold;
     }
 
-    public String getErrorMsg() {
-        return errorMsg;
-    }
-
-    public long getLastModified() {
+    long getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(long lastModified) {
+    void setLastModified(long lastModified) {
         this.lastModified = lastModified;
     }
 
-    public int getMaxGold() {
+    int getMaxGold() {
         return maxGold;
     }
 
-    public void setMaxGold(int maxGold) {
+    void setMaxGold(int maxGold) {
         this.maxGold = maxGold;
     }
 
-    public int getMinGold() {
+    int getMinGold() {
         return minGold;
     }
 
-    public void setMinGold(int minGold) {
+    void setMinGold(int minGold) {
         this.minGold = minGold;
     }
 
-    public List<Entry> getOneDayTokens() {
+    List<Entry> getOneDayTokens() {
         return oneDayTokens;
     }
 
-    public void setOneDayTokens(List<Entry> oneDayTokens) {
+    void setOneDayTokens(List<Entry> oneDayTokens) {
         this.oneDayTokens = oneDayTokens;
     }
 
-    public boolean isInProgress() {
-        return inProgress;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
 }

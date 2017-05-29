@@ -43,8 +43,9 @@ public class WowTokenTransformer {
                         .map(this::getWowTokenUIModel)
                         .toObservable()
                         .onErrorReturn(e -> WowTokenUIModel.failure(e.getMessage()))
+                        .startWith(WowTokenUIModel.inProgress())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .startWith(WowTokenUIModel.inProgress()));
+                );
     }
 
     @NonNull

@@ -1,7 +1,5 @@
 package com.summer.bnade.result.all;
 
-import com.summer.lib.model.entity.Item;
-
 import dagger.Module;
 import dagger.Provides;
 
@@ -11,10 +9,8 @@ import dagger.Provides;
 @Module
 class SearchResultModule {
     private final SearchResultActivity mView;
-    private final Item item;
 
-    SearchResultModule(SearchResultActivity view, Item item) {
-        this.item = item;
+    SearchResultModule(SearchResultActivity view) {
         this.mView = view;
     }
 
@@ -25,7 +21,7 @@ class SearchResultModule {
 
     @Provides
     SearchResultAdapter provideAdapter() {
-        return new SearchResultAdapter(item);
+        return new SearchResultAdapter(mView.item);
     }
 
 }

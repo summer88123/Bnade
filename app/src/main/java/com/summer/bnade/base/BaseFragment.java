@@ -20,13 +20,15 @@ import com.trello.rxlifecycle2.android.RxLifecycleAndroid;
 import javax.annotation.Nonnull;
 
 import io.reactivex.Observable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
 
 /**
  * Created by kevin.bai on 2017/4/14.
  */
 
-public abstract class BaseFragment extends Fragment implements IActivityCreated, LifecycleProvider<FragmentEvent> {
+public abstract class BaseFragment<M extends BaseUIModel> extends Fragment implements IActivityCreated,
+        LifecycleProvider<FragmentEvent> {
     private final BehaviorSubject<FragmentEvent> subject = BehaviorSubject.create();
 
     @Override
@@ -43,6 +45,33 @@ public abstract class BaseFragment extends Fragment implements IActivityCreated,
     public void setUpObservable() {
         // nothing
     }
+
+    protected Consumer<M> showAs() {
+        return model -> {
+            onProgress(model.isInProgress());
+            if (!model.isInProgress()) {
+                if (model.isSuccess()) {
+                    onSuccess(model);
+                } else {
+                    onFailure(model);
+                }
+            }
+        };
+    }
+
+    protected void onFailure(M model) {
+        // show failure
+        showToast(model.getErrorMsg());
+    }
+
+    protected void onSuccess(M model) {
+        // show success
+    }
+
+    protected void onProgress(boolean inProgress) {
+        // show progress
+    }
+
 
     @Nonnull
     @Override
@@ -61,7 +90,7 @@ public abstract class BaseFragment extends Fragment implements IActivityCreated,
     @Nonnull
     @CheckResult
     protected Observable<FragmentEvent> untilEmit(@Nonnull FragmentEvent fragmentEvent) {
-        return lifecycle().filter(event -> event.equals(fragmentEvent)).firstOrError().toObservable();
+        return lifecycle().filter(event -> event.equals(fragmentEvent));
     }
 
     @Nonnull

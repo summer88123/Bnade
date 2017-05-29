@@ -1,5 +1,6 @@
 package com.summer.bnade.realmrank;
 
+import com.summer.bnade.base.BaseUIModel;
 import com.summer.lib.model.entity.AuctionRealm;
 
 import java.util.List;
@@ -8,15 +9,11 @@ import java.util.List;
  * Created by kevin.bai on 2017/5/24.
  */
 
-public class RealmRankUIModel {
-    private boolean inProgress;
-    private boolean success;
-    private String errorMsg;
+class RealmRankUIModel extends BaseUIModel{
     private List<AuctionRealm> list;
 
     private RealmRankUIModel(boolean inProgress, boolean success) {
-        this.inProgress = inProgress;
-        this.success = success;
+        super(inProgress, success, null);
     }
 
     private RealmRankUIModel(List<AuctionRealm> list) {
@@ -25,8 +22,7 @@ public class RealmRankUIModel {
     }
 
     private RealmRankUIModel(String errorMsg) {
-        this(false, false);
-        this.errorMsg = errorMsg;
+        super(false, false, errorMsg);
     }
 
     static RealmRankUIModel progress() {
@@ -41,19 +37,7 @@ public class RealmRankUIModel {
         return new RealmRankUIModel(errorMsg);
     }
 
-    String getErrorMsg() {
-        return errorMsg;
-    }
-
     List<AuctionRealm> getList() {
         return list;
-    }
-
-    boolean isInProgress() {
-        return inProgress;
-    }
-
-    boolean isSuccess() {
-        return success;
     }
 }

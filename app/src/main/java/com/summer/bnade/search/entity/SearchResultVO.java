@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.github.mikephil.charting.data.CombinedData;
-import com.summer.bnade.result.single.entity.AuctionHistoryVO;
+import com.summer.bnade.result.single.ItemResultUIModel;
 import com.summer.lib.model.entity.AuctionHistory;
 import com.summer.lib.model.entity.AuctionItem;
 import com.summer.lib.model.entity.AuctionRealmItem;
@@ -36,7 +36,7 @@ public class SearchResultVO implements Parcelable {
     private List<AuctionRealmItem> auctionRealmItems;
     private List<AuctionHistory> auctionHistories;
     private List<AuctionHistory> auctionPast;
-    private AuctionHistoryVO auctionHistoryVO;
+    private ItemResultUIModel mItemResultUIModel;
     /**
      * 全服务器数据
      */
@@ -90,12 +90,12 @@ public class SearchResultVO implements Parcelable {
         this.auctionHistories = auctionHistories;
     }
 
-    public AuctionHistoryVO getAuctionHistoryVO() {
-        return auctionHistoryVO;
+    public ItemResultUIModel getItemResultUIModel() {
+        return mItemResultUIModel;
     }
 
-    public void setAuctionHistoryVO(AuctionHistoryVO auctionHistoryVO) {
-        this.auctionHistoryVO = auctionHistoryVO;
+    public void setItemResultUIModel(ItemResultUIModel itemResultUIModel) {
+        this.mItemResultUIModel = itemResultUIModel;
     }
 
     public List<AuctionItem> getAuctionItems() {

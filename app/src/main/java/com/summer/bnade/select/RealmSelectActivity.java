@@ -6,17 +6,32 @@ import android.view.Window;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseActivity;
 import com.summer.bnade.base.di.ComponentHolder;
+import com.summer.bnade.home.Provider;
 
 import javax.inject.Inject;
 
-public class RealmSelectActivity extends BaseActivity {
+public class RealmSelectActivity extends BaseActivity implements Provider<RealmSelectTransformer> {
     @Inject
-    RealmSelectPresenter mPresenter;
+    RealmSelectTransformer mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public int layout() {
+        return R.layout.activity_realm_select;
+    }
+
+    @Override
+    public void setUpView() {
+
+    }
+
+    @Override
+    public void injectComponent() {
         RealmSelectFragment fragment = (RealmSelectFragment) getSupportFragmentManager()
                 .findFragmentByTag(RealmSelectFragment.TAG);
         if (fragment == null) {
@@ -30,12 +45,7 @@ public class RealmSelectActivity extends BaseActivity {
     }
 
     @Override
-    public int layout() {
-        return R.layout.activity_realm_select;
-    }
-
-    @Override
-    public void setUpView() {
-
+    public RealmSelectTransformer provide() {
+        return mPresenter;
     }
 }

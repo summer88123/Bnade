@@ -1,27 +1,20 @@
 package com.summer.bnade.select;
 
 import dagger.Module;
-import dagger.Provides;
 
 /**
  * Created by kevin.bai on 2017/4/20.
  */
 @Module
 class RealmSelectModule {
-    private final RealmSelectContract.View mView;
+    private final RealmSelectFragment mView;
 
-    RealmSelectModule(RealmSelectContract.View view) {
+    RealmSelectModule(RealmSelectFragment view) {
         mView = view;
     }
 
-    @Provides
-    RealmSelectContract.Presenter providePresenter(RealmSelectPresenter presenter) {
-        return presenter;
-    }
-
-    @Provides
-    RealmSelectContract.View provideView() {
-        return mView;
+    RealmAdapter provideAdapter(RealmSelectTransformer presenter){
+        return new RealmAdapter(mView, presenter);
     }
 
 }

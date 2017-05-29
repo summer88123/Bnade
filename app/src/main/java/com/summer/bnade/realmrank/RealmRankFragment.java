@@ -31,7 +31,7 @@ import io.reactivex.Observable;
 /**
  * interface.
  */
-public class RealmRankFragment extends BaseFragment {
+public class RealmRankFragment extends BaseFragment<RealmRankUIModel> {
     public static final String TAG = RealmRankFragment.class.getSimpleName();
     @BindView(R.id.list)
     RecyclerView mList;
@@ -80,15 +80,14 @@ public class RealmRankFragment extends BaseFragment {
         }
     }
 
-    public void show(RealmRankUIModel model) {
-        mRefreshLayout.setRefreshing(model.isInProgress());
-        if (!model.isInProgress()) {
-            if (model.isSuccess()) {
-                mAdapter.update(model.getList());
-            } else {
-                showToast(model.getErrorMsg());
-            }
-        }
+    @Override
+    protected void onProgress(boolean inProgress) {
+        mRefreshLayout.setRefreshing(inProgress);
+    }
+
+    @Override
+    protected void onSuccess(RealmRankUIModel model) {
+        mAdapter.update(model.getList());
     }
 
     @Override
@@ -126,13 +125,13 @@ public class RealmRankFragment extends BaseFragment {
                 .doOnNext(this::updateSortType)
                 .compose(mPresenter.sort())
                 .compose(bindToLifecycle())
-                .subscribe(this::show);
+                .subscribe(showAs());
         RxSwipeRefreshLayout.refreshes(mRefreshLayout)
                 .map(o -> current)
-                .startWith(untilEmit(FragmentEvent.START).map(ignore -> current))
+                .mergeWith(untilEmit(FragmentEvent.START).map(ignore -> current))
                 .compose(mPresenter.load())
                 .compose(bindToLifecycle())
-                .subscribe(this::show);
+                .subscribe(showAs());
     }
 
     private void updateSortType(AuctionRealm.SortType sortType) {

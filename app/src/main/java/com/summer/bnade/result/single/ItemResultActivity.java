@@ -65,7 +65,7 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
     public void injectComponent() {
         ItemResultComponent component = DaggerItemResultComponent.builder()
                 .appComponent(ComponentHolder.getComponent())
-                .itemResultModule(new ItemResultModule(this, item, realm))
+                .itemResultModule(new ItemResultModule(this))
                 .build();
         component.inject(this);
     }
@@ -95,7 +95,7 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
                 mToolbar.setNavigationIcon(resource);
                 return true;
             }
-        }).into(ScreenUtil.dp2px(48), ScreenUtil.dp2px(48));
+        }).into(ScreenUtil.dp2px(148), ScreenUtil.dp2px(148));
     }
 
     @Override

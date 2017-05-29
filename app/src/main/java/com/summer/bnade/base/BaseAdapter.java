@@ -74,7 +74,7 @@ public abstract class BaseAdapter<I, H extends BaseViewHolder<I>> extends Recycl
 
     protected abstract int layoutId();
 
-    private BaseDiffCallback createDiffCallBack() {
+    protected BaseDiffCallback createDiffCallBack() {
         return new BaseDiffCallback();
     }
 
