@@ -1,1 +1,1 @@
-include ':app', ':bnade'
+include ':app', ':bnade', ':extramaker', ':extra-compiler'
