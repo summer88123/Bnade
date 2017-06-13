@@ -12,6 +12,8 @@ import com.summer.lib.model.di.BnadeModule;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import dagger.android.AndroidInjector;
+import dagger.android.support.AndroidSupportInjectionModule;
 
 /**
  * 处理全局单例的依赖对象
@@ -21,14 +23,23 @@ import dagger.Component;
 @Component(modules = {
         BaseModule.class,
         RepoModule.class,
-        BnadeModule.class})
-public interface AppComponent {
+        BnadeModule.class,
+        AndroidSupportInjectionModule.class,
+        BuildActivityModule.class,})
+public interface AppComponent extends AndroidInjector<BnadeApplication> {
+
     void inject(BnadeApplication application);
-    void inject(RealmSelectButton button);
 
     BnadeRepo bnadeRepo();
 
+    HistoryRealmRepo historyRealmRepo();
+
     HistorySearchRepo historySearchRepo();
 
-    HistoryRealmRepo historyRealmRepo();
+    void inject(RealmSelectButton button);
+
+    @Component.Builder
+    abstract class Builder extends AndroidInjector.Builder<BnadeApplication> {
+        public abstract AppComponent build();
+    }
 }

@@ -1,9 +1,9 @@
 package com.summer.bnade.data;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.SharedPreferences;
 
+import com.summer.bnade.base.BnadeApplication;
 import com.summer.lib.model.api.BnadeApi;
 import com.summer.lib.model.utils.RealmHelper;
 
@@ -17,16 +17,11 @@ import dagger.Provides;
  */
 @Module
 public class RepoModule {
-    private final Application mApp;
-
-    public RepoModule(Application app) {
-        mApp = app;
-    }
 
     @Singleton
     @Provides
-    SharedPreferences provideSharedPreferences() {
-        return mApp.getSharedPreferences("app", Activity.MODE_PRIVATE);
+    SharedPreferences provideSharedPreferences(BnadeApplication app) {
+        return app.getSharedPreferences("app", Activity.MODE_PRIVATE);
     }
 
     @Singleton

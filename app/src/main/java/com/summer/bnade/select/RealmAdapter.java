@@ -14,6 +14,8 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersAdapter;
 
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -23,6 +25,7 @@ class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> impl
     private RealmSelectFragment view;
     private RealmSelectTransformer mPresenter;
 
+    @Inject
     RealmAdapter(RealmSelectFragment view, RealmSelectTransformer presenter) {
         this.view = view;
         this.mPresenter = presenter;

@@ -2,7 +2,6 @@ package com.summer.bnade.home;
 
 import com.summer.bnade.base.di.AppComponent;
 import com.summer.bnade.base.di.PreActivity;
-import com.summer.bnade.player.PlayerItemContract;
 import com.summer.bnade.player.PlayerItemFragment;
 import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.realmrank.RealmRankFragment;
@@ -32,18 +31,11 @@ public interface MainComponent {
 
     void inject(SearchFragment fragment);
 
-    void inject(RealmRankFragment fragment);
-
-    void inject(WowTokenFragment fragment);
-
-    void inject(PlayerItemFragment fragment);
-
     WowTokenFragment wowTokenView();
 
     SearchContract.View searchView();
 
     RealmRankFragment realmRankView();
 
-    PlayerItemContract.View playerItemView();
-
+    PlayerItemFragment playerItemView();
 }

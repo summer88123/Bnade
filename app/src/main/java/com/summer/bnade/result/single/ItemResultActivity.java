@@ -13,8 +13,6 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseActivity;
-import com.summer.bnade.base.di.ComponentHolder;
-import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.utils.RxUtil;
 import com.summer.bnade.utils.ScreenUtil;
@@ -25,7 +23,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 
-public class ItemResultActivity extends BaseActivity implements Provider<ItemResultTransformer> {
+public class ItemResultActivity extends BaseActivity{
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -62,15 +60,6 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
     }
 
     @Override
-    public void injectComponent() {
-        ItemResultComponent component = DaggerItemResultComponent.builder()
-                .appComponent(ComponentHolder.getComponent())
-                .itemResultModule(new ItemResultModule(this))
-                .build();
-        component.inject(this);
-    }
-
-    @Override
     public int layout() {
         return R.layout.activity_search_realm_item_result;
     }
@@ -98,8 +87,4 @@ public class ItemResultActivity extends BaseActivity implements Provider<ItemRes
         }).into(ScreenUtil.dp2px(148), ScreenUtil.dp2px(148));
     }
 
-    @Override
-    public ItemResultTransformer provide() {
-        return mPresenter;
-    }
 }

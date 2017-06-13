@@ -15,12 +15,8 @@ public class RealmRankModule {
     }
 
     @Provides
-    RealmRankFragment provideFragment(){
+    RealmRankFragment provideFragment() {
         return mFragment;
     }
 
-    @Provides
-    RealmRankAdapter provideAdapter() {
-        return new RealmRankAdapter();
-    }
 }

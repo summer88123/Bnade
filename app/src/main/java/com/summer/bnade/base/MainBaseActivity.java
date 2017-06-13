@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.CheckResult;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.trello.rxlifecycle2.LifecycleProvider;
@@ -14,7 +15,6 @@ import com.trello.rxlifecycle2.android.RxLifecycleAndroid;
 
 import javax.annotation.Nonnull;
 
-import dagger.android.support.DaggerAppCompatActivity;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
@@ -23,7 +23,7 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by kevin.bai on 2017/4/4.
  */
 
-public abstract class BaseActivity<M extends BaseUIModel> extends DaggerAppCompatActivity implements IActivityCreated,
+public abstract class MainBaseActivity<M extends BaseUIModel> extends AppCompatActivity implements IActivityCreated,
         LifecycleProvider<ActivityEvent> {
 
     BehaviorSubject<ActivityEvent> subject = BehaviorSubject.create();

@@ -1,7 +1,6 @@
 package com.summer.bnade.select;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TextInputEditText;
 import android.support.design.widget.TextInputLayout;
@@ -11,7 +10,6 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
-import com.summer.bnade.home.Provider;
 import com.summer.bnade.select.entity.TypedRealm;
 import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Realm;
@@ -19,6 +17,8 @@ import com.timehop.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import com.trello.rxlifecycle2.android.FragmentEvent;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 
@@ -30,9 +30,9 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectUIModel> {
     TextInputEditText mEtSearch;
     @BindView(R.id.textInputLayout)
     TextInputLayout mTextInputLayout;
-
+    @Inject
     RealmAdapter mAdapter;
-
+    @Inject
     RealmSelectTransformer mPresenter;
 
     @SuppressWarnings("unused")
@@ -90,14 +90,6 @@ public class RealmSelectFragment extends BaseFragment<RealmSelectUIModel> {
     @Override
     protected void onSuccess(RealmSelectUIModel model) {
         show(model.getList());
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Provider) {
-            mPresenter = (RealmSelectTransformer) ((Provider) context).provide();
-        }
     }
 
     public void selected(Realm realm) {

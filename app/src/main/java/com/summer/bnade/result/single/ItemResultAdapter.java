@@ -9,14 +9,20 @@ import com.summer.bnade.base.BaseViewHolder;
 import com.summer.lib.model.entity.AuctionRealmItem;
 import com.summer.lib.model.entity.Gold;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 /**
  * Created by kevin.bai on 2017/4/28.
  */
-
 class ItemResultAdapter extends BaseAdapter<AuctionRealmItem, ItemResultAdapter.ViewHolder> {
+
+    @Inject
+    ItemResultAdapter(){
+
+    }
 
     @Override
     protected int layoutId() {

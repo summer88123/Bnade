@@ -2,12 +2,13 @@ package com.summer.bnade.result.single;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.summer.bnade.R;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
+
+import javax.inject.Inject;
 
 /**
  * Created by kevin.bai on 2017/5/3.
@@ -18,11 +19,12 @@ class ItemResultPageAdapter extends FragmentPagerAdapter {
     private final Item item;
     private final Realm realm;
 
-    ItemResultPageAdapter(Context context, FragmentManager fm, Item item, Realm realm) {
-        super(fm);
-        this.mContext = context;
-        this.item = item;
-        this.realm = realm;
+    @Inject
+    ItemResultPageAdapter(ItemResultActivity activity) {
+        super(activity.getSupportFragmentManager());
+        this.mContext = activity.getApplicationContext();
+        this.item = activity.item;
+        this.realm = activity.realm;
     }
 
     @Override

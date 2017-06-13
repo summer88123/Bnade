@@ -12,10 +12,16 @@ import com.summer.lib.model.entity.AuctionRealm;
 
 import java.util.Objects;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class RealmRankAdapter extends BaseAdapter<AuctionRealm, RealmRankAdapter.ViewHolder> {
+    @Inject
+    RealmRankAdapter() {
+    }
+
     @Override
     protected int layoutId() {
         return R.layout.fragment_item;
@@ -56,7 +62,7 @@ class RealmRankAdapter extends BaseAdapter<AuctionRealm, RealmRankAdapter.ViewHo
             mTvTotalCount.setText(String.valueOf(auctionRealm.getAuctionQuantity()));
             mTvUserCount.setText(String.valueOf(auctionRealm.getPlayerQuantity()));
             mTvItemKind.setText(String.valueOf(auctionRealm.getItemQuantity()));
-            mTvUpdateTime.setText(DateUtil.format(auctionRealm.getLastModified(),"H:mm"));
+            mTvUpdateTime.setText(DateUtil.format(auctionRealm.getLastModified(), "H:mm"));
         }
 
     }

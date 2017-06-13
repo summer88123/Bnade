@@ -11,11 +11,13 @@ import com.summer.bnade.base.BaseViewHolder;
 import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.Gold;
 
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolder> {
-
+    @Inject
     PlayerItemAdapter() {
     }
 

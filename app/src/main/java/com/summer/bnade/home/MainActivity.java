@@ -1,7 +1,13 @@
 package com.summer.bnade.home;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
@@ -12,11 +18,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseActivity;
+import com.summer.bnade.base.MainBaseActivity;
 import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.player.PlayerItemFragment;
 import com.summer.bnade.player.PlayerItemModule;
@@ -29,7 +34,7 @@ import com.summer.bnade.token.WowTokenModule;
 
 import butterknife.BindView;
 
-public class MainActivity extends BaseActivity
+public class MainActivity extends MainBaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, Provider<MainComponent> {
 
     @BindView(R.id.toolbar)
@@ -40,10 +45,18 @@ public class MainActivity extends BaseActivity
     DrawerLayout drawer;
     @BindView(R.id.nav_view)
     NavigationView navigationView;
+    @BindView(R.id.adView)
+    AdView mAdView;
 
     FragmentManager fm;
 
     MainComponent mMainComponent;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+    }
 
     @Override
     public int layout() {
@@ -70,6 +83,9 @@ public class MainActivity extends BaseActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         selectSearch();
+
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("408A5D0DD4D6B0C21C92D6D79C3E2388").build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override

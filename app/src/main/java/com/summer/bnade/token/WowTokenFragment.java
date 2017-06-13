@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -21,8 +20,6 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
-import com.summer.bnade.home.MainComponent;
-import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.DateUtil;
 import com.summer.bnade.utils.DefaultViewUtil;
@@ -84,15 +81,6 @@ public class WowTokenFragment extends BaseFragment<WowTokenUIModel> {
             fragment = new WowTokenFragment();
         }
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Provider) {
-            MainComponent component = (MainComponent) ((Provider) context).provide();
-            component.inject(this);
-        }
     }
 
     @Override

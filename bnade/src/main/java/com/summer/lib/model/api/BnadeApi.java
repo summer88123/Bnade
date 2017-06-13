@@ -86,7 +86,7 @@ public interface BnadeApi {
     Single<List<AuctionRealm>> getAuctionRealmsSummary();
 
     @GET("auction/realm/{realmId}/owner/{name}")
-    Single<List<Auction>> getAuctionRealmOwner(@Path("realmId") long realmId, @Path("name") String name);
+    Single<List<Auction>> getAuctionRealmOwner(@Path("realmId") long realmId, @Path("name") CharSequence name);
 
     /**
      * 查询某个服务器某个物品的拍卖行的所有数据

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.CheckResult;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,6 @@ import com.trello.rxlifecycle2.android.RxLifecycleAndroid;
 
 import javax.annotation.Nonnull;
 
-import dagger.android.support.DaggerFragment;
 import io.reactivex.Observable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.subjects.BehaviorSubject;
@@ -27,7 +27,7 @@ import io.reactivex.subjects.BehaviorSubject;
  * Created by kevin.bai on 2017/4/14.
  */
 
-public abstract class BaseFragment<M extends BaseUIModel> extends DaggerFragment implements IActivityCreated,
+public abstract class MainBaseFragment<M extends BaseUIModel> extends Fragment implements IActivityCreated,
         LifecycleProvider<FragmentEvent> {
     private final BehaviorSubject<FragmentEvent> subject = BehaviorSubject.create();
 

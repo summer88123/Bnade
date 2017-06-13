@@ -8,24 +8,14 @@ import dagger.Provides;
  */
 @Module
 public class PlayerItemModule {
-    private final PlayerItemContract.View mView;
+    private final PlayerItemFragment mView;
 
-    public PlayerItemModule(PlayerItemContract.View view) {
+    public PlayerItemModule(PlayerItemFragment view) {
         mView = view;
     }
 
     @Provides
-    PlayerItemContract.Presenter providePresenter(PlayerItemPresenter presenter) {
-        return presenter;
-    }
-
-    @Provides
-    PlayerItemAdapter provideAdapter(){
-        return new PlayerItemAdapter();
-    }
-
-    @Provides
-    PlayerItemContract.View provideView() {
+    PlayerItemFragment provideView() {
         return mView;
     }
 }

@@ -7,21 +7,11 @@ import dagger.Provides;
  * Created by kevin.bai on 2017/4/14.
  */
 @Module
-class SearchResultModule {
-    private final SearchResultActivity mView;
-
-    SearchResultModule(SearchResultActivity view) {
-        this.mView = view;
-    }
+public class SearchResultModule {
 
     @Provides
-    SearchResultActivity provideResultView() {
-        return mView;
-    }
-
-    @Provides
-    SearchResultAdapter provideAdapter() {
-        return new SearchResultAdapter(mView.item);
+    SearchResultAdapter provideAdapter(SearchResultActivity view) {
+        return new SearchResultAdapter(view.item);
     }
 
 }

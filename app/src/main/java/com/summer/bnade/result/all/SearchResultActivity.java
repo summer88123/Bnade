@@ -20,7 +20,6 @@ import com.github.mikephil.charting.components.YAxis;
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseActivity;
-import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.Content;
 import com.summer.lib.model.entity.Gold;
@@ -91,12 +90,6 @@ public class SearchResultActivity extends BaseActivity<ResultUIModel> {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void injectComponent() {
-        DaggerSearchResultComponent.builder().appComponent(ComponentHolder.getComponent())
-                .searchResultModule(new SearchResultModule(this)).build().inject(this);
     }
 
     @Override

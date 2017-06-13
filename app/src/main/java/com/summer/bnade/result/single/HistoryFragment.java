@@ -1,7 +1,6 @@
 package com.summer.bnade.result.single;
 
 
-import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,13 +14,14 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
-import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.ChartHelper;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.utils.StringHelper;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 import com.trello.rxlifecycle2.android.FragmentEvent;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -66,7 +66,7 @@ public class HistoryFragment extends BaseFragment<ItemResultUIModel> {
     CombinedChart mChartHistory;
     Item item;
     Realm realm;
-
+    @Inject
     ItemResultTransformer mPresenter;
 
     public static HistoryFragment getInstance(Item item, Realm realm) {
@@ -118,14 +118,6 @@ public class HistoryFragment extends BaseFragment<ItemResultUIModel> {
         mChartHistory.invalidate();
         mChartOneDay.setData(model.getDataOneDay());
         mChartOneDay.invalidate();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Provider) {
-            mPresenter = (ItemResultTransformer) ((Provider) context).provide();
-        }
     }
 
     @Override

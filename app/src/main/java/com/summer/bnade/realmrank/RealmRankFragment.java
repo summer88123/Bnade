@@ -1,6 +1,5 @@
 package com.summer.bnade.realmrank;
 
-import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,8 +10,6 @@ import com.jakewharton.rxbinding2.support.v4.widget.RxSwipeRefreshLayout;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
-import com.summer.bnade.home.MainComponent;
-import com.summer.bnade.home.Provider;
 import com.summer.bnade.utils.DefaultViewUtil;
 import com.summer.lib.model.entity.AuctionRealm;
 import com.trello.rxlifecycle2.android.FragmentEvent;
@@ -59,6 +56,7 @@ public class RealmRankFragment extends BaseFragment<RealmRankUIModel> {
 
     @Icicle
     AuctionRealm.SortType current = AuctionRealm.SortType.TotalDown;
+
     private ButterKnife.Action<TextView> DisableRightDrawable = (view, index) -> view
             .setCompoundDrawables(null, null, null, null);
 
@@ -69,15 +67,6 @@ public class RealmRankFragment extends BaseFragment<RealmRankUIModel> {
             fragment = new RealmRankFragment();
         }
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Provider) {
-            MainComponent component = (MainComponent) ((Provider) context).provide();
-            component.inject(this);
-        }
     }
 
     @Override

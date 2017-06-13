@@ -1,31 +1,26 @@
 package com.summer.bnade.player;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseViewFragment;
-import com.summer.bnade.home.MainComponent;
-import com.summer.bnade.home.Provider;
+import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.select.RealmSelectActivity;
 import com.summer.bnade.utils.Content;
 import com.summer.bnade.widget.RealmSelectButton;
-import com.summer.lib.model.entity.Auction;
 import com.summer.lib.model.entity.Realm;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.Observable;
 
-public class PlayerItemFragment extends BaseViewFragment<PlayerItemContract.Presenter> implements PlayerItemContract
-        .View {
+public class PlayerItemFragment extends BaseFragment<PlayerItemUIModel> {
     public static final String TAG = PlayerItemFragment.class.getSimpleName();
     @BindView(R.id.select_btn)
     RealmSelectButton mBtnRealmSelect;
@@ -34,6 +29,8 @@ public class PlayerItemFragment extends BaseViewFragment<PlayerItemContract.Pres
     @BindView(R.id.list)
     RecyclerView mList;
 
+    @Inject
+    PlayerItemTransformer mPresenter;
     @Inject
     PlayerItemAdapter mAdapter;
 
@@ -56,17 +53,8 @@ public class PlayerItemFragment extends BaseViewFragment<PlayerItemContract.Pres
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Provider) {
-            MainComponent component = (MainComponent) ((Provider) context).provide();
-            component.inject(this);
-        }
-    }
-
-    @Override
-    public void showList(List<Auction> auctions) {
-        mAdapter.update(auctions);
+    protected void onSuccess(PlayerItemUIModel model) {
+        mAdapter.update(model.getAuctions());
     }
 
     @Override
@@ -77,23 +65,23 @@ public class PlayerItemFragment extends BaseViewFragment<PlayerItemContract.Pres
     @Override
     public void setUpView() {
         mList.setAdapter(mAdapter);
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                Realm current = mBtnRealmSelect.getRealm();
-                if (current == null) {
-                    showToast(R.string.toast_player_item_no_select_realm);
-                } else {
-                    mPresenter.search(s, current);
-                }
-                return false;
-            }
+    }
 
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return false;
-            }
-        });
+    @Override
+    public void setUpObservable() {
+        RxSearchView.queryTextChangeEvents(mSearchView)
+                .map(event -> new PlayerItemAction(event.queryText(), mBtnRealmSelect.getRealm()))
+                .flatMap(action -> {
+                    if (action.getSelect() == null) {
+                        return Observable
+                                .error(new RuntimeException(getString(R.string.toast_player_item_no_select_realm)));
+                    } else {
+                        return Observable.just(action);
+                    }
+                })
+                .compose(mPresenter.search())
+                .compose(bindToLifecycle())
+                .subscribe(showAs());
     }
 
     @OnClick(R.id.select_btn)

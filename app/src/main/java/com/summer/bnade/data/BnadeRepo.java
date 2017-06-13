@@ -81,7 +81,7 @@ public class BnadeRepo {
         return api.getAuctionRealmItem(realm.getId(), item.getId());
     }
 
-    public Single<List<Auction>> getAuctionRealmOwner(long realmId, String name) {
+    public Observable<List<Auction>> getAuctionRealmOwner(long realmId, CharSequence name) {
         return api.getAuctionRealmOwner(realmId, name)
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapSingle(auction -> getItem(auction.getName())
@@ -89,7 +89,7 @@ public class BnadeRepo {
                             auction.setItem(item);
                             return auction;
                         }))
-                .toList();
+                .toList().toObservable();
     }
 
     public Single<List<Hot>> getHot(int type) {
