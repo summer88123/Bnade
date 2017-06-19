@@ -1,6 +1,5 @@
 package com.summer.bnade.search;
 
-import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
@@ -8,6 +7,8 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
 import com.summer.lib.model.entity.Hot;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -19,10 +20,11 @@ import butterknife.OnClick;
 
 class HotSearchAdapter extends BaseAdapter<Hot, HotSearchAdapter.ViewHolder> {
 
-    private final SearchContract.View mView;
+    private final OnTabClickListener mOnTabClickListener;
 
-    HotSearchAdapter(SearchContract.View view) {
-        this.mView = view;
+    @Inject
+    HotSearchAdapter(OnTabClickListener listener) {
+        this.mOnTabClickListener = listener;
     }
 
     @Override
@@ -38,8 +40,6 @@ class HotSearchAdapter extends BaseAdapter<Hot, HotSearchAdapter.ViewHolder> {
     class ViewHolder extends BaseViewHolder<Hot> {
         @BindView(R.id.tv_search_item)
         TextView tvSearchItem;
-        @BindView(R.id.card_search_item)
-        CardView cardSearchItem;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -54,7 +54,7 @@ class HotSearchAdapter extends BaseAdapter<Hot, HotSearchAdapter.ViewHolder> {
 
         @OnClick(R.id.card_search_item)
         void onClick() {
-            mView.search(item.getName());
+            mOnTabClickListener.onClick(item.getName());
         }
     }
 }

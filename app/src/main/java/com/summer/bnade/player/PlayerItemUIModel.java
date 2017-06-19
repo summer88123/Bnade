@@ -33,7 +33,7 @@ class PlayerItemUIModel extends BaseUIModel {
         return new PlayerItemUIModel(false, false, errorMsg);
     }
 
-    public List<Auction> getAuctions() {
+    List<Auction> getAuctions() {
         return auctions;
     }
 }

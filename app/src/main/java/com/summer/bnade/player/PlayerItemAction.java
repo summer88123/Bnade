@@ -7,15 +7,15 @@ import com.summer.lib.model.entity.Realm;
  */
 
 public class PlayerItemAction {
-    CharSequence query;
-    Realm select;
+    private CharSequence query;
+    private Realm select;
 
-    public PlayerItemAction(CharSequence query, Realm select) {
+    PlayerItemAction(CharSequence query, Realm select) {
         this.query = query;
         this.select = select;
     }
 
-    public CharSequence getQuery() {
+    CharSequence getQuery() {
         return query;
     }
 

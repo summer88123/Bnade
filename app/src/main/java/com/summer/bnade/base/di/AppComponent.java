@@ -25,7 +25,7 @@ import dagger.android.support.AndroidSupportInjectionModule;
         RepoModule.class,
         BnadeModule.class,
         AndroidSupportInjectionModule.class,
-        BuildActivityModule.class,})
+        BuilderModule.class,})
 public interface AppComponent extends AndroidInjector<BnadeApplication> {
 
     void inject(BnadeApplication application);

@@ -21,21 +21,16 @@ import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 
 import com.summer.bnade.R;
-import com.summer.bnade.base.MainBaseActivity;
-import com.summer.bnade.base.di.ComponentHolder;
+import com.summer.bnade.base.BaseActivity;
 import com.summer.bnade.player.PlayerItemFragment;
-import com.summer.bnade.player.PlayerItemModule;
 import com.summer.bnade.realmrank.RealmRankFragment;
-import com.summer.bnade.realmrank.RealmRankModule;
 import com.summer.bnade.search.SearchFragment;
-import com.summer.bnade.search.SearchModule;
 import com.summer.bnade.token.WowTokenFragment;
-import com.summer.bnade.token.WowTokenModule;
 
 import butterknife.BindView;
 
-public class MainActivity extends MainBaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, Provider<MainComponent> {
+public class MainActivity extends BaseActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -50,10 +45,9 @@ public class MainActivity extends MainBaseActivity
 
     FragmentManager fm;
 
-    MainComponent mMainComponent;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        fm = getSupportFragmentManager();
         super.onCreate(savedInstanceState);
         MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
     }
@@ -86,24 +80,6 @@ public class MainActivity extends MainBaseActivity
 
         AdRequest adRequest = new AdRequest.Builder().addTestDevice("408A5D0DD4D6B0C21C92D6D79C3E2388").build();
         mAdView.loadAd(adRequest);
-    }
-
-    @Override
-    public MainComponent provide() {
-        return mMainComponent;
-    }
-
-    @Override
-    public void injectComponent() {
-        fm = getSupportFragmentManager();
-        mMainComponent = DaggerMainComponent.builder()
-                .appComponent(ComponentHolder.getComponent())
-                .wowTokenModule(new WowTokenModule(WowTokenFragment.getInstance(fm)))
-                .searchModule(new SearchModule(SearchFragment.getInstance(fm)))
-                .realmRankModule(new RealmRankModule(RealmRankFragment.getInstance(fm)))
-                .playerItemModule(new PlayerItemModule(PlayerItemFragment.getInstance(fm)))
-                .build();
-        mMainComponent.inject(this);
     }
 
     @Override
@@ -143,22 +119,22 @@ public class MainActivity extends MainBaseActivity
         int id = item.getItemId();
 
         if (id == R.id.btn_item_search) {
-            SearchFragment search = (SearchFragment) mMainComponent.searchView();
+            SearchFragment search = SearchFragment.getInstance(fm);
             fm.beginTransaction().setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
                     .replace(R.id.content_main, search, SearchFragment.TAG).commit();
         } else if (id == R.id.btn_token) {
-            WowTokenFragment token = mMainComponent.wowTokenView();
+            WowTokenFragment token = WowTokenFragment.getInstance(fm);
             fm.beginTransaction()
                     .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
                     .replace(R.id.content_main, token, WowTokenFragment.TAG)
                     .commit();
         } else if (id == R.id.btn_realm_rank) {
-            RealmRankFragment token = mMainComponent.realmRankView();
+            RealmRankFragment token = RealmRankFragment.getInstance(fm);
             fm.beginTransaction()
                     .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
                     .replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
         } else if (id == R.id.btn_player_item) {
-            PlayerItemFragment player = (PlayerItemFragment) mMainComponent.playerItemView();
+            PlayerItemFragment player = PlayerItemFragment.getInstance(fm);
             fm.beginTransaction()
                     .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
                     .replace(R.id.content_main, player, PlayerItemFragment.TAG).commit();
@@ -180,7 +156,7 @@ public class MainActivity extends MainBaseActivity
     }
 
     private void selectSearch() {
-        SearchFragment search = (SearchFragment) mMainComponent.searchView();
+        SearchFragment search = SearchFragment.getInstance(fm);
         fm.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .replace(R.id.content_main, search, SearchFragment.TAG).commit();
         navigationView.setCheckedItem(R.id.btn_item_search);

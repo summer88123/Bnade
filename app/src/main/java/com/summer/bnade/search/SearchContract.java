@@ -16,8 +16,6 @@ public interface SearchContract {
     interface View extends BaseView<Presenter> {
         void show(SearchVO searchVO);
 
-        void search(String query);
-
         void showFuzzySearch(List<String> names);
 
         void showRealmItemResult(Item item, Realm realm);

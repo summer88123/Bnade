@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 
 import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
+import com.jakewharton.rxbinding2.support.v7.widget.SearchViewQueryTextEvent;
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.select.RealmSelectActivity;
@@ -34,7 +35,6 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemUIModel> {
     @Inject
     PlayerItemAdapter mAdapter;
 
-    @SuppressWarnings("unused")
     public static PlayerItemFragment getInstance(FragmentManager fm) {
         PlayerItemFragment fragment = (PlayerItemFragment) fm.findFragmentByTag(TAG);
         if (fragment == null) {
@@ -70,16 +70,16 @@ public class PlayerItemFragment extends BaseFragment<PlayerItemUIModel> {
     @Override
     public void setUpObservable() {
         RxSearchView.queryTextChangeEvents(mSearchView)
+                .filter(SearchViewQueryTextEvent::isSubmitted)
                 .map(event -> new PlayerItemAction(event.queryText(), mBtnRealmSelect.getRealm()))
                 .flatMap(action -> {
                     if (action.getSelect() == null) {
                         return Observable
-                                .error(new RuntimeException(getString(R.string.toast_player_item_no_select_realm)));
+                                .just(PlayerItemUIModel.failure(getString(R.string.toast_player_item_no_select_realm)));
                     } else {
-                        return Observable.just(action);
+                        return Observable.just(action).compose(mPresenter.search());
                     }
                 })
-                .compose(mPresenter.search())
                 .compose(bindToLifecycle())
                 .subscribe(showAs());
     }

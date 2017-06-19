@@ -1,12 +1,13 @@
 package com.summer.bnade.search;
 
-import android.support.v7.widget.CardView;
 import android.view.View;
 import android.widget.TextView;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -18,10 +19,11 @@ import butterknife.OnClick;
 
 class HistoryAdapter extends BaseAdapter<String, HistoryAdapter.ViewHolder> {
 
-    private final SearchContract.View mView;
+    private final OnTabClickListener mOnTabClickListener;
 
-    HistoryAdapter(SearchContract.View view) {
-        this.mView = view;
+    @Inject
+    HistoryAdapter(OnTabClickListener listener) {
+        this.mOnTabClickListener = listener;
     }
 
     @Override
@@ -37,8 +39,6 @@ class HistoryAdapter extends BaseAdapter<String, HistoryAdapter.ViewHolder> {
     class ViewHolder extends BaseViewHolder<String> {
         @BindView(R.id.tv_search_item)
         TextView tvSearchItem;
-        @BindView(R.id.card_search_item)
-        CardView cardSearchItem;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -52,7 +52,7 @@ class HistoryAdapter extends BaseAdapter<String, HistoryAdapter.ViewHolder> {
 
         @OnClick(R.id.card_search_item)
         void onClick() {
-            mView.search(item);
+            mOnTabClickListener.onClick(item);
         }
     }
 }

@@ -4,7 +4,6 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.IdRes;
@@ -22,9 +21,7 @@ import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import com.jakewharton.rxbinding2.support.v7.widget.SearchViewQueryTextEvent;
 import com.jakewharton.rxbinding2.widget.RxRadioGroup;
 import com.summer.bnade.R;
-import com.summer.bnade.base.BaseViewFragment;
-import com.summer.bnade.home.MainComponent;
-import com.summer.bnade.home.Provider;
+import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.result.all.SearchResultActivity;
 import com.summer.bnade.result.single.ItemResultActivity;
 import com.summer.bnade.search.entity.SearchVO;
@@ -45,7 +42,7 @@ import icepick.Icicle;
 
 import static com.summer.bnade.R.id.searchView;
 
-public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> implements SearchContract.View {
+public class SearchFragment extends BaseFragment<SearchVO> implements SearchContract.View, OnTabClickListener {
     public static final String TAG = SearchFragment.class.getSimpleName();
     @BindView(searchView)
     SearchView mSearchView;
@@ -57,17 +54,22 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     ImageButton mIbClearHistories;
     @BindView(R.id.list_histories)
     RecyclerView mListHistories;
+
+    ListPopupWindow mFuzzyList;
+    @BindView(R.id.content)
+    ConstraintLayout mContent;
+    @BindView(R.id.select_btn)
+    RealmSelectButton mSelectBtn;
+
+    @Inject
+    SearchPresenter mPresenter;
     @Inject
     HotSearchAdapter mHotAdapter;
     @Inject
     HistoryAdapter mHistoriesAdapter;
     @Inject
     FuzzyItemAdapter mFuzzyAdapter;
-    ListPopupWindow mFuzzyList;
-    @BindView(R.id.content)
-    ConstraintLayout mContent;
-    @BindView(R.id.select_btn)
-    RealmSelectButton mSelectBtn;
+
     @Icicle
     @IdRes
     int mCurrentId = R.id.rb_month;
@@ -89,34 +91,12 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof Provider) {
-            MainComponent component = (MainComponent) ((Provider) context).provide();
-            component.inject(this);
-        }
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.updateHistory();
-    }
-
-    @Override
     public void show(SearchVO searchVO) {
         updateHotSearch(searchVO.getHotList());
         updateHistories(searchVO.getHistories());
     }
 
-    @Override
-    public void search(String query) {
+    private void search(String query) {
         mPresenter.search(query, mSelectBtn.getRealm());
     }
 
@@ -197,9 +177,31 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
                 .subscribe(this::search);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mPresenter.load(getHotType(mRgHotType.getCheckedRadioButtonId()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.updateHistory();
+    }
+
+    @Override
+    public void setPresenter(SearchContract.Presenter presenter) {
+
+    }
+
     @OnClick(R.id.ib_clear_histories)
     public void onClick() {
         mPresenter.clearHistories();
+    }
+
+    @Override
+    public void onClick(String name) {
+        search(name);
     }
 
     @OnClick(R.id.select_btn)
@@ -230,4 +232,5 @@ public class SearchFragment extends BaseViewFragment<SearchContract.Presenter> i
                 return Hot.MONTH;
         }
     }
+
 }

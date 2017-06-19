@@ -1,12 +1,12 @@
 package com.summer.bnade.search;
 
-import com.summer.bnade.base.mvp.BasePresenter;
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.bnade.data.HistoryRealmRepo;
 import com.summer.bnade.data.HistorySearchRepo;
 import com.summer.bnade.data.error.EmptyDataException;
 import com.summer.bnade.search.entity.SearchResultVO;
 import com.summer.bnade.search.entity.SearchVO;
+import com.summer.bnade.utils.RxUtil;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 
@@ -22,23 +22,29 @@ import io.reactivex.annotations.NonNull;
  * Created by kevin.bai on 2017/4/13.
  */
 
-public class SearchPresenter extends BasePresenter<SearchContract.View> implements SearchContract.Presenter {
+public class SearchPresenter implements SearchContract.Presenter {
     private final HistorySearchRepo mHistorySearchRepo;
     private final HistoryRealmRepo mRealmRepo;
+    private final SearchFragment mView;
+    private final BnadeRepo mRepo;
+    private RxUtil.BaseErrorHandler mErrorHandler;
+
 
     @Inject
-    SearchPresenter(SearchContract.View view, BnadeRepo repo, HistorySearchRepo historySearchRepo,
+    SearchPresenter(SearchFragment view, BnadeRepo repo, HistorySearchRepo historySearchRepo,
                     HistoryRealmRepo realmRepo) {
-        super(view, repo);
+        this.mView = view;
+        this.mRepo = repo;
         this.mHistorySearchRepo = historySearchRepo;
         this.mRealmRepo = realmRepo;
+        mErrorHandler = new RxUtil.BaseErrorHandler(mView);
     }
 
     @Override
     public void load(int hotType) {
         Single.zip(mRepo.getHot(hotType), mHistorySearchRepo.getHistories().toList(), SearchVO::new)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(searchVO -> mView.show(searchVO), mErrorHandler);
+                .subscribe(mView::show, mErrorHandler);
     }
 
     @Override
@@ -72,13 +78,13 @@ public class SearchPresenter extends BasePresenter<SearchContract.View> implemen
     public void updateHistory() {
         mHistorySearchRepo.getHistories().toList()
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(strings -> mView.updateHistories(strings));
+                .subscribe(mView::updateHistories);
     }
 
     @Override
     public void updateHotSearchType(int type) {
         mRepo.getHot(type).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(hots -> mView.updateHotSearch(hots), mErrorHandler);
+                .subscribe(mView::updateHotSearch, mErrorHandler);
     }
 
     @Override

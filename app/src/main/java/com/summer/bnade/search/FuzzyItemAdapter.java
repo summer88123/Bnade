@@ -5,12 +5,17 @@ import android.widget.TextView;
 
 import com.summer.bnade.base.Adapter;
 
+import javax.inject.Inject;
+
 
 /**
  * Created by kevin.bai on 2017/4/17.
  */
 
 class FuzzyItemAdapter extends Adapter<String, FuzzyItemAdapter.FuzzyViewHolder> {
+    @Inject
+    FuzzyItemAdapter() {
+    }
 
     @Override
     protected int layoutId() {
@@ -25,7 +30,7 @@ class FuzzyItemAdapter extends Adapter<String, FuzzyItemAdapter.FuzzyViewHolder>
     class FuzzyViewHolder extends com.summer.bnade.base.ViewHolder<String> {
         TextView mTextView;
 
-        public FuzzyViewHolder(View itemView) {
+        FuzzyViewHolder(View itemView) {
             super(itemView);
             mTextView = (TextView) itemView;
         }

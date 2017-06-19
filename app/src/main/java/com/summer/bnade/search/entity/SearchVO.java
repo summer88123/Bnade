@@ -1,5 +1,6 @@
 package com.summer.bnade.search.entity;
 
+import com.summer.bnade.base.BaseUIModel;
 import com.summer.lib.model.entity.Hot;
 
 import java.util.List;
@@ -8,11 +9,12 @@ import java.util.List;
  * Created by kevin.bai on 2017/4/13.
  */
 
-public class SearchVO {
+public class SearchVO extends BaseUIModel{
     private List<Hot> hotList;
     private List<String> histories;
 
     public SearchVO(List<Hot> hotList, List<String> histories) {
+        super(false, false, null);
         this.hotList = hotList;
         this.histories = histories;
     }

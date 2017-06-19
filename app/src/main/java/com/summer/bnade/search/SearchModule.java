@@ -8,11 +8,6 @@ import dagger.Provides;
  */
 @Module
 public class SearchModule {
-    private final SearchFragment mView;
-
-    public SearchModule(SearchFragment view) {
-        mView = view;
-    }
 
     @Provides
     SearchContract.Presenter providePresenter(SearchPresenter presenter) {
@@ -20,22 +15,13 @@ public class SearchModule {
     }
 
     @Provides
-    SearchContract.View provideSearchView() {
-        return mView;
+    SearchContract.View provideSearchView(SearchFragment view) {
+        return view;
     }
 
     @Provides
-    FuzzyItemAdapter provideFuzzyItemAdapter() {
-        return new FuzzyItemAdapter();
+    OnTabClickListener provideHistoryAdapter(SearchFragment view){
+        return view;
     }
 
-    @Provides
-    HistoryAdapter provideHistoryAdapter(SearchContract.View view){
-        return new HistoryAdapter(view);
-    }
-
-    @Provides
-    HotSearchAdapter provideHotSearchAdapter(SearchContract.View view){
-        return new HotSearchAdapter(view);
-    }
 }
