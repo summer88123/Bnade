@@ -1,6 +1,5 @@
 package com.summer.bnade.data;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 
 import com.summer.lib.model.entity.Realm;
@@ -8,6 +7,9 @@ import com.summer.lib.model.utils.RealmHelper;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
@@ -18,7 +20,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Created by kevin.bai on 2017/4/30.
  */
-
+@Singleton
 public class HistoryRealmRepo {
     private static final String HISTORY_REALM_KEY = "KEY_HISTORY_REALM";
     private static final String LAST_REALM_KEY = "KEY_LAST_REALM";
@@ -28,7 +30,7 @@ public class HistoryRealmRepo {
     private final SharedPreferences sp;
     private Set<String> cache;
 
-    @SuppressLint("CommitPrefEdits")
+    @Inject
     public HistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
         this.mRealmHelper = realmHelper;
         this.sp = sp;

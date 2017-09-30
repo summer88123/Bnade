@@ -62,7 +62,7 @@ public class SearchResultVO implements Parcelable {
         this.names = names;
     }
 
-    protected SearchResultVO(Parcel in) {
+    private SearchResultVO(Parcel in) {
         this.item = in.readParcelable(Item.class.getClassLoader());
         this.auctionRealmItems = in.createTypedArrayList(AuctionRealmItem.CREATOR);
         this.auctionItems = in.createTypedArrayList(AuctionItem.CREATOR);

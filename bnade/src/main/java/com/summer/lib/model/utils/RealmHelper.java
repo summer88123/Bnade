@@ -112,7 +112,7 @@ public class RealmHelper {
     private Gson mGson;
 
     @Inject
-    public RealmHelper(@Named(BnadeModule.BNADE) Gson gson) {
+    RealmHelper(@Named(BnadeModule.BNADE) Gson gson) {
         this.mGson = gson;
     }
 

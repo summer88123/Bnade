@@ -11,8 +11,8 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 
 import com.summer.bnade.R;
+import com.summer.bnade.base.BnadeApplication;
 import com.summer.bnade.data.HistoryRealmRepo;
-import com.summer.bnade.base.di.ComponentHolder;
 import com.summer.lib.model.entity.Realm;
 
 import javax.inject.Inject;
@@ -106,7 +106,7 @@ public class RealmSelectButton extends ConstraintLayout {
     private void init() {
         LayoutInflater.from(getContext()).inflate(R.layout.realm_select_button, this);
         ButterKnife.bind(this);
-        ComponentHolder.getComponent().inject(this);
+        ((BnadeApplication) getContext().getApplicationContext()).applicationInjector().inject(this);
         hasRealmSet.clone(this);
         noRealmSet.clone(this);
         mRealmRepo.last().subscribe(new Consumer<Realm>() {

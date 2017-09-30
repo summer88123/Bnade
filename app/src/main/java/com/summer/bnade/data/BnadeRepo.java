@@ -20,6 +20,9 @@ import com.summer.lib.model.utils.RealmHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.annotations.NonNull;
@@ -28,6 +31,7 @@ import io.reactivex.schedulers.Schedulers;
 /**
  * Created by kevin.bai on 2017/4/9.
  */
+@Singleton
 public class BnadeRepo {
     private final BnadeApi api;
     // TODO 缓存需要设置失效
@@ -35,6 +39,7 @@ public class BnadeRepo {
     private final RealmHelper mRealmHelper;
     private final SearchResultVO mSearchResultVO;
 
+    @Inject
     BnadeRepo(BnadeApi api, RealmHelper realmHelper) {
         this.api = api;
         this.mRealmHelper = realmHelper;

@@ -17,7 +17,7 @@ public abstract class Adapter<ITEM, VH extends ViewHolder> extends BaseAdapter {
     private final List<ITEM> data;
     private LayoutInflater mInflater;
 
-    public Adapter() {
+    protected Adapter() {
         data = new ArrayList<>();
     }
 

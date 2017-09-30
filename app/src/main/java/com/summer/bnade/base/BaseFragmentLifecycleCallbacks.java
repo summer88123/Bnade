@@ -8,6 +8,9 @@ import android.view.View;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import icepick.Icepick;
@@ -15,10 +18,14 @@ import icepick.Icepick;
 /**
  * Created by kevin.bai on 2017/5/16.
  */
-
+@Singleton
 public class BaseFragmentLifecycleCallbacks extends FragmentManager.FragmentLifecycleCallbacks {
 
     private Map<Fragment, Unbinder> cache = new HashMap<>();
+
+    @Inject
+    BaseFragmentLifecycleCallbacks() {
+    }
 
     @Override
     public void onFragmentCreated(FragmentManager fm, Fragment f, Bundle savedInstanceState) {

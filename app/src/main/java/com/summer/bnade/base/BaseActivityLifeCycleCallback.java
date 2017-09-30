@@ -8,6 +8,9 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import icepick.Icepick;
@@ -15,15 +18,16 @@ import icepick.Icepick;
 /**
  * Created by kevin.bai on 2017/5/16.
  */
-
+@Singleton
 class BaseActivityLifeCycleCallback implements Application.ActivityLifecycleCallbacks {
 
     private Map<Activity, Unbinder> cache = new HashMap<>();
 
-    private final BaseFragmentLifecycleCallbacks mBaseFragmentLifecycleCallbacks;
+    @Inject
+    BaseFragmentLifecycleCallbacks mBaseFragmentLifecycleCallbacks;
 
-    BaseActivityLifeCycleCallback(BaseFragmentLifecycleCallbacks baseFragmentLifecycleCallbacks) {
-        mBaseFragmentLifecycleCallbacks = baseFragmentLifecycleCallbacks;
+    @Inject
+    BaseActivityLifeCycleCallback() {
     }
 
     @Override

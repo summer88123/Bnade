@@ -1,10 +1,12 @@
 package com.summer.bnade.data;
 
-import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -12,14 +14,14 @@ import io.reactivex.Observable;
 /**
  * Created by kevin.bai on 2017/4/16.
  */
-
+@Singleton
 public class HistorySearchRepo {
     private static final String HISTORY_KEY = "KEY_HISTORY_SEARCH";
     private Set<String> cache;
     private SharedPreferences mSp;
     private SharedPreferences.Editor mEditor;
 
-    @SuppressLint("CommitPrefEdits")
+    @Inject
     HistorySearchRepo(SharedPreferences sp) {
         this.mSp = sp;
         this.mEditor = mSp.edit();

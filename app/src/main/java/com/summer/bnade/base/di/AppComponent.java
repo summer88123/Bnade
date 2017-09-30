@@ -1,11 +1,7 @@
 package com.summer.bnade.base.di;
 
-import com.summer.bnade.base.BaseModule;
+import com.summer.bnade.base.AppModule;
 import com.summer.bnade.base.BnadeApplication;
-import com.summer.bnade.data.BnadeRepo;
-import com.summer.bnade.data.HistoryRealmRepo;
-import com.summer.bnade.data.HistorySearchRepo;
-import com.summer.bnade.data.RepoModule;
 import com.summer.bnade.widget.RealmSelectButton;
 import com.summer.lib.model.di.BnadeModule;
 
@@ -21,20 +17,13 @@ import dagger.android.support.AndroidSupportInjectionModule;
  */
 @Singleton
 @Component(modules = {
-        BaseModule.class,
-        RepoModule.class,
+        AppModule.class,
         BnadeModule.class,
         AndroidSupportInjectionModule.class,
         BuilderModule.class,})
 public interface AppComponent extends AndroidInjector<BnadeApplication> {
 
     void inject(BnadeApplication application);
-
-    BnadeRepo bnadeRepo();
-
-    HistoryRealmRepo historyRealmRepo();
-
-    HistorySearchRepo historySearchRepo();
 
     void inject(RealmSelectButton button);
 
