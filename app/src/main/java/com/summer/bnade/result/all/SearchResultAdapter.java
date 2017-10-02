@@ -75,8 +75,7 @@ class SearchResultAdapter extends BaseAdapter<AuctionItem, SearchResultAdapter.V
             mTvUpdateTime.setText(DateUtil.format(auctionItem.getLastUpdateTime(), "H:mm"));
             mTvTotal.setText(auctionItem.getTotal() + "");
             Gold minBuyout = auctionItem.getMinBuyOut();
-            mTvMinBuyout.setText(mTvMinBuyout.getContext()
-                    .getString(R.string.full_gold, minBuyout.getGold(), minBuyout.getSilver(), minBuyout.getCopper()));
+            mTvMinBuyout.setText(minBuyout.showSpan(mTvMinBuyout.getContext()));
         }
 
     }

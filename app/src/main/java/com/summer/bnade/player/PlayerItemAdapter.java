@@ -1,5 +1,6 @@
 package com.summer.bnade.player;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -9,7 +10,6 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
 import com.summer.lib.model.entity.Auction;
-import com.summer.lib.model.entity.Gold;
 
 import javax.inject.Inject;
 
@@ -22,13 +22,13 @@ class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolde
     }
 
     @Override
-    protected int layoutId() {
-        return R.layout.fragment_auction;
+    protected ViewHolder createViewHolder(View v, int viewType) {
+        return new ViewHolder(v);
     }
 
     @Override
-    protected ViewHolder createViewHolder(View v, int viewType) {
-        return new ViewHolder(v);
+    protected int layoutId() {
+        return R.layout.fragment_auction;
     }
 
     public class ViewHolder extends BaseViewHolder<Auction> {
@@ -56,19 +56,15 @@ class PlayerItemAdapter extends BaseAdapter<Auction, PlayerItemAdapter.ViewHolde
 
         @Override
         public void onBind(Auction auction) {
+            Context context = mTvCount.getContext();
             mTvCount.setText(String.valueOf(auction.getCount()));
             mTvName.setText(auction.getName());
             mTvLastTime.setText(auction.getLastTime().getResult());
             mTvLabelBidPrice.setText(R.string.bid_price);
-            Gold bidPrice = auction.getBidPrece();
-            mTvBidPrice.setText(mResources
-                    .getString(R.string.full_gold, bidPrice.getGold(), bidPrice.getSilver(), bidPrice.getCopper()));
+            mTvBidPrice.setText(auction.getBidPrece().showSpan(context));
             mTvLabelBuyout.setText(R.string.buyout);
-            Gold buyout = auction.getBuyOut();
-            mTvBuyout.setText(mResources
-                    .getString(R.string.full_gold, buyout.getGold(), buyout.getSilver(), buyout.getCopper()));
+            mTvBuyout.setText(auction.getBuyOut().showSpan(context));
             Glide.with(itemView.getContext()).load(auction.getItem().getUrl()).into(mIvIcon);
         }
-
     }
 }

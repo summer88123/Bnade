@@ -1,5 +1,6 @@
 package com.summer.bnade.result.single;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.TextView;
 
@@ -7,7 +8,6 @@ import com.summer.bnade.R;
 import com.summer.bnade.base.BaseAdapter;
 import com.summer.bnade.base.BaseViewHolder;
 import com.summer.lib.model.entity.AuctionRealmItem;
-import com.summer.lib.model.entity.Gold;
 
 import javax.inject.Inject;
 
@@ -53,15 +53,12 @@ class ItemResultAdapter extends BaseAdapter<AuctionRealmItem, ItemResultAdapter.
 
         @Override
         public void onBind(AuctionRealmItem item) {
+            Context context = mTvPlayerName.getContext();
             mTvPlayerName.setText(item.getPlayerName());
             mTvLastTime.setText(item.getLastTime().getResult());
             mTvCount.setText(String.valueOf(item.getCount()));
-            Gold bidPrice = item.getBidPrice();
-            mTvBidPrice.setText(mResources
-                    .getString(R.string.full_gold, bidPrice.getGold(), bidPrice.getSilver(), bidPrice.getCopper()));
-            Gold buyout = item.getBuyout();
-            mTvBuyout.setText(mResources
-                    .getString(R.string.full_gold, buyout.getGold(), buyout.getSilver(), buyout.getCopper()));
+            mTvBidPrice.setText(item.getBidPrice().showSpan(context));
+            mTvBuyout.setText(item.getBuyout().showSpan(context));
         }
     }
 }

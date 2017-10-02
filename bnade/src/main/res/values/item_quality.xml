@@ -34,4 +34,7 @@
     <color name="gold">#FFD700</color>
     <color name="silver">#C0C0C0</color>
     <color name="copper">#C47222</color>
+
+    <color name="nga_bg">#fffcee</color>
+    <color name="nga_bg_light">#fff0ce</color>
 </resources>
