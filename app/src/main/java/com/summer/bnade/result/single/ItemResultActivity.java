@@ -69,7 +69,7 @@ public class ItemResultActivity extends BaseActivity{
         mTabLayout.setupWithViewPager(mViewPager);
         mViewPager.setAdapter(mItemResultPageAdapter);
         mToolbar.setTitle(item.getName());
-        mToolbar.setSubtitle(realm.getConnected());
+        mToolbar.setSubtitle(realm.getName());
         Glide.with(this).load(item.getUrl()).listener(new RequestListener<String, GlideDrawable>() {
             @Override
             public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean

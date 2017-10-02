@@ -45,7 +45,7 @@ class SearchResultTransformer {
                     List<AuctionItem> result = new ArrayList<>();
                     CharSequence filter = event.queryText();
                     for (AuctionItem auctionItem : list) {
-                        if (auctionItem.getRealm().getConnected().contains(filter)) {
+                        if (auctionItem.getRealm().getName().contains(filter)) {
                             result.add(auctionItem);
                         }
                     }

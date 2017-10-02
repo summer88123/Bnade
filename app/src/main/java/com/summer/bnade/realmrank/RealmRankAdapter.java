@@ -54,7 +54,7 @@ class RealmRankAdapter extends BaseAdapter<AuctionRealm, RealmRankAdapter.ViewHo
 
         @Override
         public void onBind(AuctionRealm auctionRealm) {
-            mTvRealmName.setText(auctionRealm.getRealm().getConnected());
+            mTvRealmName.setText(auctionRealm.getRealm().getName());
             mTvRealmType.setText(auctionRealm.getType());
             mTvRealmType.setTextColor(Objects.equals(auctionRealm.getType(), AuctionRealm.PVP)
                     ? ContextCompat.getColor(itemView.getContext(), R.color.pvp_label)

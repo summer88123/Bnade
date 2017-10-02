@@ -77,6 +77,8 @@ class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> impl
         TextView mContent;
         @BindView(R.id.imageButton)
         ImageButton mImageButton;
+        @BindView(R.id.tv_connected)
+        TextView mTvConnected;
 
         public ViewHolder(View view) {
             super(view);
@@ -85,7 +87,8 @@ class RealmAdapter extends BaseAdapter<TypedRealm, RealmAdapter.ViewHolder> impl
 
         @Override
         public void onBind(TypedRealm realm) {
-            mContent.setText(realm.getConnected());
+            mContent.setText(realm.getName());
+            mTvConnected.setText(realm.getConnected());
             if (Objects.equals(realm.getType(), TypedRealm.LABEL_USED)) {
                 mImageButton.setVisibility(View.VISIBLE);
             } else {

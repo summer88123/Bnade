@@ -20,15 +20,18 @@ public class Realm implements Parcelable {
         }
     };
     private long id;
+    private String name;
     private String connected;
 
     private Realm(long id) {
         this.id = id;
         this.connected = "未知服务器";
+        this.name = connected;
     }
 
     protected Realm(Parcel in) {
         this.id = in.readLong();
+        this.name = in.readString();
         this.connected = in.readString();
     }
 
@@ -59,6 +62,7 @@ public class Realm implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(this.id);
+        dest.writeString(this.name);
         dest.writeString(this.connected);
     }
 
@@ -71,11 +75,18 @@ public class Realm implements Parcelable {
     }
 
     public long getId() {
-
         return id;
     }
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

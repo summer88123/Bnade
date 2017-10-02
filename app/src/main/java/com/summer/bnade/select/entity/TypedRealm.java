@@ -29,6 +29,10 @@ public class TypedRealm {
         return realm.getId();
     }
 
+    public String getName(){
+        return realm.getName();
+    }
+
     public String getConnected(){
         return realm.getConnected();
     }

@@ -15,7 +15,7 @@ import com.summer.lib.model.entity.Hot;
 import com.summer.lib.model.entity.Item;
 import com.summer.lib.model.entity.Realm;
 import com.summer.lib.model.entity.WowTokens;
-import com.summer.lib.model.utils.RealmHelper;
+import com.summer.lib.model.repo.RealmRepo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,25 +36,25 @@ public class BnadeRepo {
     private final BnadeApi api;
     // TODO 缓存需要设置失效
     private final SparseArray<List<Hot>> hotCache;
-    private final RealmHelper mRealmHelper;
+    private final RealmRepo mRealmRepo;
     private final SearchResultVO mSearchResultVO;
 
     @Inject
-    BnadeRepo(BnadeApi api, RealmHelper realmHelper) {
+    BnadeRepo(BnadeApi api, RealmRepo realmRepo) {
         this.api = api;
-        this.mRealmHelper = realmHelper;
+        this.mRealmRepo = realmRepo;
         hotCache = new SparseArray<>(3);
         mSearchResultVO = new SearchResultVO();
     }
 
     public Observable<Realm> getAllRealm(boolean hasAllItem) {
-        return mRealmHelper.getAllRealm(hasAllItem);
+        return mRealmRepo.getAllRealm(hasAllItem);
     }
 
     public Single<List<AuctionItem>> getAuction(Item item) {
         return api.getAuctionItem(item.getId())
                 .flatMapObservable(Observable::fromIterable)
-                .flatMapSingle(auctionItem -> mRealmHelper.getRealmById(auctionItem.getRealmId())
+                .flatMapSingle(auctionItem -> mRealmRepo.getRealmById(auctionItem.getRealmId())
                         .map(realm -> {
                             auctionItem.setRealm(realm);
                             return auctionItem;
@@ -74,7 +74,7 @@ public class BnadeRepo {
         return api.getAuctionRealmsSummary()
                 .flatMapObservable(Observable::fromIterable)
                 .flatMapSingle(auctionRealm -> Single.just(auctionRealm)
-                        .zipWith(mRealmHelper.getRealmById(auctionRealm.getId()), (auctionRealm1, realm) -> {
+                        .zipWith(mRealmRepo.getRealmById(auctionRealm.getId()), (auctionRealm1, realm) -> {
                             auctionRealm1.setRealm(realm);
                             return auctionRealm1;
                         }))
@@ -115,7 +115,7 @@ public class BnadeRepo {
     }
 
     public Observable<Realm> getRealmsByName(CharSequence s) {
-        return mRealmHelper.getRealmsByName(s.toString());
+        return mRealmRepo.getRealmsByName(s.toString());
     }
 
     public Single<List<WowTokens>> getWowTokens() {

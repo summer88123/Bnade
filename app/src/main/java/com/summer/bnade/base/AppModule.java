@@ -1,7 +1,10 @@
 package com.summer.bnade.base;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.summer.lib.model.di.Application;
 
 import javax.inject.Singleton;
 
@@ -18,5 +21,11 @@ public class AppModule {
     @Provides
     SharedPreferences provideSharedPreferences(BnadeApplication app) {
         return app.getSharedPreferences("app", Activity.MODE_PRIVATE);
+    }
+
+    @Provides
+    @Application
+    Context provideContext(BnadeApplication app) {
+        return app.getApplicationContext();
     }
 }

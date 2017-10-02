@@ -70,6 +70,13 @@
         <item name="android:layout_marginLeft">8dp</item>
         <item name="android:layout_marginTop">8dp</item>
     </style>
-
+    <style name="AppTheme.Title">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="AppTheme.Title.SubTitle">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_light</item>
+    </style>
 
 </resources>

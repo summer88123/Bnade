@@ -3,7 +3,7 @@ package com.summer.bnade.data;
 import android.content.SharedPreferences;
 
 import com.summer.lib.model.entity.Realm;
-import com.summer.lib.model.utils.RealmHelper;
+import com.summer.lib.model.repo.RealmRepo;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -26,13 +26,13 @@ public class HistoryRealmRepo {
     private static final String LAST_REALM_KEY = "KEY_LAST_REALM";
     private static final String NONE = "NONE";
     private final SharedPreferences.Editor mEditor;
-    private final RealmHelper mRealmHelper;
+    private final RealmRepo mRealmRepo;
     private final SharedPreferences sp;
     private Set<String> cache;
 
     @Inject
-    public HistoryRealmRepo(SharedPreferences sp, RealmHelper realmHelper) {
-        this.mRealmHelper = realmHelper;
+    public HistoryRealmRepo(SharedPreferences sp, RealmRepo realmRepo) {
+        this.mRealmRepo = realmRepo;
         this.sp = sp;
         this.mEditor = sp.edit();
     }
@@ -40,15 +40,15 @@ public class HistoryRealmRepo {
     public Completable add(final Realm realm) {
         return Completable.fromAction(() -> {
             initCache();
-            cache.add(realm.getConnected());
-            mEditor.putString(LAST_REALM_KEY, realm.getConnected()).apply();
+            cache.add(realm.getName());
+            mEditor.putString(LAST_REALM_KEY, realm.getName()).apply();
             save();
         }).subscribeOn(Schedulers.io());
     }
 
     public Maybe<Realm> last() {
         return Single.fromCallable(() -> sp.getString(LAST_REALM_KEY, NONE))
-                .flatMapMaybe(s -> mRealmHelper.getRealmsByName(s).firstElement()).subscribeOn(Schedulers.io());
+                .flatMapMaybe(s -> mRealmRepo.getRealmsByName(s).firstElement()).subscribeOn(Schedulers.io());
     }
 
     public Completable clearLast() {
@@ -69,14 +69,14 @@ public class HistoryRealmRepo {
                     initCache();
                     return Observable.fromIterable(cache);
                 })
-                .flatMap(mRealmHelper::getRealmsByName)
+                .flatMap(mRealmRepo::getRealmsByName)
                 .subscribeOn(Schedulers.io());
     }
 
     public Completable remove(final Realm item) {
         return Completable.fromAction(() -> {
             initCache();
-            cache.remove(item.getConnected());
+            cache.remove(item.getName());
             save();
         }).subscribeOn(Schedulers.io());
     }

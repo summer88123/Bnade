@@ -91,7 +91,7 @@ public class RealmSelectButton extends ConstraintLayout {
             return;
         }
         this.realm = realm;
-        mBtnRealmSelect.setText(realm.getConnected());
+        mBtnRealmSelect.setText(realm.getName());
         TransitionManager.beginDelayedTransition(this);
         hasRealmSet.setVisibility(R.id.btn_realm_clear, ConstraintSet.VISIBLE);
         hasRealmSet.connect(R.id.btn_realm_select, ConstraintSet.RIGHT, R.id.btn_realm_clear, ConstraintSet.LEFT);

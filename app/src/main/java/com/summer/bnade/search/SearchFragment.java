@@ -165,7 +165,6 @@ public class SearchFragment extends BaseFragment<SearchVO> implements SearchCont
             mFuzzyList.dismiss();
             mSearchView.setQuery(mFuzzyAdapter.getItem(position), true);
         });
-        mRgHotType.check(mCurrentId);
         RxRadioGroup.checkedChanges(mRgHotType)
                 .subscribe(i -> {
                     mCurrentId = i;
