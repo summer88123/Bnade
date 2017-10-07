@@ -37,11 +37,6 @@ public abstract class BaseFragment<M extends BaseUIModel> extends DaggerFragment
     }
 
     @Override
-    public void injectComponent() {
-        // nothing
-    }
-
-    @Override
     public void setUpObservable() {
         // nothing
     }

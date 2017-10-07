@@ -40,7 +40,6 @@ class BaseActivityLifeCycleCallback implements Application.ActivityLifecycleCall
             activity.setContentView(created.layout());
             cache.put(activity, ButterKnife.bind(activity));
             Icepick.restoreInstanceState(activity, savedInstanceState);
-            created.injectComponent();
             created.setUpView();
             created.setUpObservable();
         }

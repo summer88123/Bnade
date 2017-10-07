@@ -18,7 +18,5 @@ public interface IActivityCreated {
      */
     void setUpView();
 
-    void injectComponent();
-
     void setUpObservable();
 }

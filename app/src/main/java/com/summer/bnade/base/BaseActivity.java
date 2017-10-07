@@ -29,11 +29,6 @@ public abstract class BaseActivity<M extends BaseUIModel> extends DaggerAppCompa
     BehaviorSubject<ActivityEvent> subject = BehaviorSubject.create();
 
     @Override
-    public void injectComponent() {
-        // nothing
-    }
-
-    @Override
     public void setUpObservable() {
         // nothing
     }

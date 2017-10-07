@@ -39,7 +39,6 @@ public class BaseFragmentLifecycleCallbacks extends FragmentManager.FragmentLife
         if (f instanceof IActivityCreated) {
             IActivityCreated created = (IActivityCreated) f;
             cache.put(f, ButterKnife.bind(f, v));
-            created.injectComponent();
             created.setUpView();
             created.setUpObservable();
         }
