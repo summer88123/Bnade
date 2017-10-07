@@ -1,8 +1,11 @@
 package com.summer.bnade.base.di;
 
 import com.summer.bnade.home.MainActivity;
+import com.summer.bnade.home.MainActivityModule;
+import com.summer.bnade.personal.PersonalFragment;
 import com.summer.bnade.player.PlayerItemFragment;
-import com.summer.bnade.realmrank.RealmRankFragment;
+import com.summer.bnade.realm.RealmFragment;
+import com.summer.bnade.realm.rank.RealmRankFragment;
 import com.summer.bnade.result.all.SearchResultActivity;
 import com.summer.bnade.result.all.SearchResultModule;
 import com.summer.bnade.result.single.HistoryFragment;
@@ -29,7 +32,7 @@ abstract class BuilderModule {
     @ContributesAndroidInjector
     abstract ItemResultActivity itemResultActivityInjector();
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = MainActivityModule.class)
     abstract MainActivity mainActivityInjector();
 
     @ContributesAndroidInjector
@@ -55,4 +58,10 @@ abstract class BuilderModule {
 
     @ContributesAndroidInjector
     abstract WowTokenFragment wowTokenFragmentInjector();
+
+    @ContributesAndroidInjector
+    abstract PersonalFragment personalFragmentInjector();
+
+    @ContributesAndroidInjector
+    abstract RealmFragment realmFragmentInjector();
 }

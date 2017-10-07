@@ -1,26 +1,24 @@
 package com.summer.bnade.home;
 
-import com.google.android.gms.ads.MobileAds;
-
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.summer.bnade.R;
 import com.summer.bnade.base.BaseActivity;
-import com.summer.bnade.player.PlayerItemFragment;
-import com.summer.bnade.realmrank.RealmRankFragment;
+import com.summer.bnade.base.BaseFragment;
 import com.summer.bnade.search.SearchFragment;
-import com.summer.bnade.token.WowTokenFragment;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
+import dagger.Lazy;
 
 public class MainActivity extends BaseActivity
         implements BottomNavigationView.OnNavigationItemSelectedListener {
@@ -31,14 +29,27 @@ public class MainActivity extends BaseActivity
     FloatingActionButton fab;
     @BindView(R.id.nav_view)
     BottomNavigationView navigationView;
-
+    @Inject
     FragmentManager fm;
+    @Inject
+    @Search
+    Lazy<BaseFragment> search;
+    @Inject
+    @Realm
+    Lazy<BaseFragment> realm;
+    @Inject
+    @PlayerItem
+    Lazy<BaseFragment> playerItem;
+    @Inject
+    @Personal
+    Lazy<BaseFragment> personal;
+
+    BaseFragment current;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        fm = getSupportFragmentManager();
         super.onCreate(savedInstanceState);
-        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
+//        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713");
     }
 
     @Override
@@ -50,14 +61,12 @@ public class MainActivity extends BaseActivity
     public void setUpView() {
         setSupportActionBar(toolbar);
         fab.setOnClickListener(view -> {
-            SearchFragment searchFragment = (SearchFragment) fm.findFragmentByTag(SearchFragment.TAG);
-            if (searchFragment != null) {
-                searchFragment.search();
+            if (search.get() == current) {
+                ((SearchFragment) search.get()).search();
             } else {
                 selectSearch();
             }
         });
-
 
         navigationView.setOnNavigationItemSelectedListener(this);
 
@@ -90,39 +99,29 @@ public class MainActivity extends BaseActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
+        BaseFragment next;
         if (id == R.id.btn_item_search) {
-            SearchFragment search = SearchFragment.getInstance(fm);
-            fm.beginTransaction().setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
-                    .replace(R.id.content_main, search, SearchFragment.TAG).commit();
-        } else if (id == R.id.btn_token) {
-            WowTokenFragment token = WowTokenFragment.getInstance(fm);
-            fm.beginTransaction()
-                    .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
-                    .replace(R.id.content_main, token, WowTokenFragment.TAG)
-                    .commit();
+            next = search.get();
+//        } else if (id == R.id.btn_token) {
+//            next = token.get();
         } else if (id == R.id.btn_realm_rank) {
-            RealmRankFragment token = RealmRankFragment.getInstance(fm);
-            fm.beginTransaction()
-                    .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
-                    .replace(R.id.content_main, token, RealmRankFragment.TAG).commit();
+            next = realm.get();
         } else if (id == R.id.btn_player_item) {
-            PlayerItemFragment player = PlayerItemFragment.getInstance(fm);
-            fm.beginTransaction()
-                    .setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
-                    .replace(R.id.content_main, player, PlayerItemFragment.TAG).commit();
+            next = playerItem.get();
+        } else if (id == R.id.btn_personal) {
+            next = personal.get();
+        } else {
+            next = search.get();
         }
-
+        current = next;
+        fm.beginTransaction().setCustomAnimations(R.anim.fragment_slide_left_enter, R.anim.fragment_slide_left_exit)
+                .replace(R.id.content_main, next, SearchFragment.TAG).commit();
         setTitle(item.getTitle());
         return true;
     }
 
     private void selectSearch() {
-        SearchFragment search = SearchFragment.getInstance(fm);
-        fm.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-                .replace(R.id.content_main, search, SearchFragment.TAG).commit();
         navigationView.setSelectedItemId(R.id.btn_item_search);
-        setTitle(R.string.item_search);
     }
 
 }

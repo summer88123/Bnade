@@ -1,4 +1,4 @@
-package com.summer.bnade.realmrank;
+package com.summer.bnade.realm.rank;
 
 import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;

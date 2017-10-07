@@ -5,10 +5,10 @@
         android:id="@+id/btn_item_search"
         android:icon="@drawable/ic_search_black_24dp"
         android:title="@string/item_search" />
-    <item
-        android:id="@+id/btn_token"
-        android:icon="@drawable/ic_menu_gallery"
-        android:title="@string/wow_tokens" />
+    <!--<item-->
+        <!--android:id="@+id/btn_token"-->
+        <!--android:icon="@drawable/ic_menu_gallery"-->
+        <!--android:title="@string/wow_tokens" />-->
     <item
         android:id="@+id/btn_realm_rank"
         android:icon="@drawable/ic_menu_slideshow"
@@ -17,5 +17,9 @@
         android:id="@+id/btn_player_item"
         android:icon="@drawable/ic_local_play_black_24dp"
         android:title="@string/player_item" />
+    <item
+        android:id="@+id/btn_personal"
+        android:icon="@drawable/ic_local_play_black_24dp"
+        android:title="@string/personal" />
 
 </menu>

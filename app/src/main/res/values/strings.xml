@@ -48,4 +48,5 @@
     <string name="label_history">@string/wow_token_history</string>
     <string name="delete_used_realm">删除%1$s</string>
     <string name="revoked">撤销</string>
+    <string name="personal">我的</string>
 </resources>

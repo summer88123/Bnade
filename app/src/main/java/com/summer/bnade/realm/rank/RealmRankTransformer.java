@@ -1,4 +1,4 @@
-package com.summer.bnade.realmrank;
+package com.summer.bnade.realm.rank;
 
 import com.summer.bnade.data.BnadeRepo;
 import com.summer.lib.model.entity.AuctionRealm;
